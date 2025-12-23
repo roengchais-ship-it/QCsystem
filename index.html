@@ -3,48 +3,65 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>QC System v4.2 (Beautiful Search)</title>
+    <title>QC System v4.3 (Deep Teal Theme)</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     
     <style>
-        /* --- CORE STYLES --- */
+        /* --- CORE STYLES & THEME COLOR --- */
+        :root {
+            --primary-color: #2c4b46; /* <-- สีหลักของคุณ */
+            --primary-light: #3d6e66; /* สีสำหรับทำ Gradient */
+            --bg-color: #f4f7f6;
+        }
+
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f4f7f6; padding: 20px; color: #333; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: var(--bg-color); padding: 20px; color: #333; }
         .container { max-width: 1400px; margin: 0 auto; }
         
         /* Loading */
         #loading-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255, 255, 255, 0.95); display: none; justify-content: center; align-items: center; flex-direction: column; z-index: 2000; }
-        .spinner { border: 4px solid #f3f3f3; border-top: 4px solid #667eea; border-radius: 50%; width: 50px; height: 50px; animation: spin 1s linear infinite; margin-bottom: 20px; }
+        .spinner { border: 4px solid #f3f3f3; border-top: 4px solid var(--primary-color); border-radius: 50%; width: 50px; height: 50px; animation: spin 1s linear infinite; margin-bottom: 20px; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 
-        /* Header */
-        .header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 30px; border-radius: 15px; margin-bottom: 20px; box-shadow: 0 10px 20px rgba(102, 126, 234, 0.2); }
+        /* Header (ใช้สีใหม่) */
+        .header { 
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-light) 100%); 
+            color: white; padding: 30px; border-radius: 15px; margin-bottom: 20px; 
+            box-shadow: 0 10px 20px rgba(44, 75, 70, 0.2); 
+        }
         .header h1 { font-size: 28px; margin-bottom: 5px; font-weight: 700; }
         
-        /* Tabs (Grid Layout) */
+        /* Tabs */
         .tabs { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 25px; background: white; padding: 10px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
         .tab { width: 100%; padding: 12px 5px; background: #f8f9fa; border: none; border-radius: 8px; cursor: pointer; font-size: 15px; font-weight: 600; color: #666; transition: all 0.3s; display: flex; justify-content: center; align-items: center; }
-        .tab:hover { background: #e9ecef; }
-        .tab.active { background: #667eea; color: white; box-shadow: 0 4px 10px rgba(102, 126, 234, 0.3); }
+        .tab:hover { background: #e9ecef; color: var(--primary-color); }
+        .tab.active { background: var(--primary-color); color: white; box-shadow: 0 4px 10px rgba(44, 75, 70, 0.3); }
         @media (max-width: 600px) { .tab { font-size: 12px; padding: 10px 2px; } }
 
         .tab-content { display: none; background: white; padding: 30px; border-radius: 15px; box-shadow: 0 5px 20px rgba(0,0,0,0.05); min-height: 400px; }
         .tab-content.active { display: block; animation: fadeIn 0.3s ease; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-        /* Forms */
+        /* Forms (ใช้สีใหม่เน้น) */
         .form-section { margin-bottom: 30px; padding-bottom: 20px; border-bottom: 2px dashed #eee; }
-        .section-title { font-size: 18px; font-weight: 700; color: #667eea; margin-bottom: 20px; border-left: 4px solid #667eea; padding-left: 10px; }
+        .section-title { 
+            font-size: 18px; font-weight: 700; 
+            color: var(--primary-color); margin-bottom: 20px; 
+            border-left: 4px solid var(--primary-color); padding-left: 10px; 
+        }
         .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 15px; }
         .form-group label { display: block; margin-bottom: 8px; font-weight: 600; font-size: 14px; color: #444; }
-        .form-group input, .form-group select { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 8px; font-size: 14px; background: #f9f9f9; }
-        .form-group input:focus { outline: none; border-color: #667eea; background: white; }
+        .form-group input, .form-group select { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 8px; font-size: 14px; background: #f9f9f9; transition: all 0.3s; }
+        .form-group input:focus, .form-group select:focus { 
+            outline: none; border-color: var(--primary-color); background: white; 
+            box-shadow: 0 0 0 3px rgba(44, 75, 70, 0.1);
+        }
 
-        /* Buttons */
+        /* Buttons (ปุ่มหลักใช้สีใหม่) */
         .btn { padding: 10px 20px; border: none; border-radius: 8px; font-size: 14px; font-weight: 600; cursor: pointer; transition: 0.2s; display: inline-flex; align-items: center; gap: 6px; }
-        .btn:hover { transform: translateY(-2px); }
-        .btn-primary { background: #667eea; color: white; }
+        .btn:hover { transform: translateY(-2px); filter: brightness(1.1); }
+        .btn-primary { background: var(--primary-color); color: white; }
         .btn-success { background: #28a745; color: white; }
         .btn-danger { background: #dc3545; color: white; }
         .btn-warning { background: #ffc107; color: #333; }
@@ -58,14 +75,15 @@
         td { padding: 15px; border-bottom: 1px solid #eee; color: #444; }
         tr:hover { background-color: #f1f3f9; }
 
-        /* Dashboard */
+        /* Dashboard (ปรับสีการ์ด Total) */
         .dashboard-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 20px; margin-bottom: 30px; }
         .kpi-card { background: white; padding: 25px; border-radius: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.05); display: flex; align-items: center; justify-content: space-between; border-left: 5px solid #ccc; transition: transform 0.3s; }
         .kpi-card:hover { transform: translateY(-5px); }
         .kpi-info h3 { margin: 0; font-size: 13px; color: #888; text-transform: uppercase; }
         .kpi-info .value { margin: 5px 0 0; font-size: 32px; font-weight: 800; color: #333; }
         .kpi-icon { font-size: 36px; opacity: 0.2; }
-        .card-total { border-color: #667eea; } .card-total .kpi-icon { color: #667eea; }
+        
+        .card-total { border-color: var(--primary-color); } .card-total .kpi-icon { color: var(--primary-color); }
         .card-pass { border-color: #28a745; } .card-pass .kpi-icon { color: #28a745; }
         .card-fail { border-color: #dc3545; } .card-fail .kpi-icon { color: #dc3545; }
         .card-rate { border-color: #ffc107; } .card-rate .kpi-icon { color: #ffc107; }
@@ -75,50 +93,16 @@
         .dash-table { width: 100%; } .dash-table th { font-size: 12px; } .dash-table td { font-weight: 600; }
         @media (max-width: 900px) { .charts-row { grid-template-columns: 1fr; } .form-row { grid-template-columns: 1fr; } }
 
-        /* --- BEAUTIFUL SEARCH STYLES --- */
-        .search-hero {
-            text-align: center;
-            padding: 40px 20px;
-            background: #fdfdfd;
-            border-radius: 15px;
-            margin-bottom: 30px;
-            border: 1px dashed #e0e0e0;
-        }
-        .search-wrapper {
-            position: relative;
-            max-width: 600px;
-            margin: 0 auto;
-        }
-        .search-icon-inside {
-            position: absolute;
-            left: 20px;
-            top: 50%;
-            transform: translateY(-50%);
-            font-size: 20px;
-            color: #667eea;
-        }
+        /* Search Styles (ใช้สีใหม่) */
+        .search-hero { text-align: center; padding: 40px 20px; background: #fdfdfd; border-radius: 15px; margin-bottom: 30px; border: 1px dashed #e0e0e0; }
+        .search-wrapper { position: relative; max-width: 600px; margin: 0 auto; }
+        .search-icon-inside { position: absolute; left: 20px; top: 50%; transform: translateY(-50%); font-size: 20px; color: var(--primary-color); }
         .search-input-modern {
-            width: 100%;
-            padding: 18px 20px 18px 55px; /* Space for icon */
-            font-size: 18px;
-            border: 2px solid #eee;
-            border-radius: 50px;
-            transition: all 0.3s;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.03);
-            outline: none;
+            width: 100%; padding: 18px 20px 18px 55px; font-size: 18px; border: 2px solid #eee; border-radius: 50px; transition: all 0.3s; box-shadow: 0 5px 15px rgba(0,0,0,0.03); outline: none;
         }
-        .search-input-modern:focus {
-            border-color: #667eea;
-            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.15);
-        }
-        .search-placeholder {
-            margin-top: 15px;
-            font-size: 14px;
-            color: #888;
-        }
-
-        /* Search Results Card */
-        .result-card { background: white; border: 1px solid #eee; border-left: 5px solid #667eea; padding: 20px; margin-bottom: 15px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.03); transition: transform 0.2s; }
+        .search-input-modern:focus { border-color: var(--primary-color); box-shadow: 0 8px 25px rgba(44, 75, 70, 0.15); }
+        
+        .result-card { background: white; border: 1px solid #eee; border-left: 5px solid var(--primary-color); padding: 20px; margin-bottom: 15px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.03); transition: transform 0.2s; }
         .result-card:hover { transform: translateY(-3px); box-shadow: 0 6px 15px rgba(0,0,0,0.06); }
         .result-header { display: flex; justify-content: space-between; margin-bottom: 15px; border-bottom: 1px solid #f5f5f5; padding-bottom: 10px; }
         .result-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 15px; }
@@ -132,10 +116,11 @@
         .modal.active { display: flex; justify-content: center; align-items: center; }
         .modal-content { background: white; padding: 30px; border-radius: 15px; width: 90%; max-width: 800px; max-height: 90vh; overflow-y: auto; }
         .file-upload { border: 2px dashed #ccc; padding: 20px; text-align: center; border-radius: 8px; cursor: pointer; transition: 0.3s; background: #fafafa; }
-        .file-upload:hover { border-color: #667eea; background: #f0f4ff; }
+        .file-upload:hover { border-color: var(--primary-color); background: #f0f4ff; }
         .autocomplete-list { position: absolute; z-index: 10; top: 100%; left: 0; right: 0; background: white; border: 1px solid #ddd; max-height: 200px; overflow-y: auto; border-radius: 0 0 8px 8px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
         .autocomplete-item { padding: 10px 15px; cursor: pointer; border-bottom: 1px solid #f0f0f0; }
-        .autocomplete-item:hover { background: #f0f4ff; color: #667eea; }
+        .autocomplete-item:hover { background: #f0f4ff; color: var(--primary-color); }
+        #fileName { color: var(--primary-color); font-weight:bold; margin-top:5px; }
     </style>
 </head>
 <body>
@@ -143,8 +128,8 @@
 
     <div class="container">
         <div class="header">
-            <h1>☁️ QC System v4.2</h1>
-            <p>ระบบตรวจสอบคุณภาพวัตถุดิบ (Beautiful Search UI)</p>
+            <h1>☁️ QC System v4.3</h1>
+            <p>ระบบตรวจสอบคุณภาพวัตถุดิบ (Deep Teal Theme)</p>
         </div>
         
         <div class="tabs">
@@ -194,9 +179,9 @@
                         <label>Upload COA File (PDF/Image)</label>
                         <div class="file-upload" onclick="document.getElementById('coaFile').click()">
                             <input type="file" id="coaFile" accept=".pdf,.jpg,.jpeg,.png" style="display:none"> 
-                            <span style="font-size:24px;">📎</span>
+                            <span style="font-size:24px; color:var(--primary-color);">📎</span>
                             <p>Click to select file</p>
-                            <p id="fileName" style="color:#667eea; font-weight:bold; margin-top:5px;"></p>
+                            <p id="fileName"></p>
                         </div>
                     </div>
                 </div>
@@ -233,7 +218,7 @@
 
         <div id="master" class="tab-content">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-                <h2 style="color: #667eea; margin:0;">📊 Cloud Database</h2>
+                <h2 style="color: var(--primary-color); margin:0;">📊 Cloud Database</h2>
                 <div style="display: flex; gap: 10px;">
                     <button class="btn btn-success" onclick="exportToExcel()">📊 Export Excel</button>
                     <button class="btn btn-secondary" onclick="fetchData()">🔄 Refresh</button>
@@ -287,7 +272,7 @@
     <div id="editModal" class="modal">
         <div class="modal-content">
             <div style="display:flex; justify-content:space-between; margin-bottom:20px; border-bottom:1px solid #eee; padding-bottom:10px;">
-                <h2 style="color:#667eea; margin:0;">✏️ Edit Record</h2>
+                <h2 style="color:var(--primary-color); margin:0;">✏️ Edit Record</h2>
                 <button class="close-modal" onclick="closeEditModal()" style="font-size:24px; border:none; background:none; cursor:pointer;">&times;</button>
             </div>
             <form id="editForm">
@@ -508,7 +493,7 @@
                         <div class="info-item"><label>Supplier</label><span>${item.supplier}</span></div>
                         <div class="info-item"><label>Lot No.</label><span>${item.lotNo}</span></div>
                         <div class="info-item"><label>QC Result</label><span>${item.qcColor}, ${item.qcOdor}</span></div>
-                        <div class="info-item"><label>File</label>${item.coaFile && item.coaFile.isLink ? `<a href="${item.coaFile.data}" target="_blank" style="color:#667eea; text-decoration:underline;">Open COA</a>` : '<span style="color:#999">-</span>'}</div>
+                        <div class="info-item"><label>File</label>${item.coaFile && item.coaFile.isLink ? `<a href="${item.coaFile.data}" target="_blank" style="color:var(--primary-color); text-decoration:underline;">Open COA</a>` : '<span style="color:#999">-</span>'}</div>
                     </div>
                 </div>
             `).join('');
@@ -525,7 +510,7 @@
             currentEditOriginalUrl = (item.coaFile && item.coaFile.isLink) ? item.coaFile.data : "";
             const statusLabel = document.getElementById('edit_fileStatus');
             const removeBtn = document.getElementById('edit_btnRemoveFile');
-            if (currentEditOriginalUrl) { statusLabel.innerHTML = `<a href="${currentEditOriginalUrl}" target="_blank" style="color:#667eea;">Current File</a>`; removeBtn.style.display = "inline-block"; } else { statusLabel.textContent = "No file currently."; removeBtn.style.display = "none"; }
+            if (currentEditOriginalUrl) { statusLabel.innerHTML = `<a href="${currentEditOriginalUrl}" target="_blank" style="color:var(--primary-color);">Current File</a>`; removeBtn.style.display = "inline-block"; } else { statusLabel.textContent = "No file currently."; removeBtn.style.display = "none"; }
             document.getElementById('editModal').classList.add('active');
         }
 
