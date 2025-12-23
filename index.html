@@ -3,18 +3,19 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>QC System v4.8 (Green Active Tab & Fixed Overflow)</title>
+    <title>QC System v4.9 (Final Polish)</title>
     
     <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.0.0"></script>
     
     <style>
         /* --- THEME CONFIG --- */
         :root {
-            --primary: #2c4b46;       /* Deep Teal (สีหลักเดิม) */
+            --primary: #2c4b46;       /* Deep Teal */
             --primary-soft: #3d6e66;
-            --active-green: #27ae60;  /* สีเขียวสำหรับปุ่ม Active */
+            --active-green: #27ae60;  /* Green for Active State */
             --bg-body: #f0f2f5;
             --text-main: #2d3436;
             --text-light: #636e72;
@@ -28,10 +29,10 @@
         body { 
             font-family: 'Prompt', sans-serif; 
             background: var(--bg-body); 
-            padding: 20px;
+            padding: 15px;
             color: var(--text-main); 
             line-height: 1.5;
-            overflow-x: hidden; /* ป้องกันการเลื่อนซ้ายขวาในระดับ Body */
+            overflow-x: hidden; 
         }
         
         .container { max-width: 1200px; margin: 0 auto; width: 100%; }
@@ -44,50 +45,33 @@
         /* Header */
         .header { 
             background: linear-gradient(120deg, var(--primary) 0%, var(--primary-soft) 100%); 
-            color: white; padding: 30px 25px; border-radius: 16px; margin-bottom: 20px; 
+            color: white; padding: 25px 20px; border-radius: 16px; margin-bottom: 20px; 
             box-shadow: var(--shadow-md); position: relative; overflow: hidden;
         }
-        .header::after { content: ""; position: absolute; top: -50%; right: -10%; width: 200px; height: 200px; background: rgba(255,255,255,0.05); border-radius: 50%; }
-        .header h1 { font-size: 1.6rem; margin-bottom: 5px; font-weight: 600; }
+        .header h1 { font-size: 1.5rem; margin-bottom: 5px; font-weight: 600; }
         .header p { font-size: 0.9rem; opacity: 0.9; }
 
-        /* --- TABS (ปรับปรุงใหม่) --- */
+        /* Tabs (Balanced & Green Active) */
         .tabs { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 20px; }
         .tab { 
-            padding: 12px 15px; background: white; border: none; border-radius: 12px; cursor: pointer; 
-            font-size: 0.95rem; font-weight: 600; color: var(--text-light); transition: all 0.2s ease; 
+            padding: 12px 10px; background: white; border: none; border-radius: 12px; cursor: pointer; 
+            font-size: 0.9rem; font-weight: 600; color: var(--text-light); transition: all 0.2s ease; 
             box-shadow: var(--shadow-sm); font-family: 'Prompt', sans-serif; 
-            display: flex; align-items: center; justify-content: center; gap: 8px; /* แนวนอน */
+            display: flex; align-items: center; justify-content: center; gap: 8px;
         }
         .tab:hover { transform: translateY(-2px); color: var(--primary); }
+        .tab.active { background: var(--active-green); color: white; box-shadow: 0 4px 12px rgba(39, 174, 96, 0.3); }
         
-        /* ปุ่ม Active เป็นสีเขียว */
-        .tab.active { 
-            background: var(--active-green); 
-            color: white; 
-            box-shadow: 0 4px 12px rgba(39, 174, 96, 0.3); 
-        }
-        .tab span { font-size: 1.2rem; }
-        
-        .tab-content { 
-            display: none; background: white; padding: 25px; border-radius: 16px; 
-            box-shadow: var(--shadow-md); min-height: 400px; 
-        }
+        .tab-content { display: none; background: white; padding: 25px; border-radius: 16px; box-shadow: var(--shadow-md); min-height: 400px; }
         .tab-content.active { display: block; animation: fadeIn 0.3s ease-out; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-        /* Page Headers inside Tabs */
-        .page-header-flex {
-            display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 15px;
-        }
-        .page-header-title { color: var(--primary); margin: 0; font-size: 1.25rem; font-weight: 600; }
-        .page-header-actions { display: flex; gap: 10px; }
-
-        /* Form */
+        /* Form Styling */
         .form-section { margin-bottom: 30px; padding: 20px; border-radius: 12px; background: #fcfcfc; border: 1px solid #f0f0f0; }
         .section-title { font-size: 1rem; font-weight: 600; color: var(--primary); margin-bottom: 20px; display: flex; align-items: center; gap: 8px; border-bottom: 2px solid rgba(44, 75, 70, 0.1); padding-bottom: 8px; }
         .section-icon { background: rgba(44, 75, 70, 0.1); color: var(--primary); width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; border-radius: 6px; font-size: 0.9rem; }
         .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px; }
+        .form-group { position: relative; /* สำคัญสำหรับ Autocomplete */ }
         .form-group label { display: block; margin-bottom: 6px; font-weight: 500; font-size: 0.9rem; color: var(--text-main); }
         .required { color: #e74c3c; margin-left: 2px; }
         .form-group input, .form-group select { 
@@ -95,14 +79,29 @@
             font-size: 0.95rem; font-family: 'Prompt', sans-serif; transition: all 0.2s;
         }
         .form-group input:focus, .form-group select:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 3px rgba(44, 75, 70, 0.15); }
+        
+        /* FIX 1: Autocomplete Styling (แก้บั๊กตกขอบ/บัง) */
+        .autocomplete-list { 
+            position: absolute; 
+            z-index: 1000; /* ให้ลอยเหนือสุด */
+            top: 100%; 
+            left: 0; 
+            right: 0; 
+            background: white; 
+            border: 1px solid #ddd; 
+            border-radius: 0 0 10px 10px; 
+            box-shadow: 0 10px 20px rgba(0,0,0,0.15); 
+            max-height: 200px; 
+            overflow-y: auto; 
+        }
+        .autocomplete-item { padding: 10px 15px; cursor: pointer; border-bottom: 1px solid #f9f9f9; font-size: 0.9rem; }
+        .autocomplete-item:hover { background: #f0f7f6; color: var(--primary); }
+
         .file-upload { border: 2px dashed #cbd5e0; padding: 20px; text-align: center; border-radius: 10px; cursor: pointer; transition: 0.3s; background: #f8fafc; }
         .file-upload:hover { border-color: var(--primary); background: #f0f7f6; }
 
         /* Buttons */
-        .btn { 
-            padding: 10px 20px; border: none; border-radius: 10px; font-size: 0.95rem; font-weight: 500; 
-            cursor: pointer; transition: 0.2s; display: inline-flex; align-items: center; justify-content: center; gap: 6px; font-family: 'Prompt', sans-serif; 
-        }
+        .btn { padding: 10px 20px; border: none; border-radius: 10px; font-size: 0.95rem; font-weight: 500; cursor: pointer; transition: 0.2s; display: inline-flex; align-items: center; justify-content: center; gap: 6px; font-family: 'Prompt', sans-serif; }
         .btn:hover { transform: translateY(-2px); filter: brightness(1.1); }
         .btn-primary { background: var(--primary); color: white; }
         .btn-success { background: #27ae60; color: white; }
@@ -112,18 +111,11 @@
         .btn-sm { padding: 6px 10px; font-size: 0.8rem; border-radius: 8px; }
 
         /* Table */
-        .table-container { border-radius: 12px; overflow-x: auto; border: 1px solid #eee; margin-top: 15px; }
+        .table-container { border-radius: 12px; overflow-x: auto; border: 1px solid #eee; margin-top: 15px; width: 100%; }
         table { width: 100%; border-collapse: collapse; min-width: 600px; }
-        th { background: #f8f9fa; color: var(--text-light); padding: 12px 10px; text-align: left; font-weight: 600; font-size: 0.85rem; text-transform: uppercase; white-space: nowrap; }
+        th { background: #f8f9fa; color: var(--text-light); padding: 12px 10px; text-align: left; font-weight: 600; font-size: 0.85rem; white-space: nowrap; }
         td { padding: 12px 10px; border-bottom: 1px solid #f0f0f0; color: var(--text-main); font-size: 0.9rem; vertical-align: middle; }
         tr:hover { background-color: #fafafa; }
-
-        /* Status Badges */
-        .status-badge { padding: 4px 10px; border-radius: 20px; font-size: 0.75rem; font-weight: 600; display: inline-block; white-space: nowrap; }
-        .pass { background: rgba(39, 174, 96, 0.15); color: #27ae60; }
-        .fail { background: rgba(231, 76, 60, 0.15); color: #e74c3c; }
-        .pending { background: rgba(241, 196, 15, 0.15); color: #d35400; }
-        .hold { background: rgba(149, 165, 166, 0.2); color: #7f8c8d; }
 
         /* Dashboard */
         .dashboard-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 25px; }
@@ -136,8 +128,9 @@
         .card-fail { border-bottom-color: #e74c3c; } .card-fail .kpi-icon { color: #e74c3c; }
         .card-rate { border-bottom-color: #f39c12; } .card-rate .kpi-icon { color: #f39c12; }
 
+        /* FIX 5: Mobile Overflow & Layout */
         .charts-row { display: grid; grid-template-columns: 1fr 1.5fr; gap: 20px; }
-        .chart-box { background: white; padding: 20px; border-radius: 16px; box-shadow: var(--shadow-sm); border: 1px solid #f5f5f5; }
+        .chart-box { background: white; padding: 20px; border-radius: 16px; box-shadow: var(--shadow-sm); border: 1px solid #f5f5f5; width: 100%; overflow: hidden; }
         .chart-header { font-size: 1rem; font-weight: 600; color: var(--primary); margin-bottom: 15px; }
 
         /* Search */
@@ -147,49 +140,31 @@
             font-size: 1rem; border: 2px solid #eee; border-radius: 50px; font-family: 'Prompt';
             background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="%232c4b46" stroke-width="2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>') no-repeat 15px center;
         }
+        .result-card { background: white; padding: 15px; border-radius: 12px; margin-bottom: 10px; border-left: 4px solid var(--primary); box-shadow: var(--shadow-sm); }
 
-        /* Modal & Autocomplete */
-        .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); backdrop-filter: blur(4px); }
+        /* Status Badges */
+        .status-badge { padding: 4px 10px; border-radius: 20px; font-size: 0.75rem; font-weight: 600; display: inline-block; white-space: nowrap; }
+        .pass { background: rgba(39, 174, 96, 0.15); color: #27ae60; }
+        .fail { background: rgba(231, 76, 60, 0.15); color: #e74c3c; }
+        .pending { background: rgba(241, 196, 15, 0.15); color: #d35400; }
+        .hold { background: rgba(149, 165, 166, 0.2); color: #7f8c8d; }
+        .no-file { background: rgba(231, 76, 60, 0.1); color: #c0392b; border: 1px solid #e74c3c; }
+
+        /* Modal */
+        .modal { display: none; position: fixed; z-index: 2000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); backdrop-filter: blur(4px); }
         .modal.active { display: flex; justify-content: center; align-items: center; }
         .modal-content { background: white; padding: 25px; border-radius: 16px; width: 95%; max-width: 600px; max-height: 90vh; overflow-y: auto; }
-        .autocomplete-list { position: absolute; z-index: 10; top: 100%; left: 0; right: 0; background: white; border: 1px solid #eee; border-radius: 0 0 12px 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); max-height: 200px; overflow-y: auto; }
-        .autocomplete-item { padding: 12px 16px; cursor: pointer; border-bottom: 1px solid #f9f9f9; font-size: 0.9rem; }
-        .autocomplete-item:hover { background: #f0f7f6; color: var(--primary); }
 
-        /* --- MOBILE RESPONSIVE FIXES (V4.8) --- */
-        @media (max-width: 600px) {
-            body { padding: 15px 10px; } /* ลด padding body */
-            .header { padding: 20px; border-radius: 12px; }
-            .header h1 { font-size: 1.4rem; }
-            
-            .tab-content { padding: 15px; }
-            
-            /* Tabs: ปรับให้ Balance ในมือถือ (แนวนอน) */
+        @media (max-width: 768px) {
             .tabs { gap: 5px; }
-            .tab { 
-                flex-direction: row; /* บังคับแนวนอนในมือถือ */
-                padding: 10px 5px; 
-                border-radius: 10px; 
-                font-size: 0.85rem;
-                white-space: nowrap; /* ห้ามตัดบรรทัด */
-            }
+            .tab { flex-direction: row; padding: 10px 5px; border-radius: 10px; font-size: 0.85rem; white-space: nowrap; }
             .tab span { font-size: 1.1rem; }
-
-            /* Form */
             .form-row { grid-template-columns: 1fr; gap: 12px; }
-            
-            /* Header Flex */
+            .charts-row { grid-template-columns: 1fr; } /* กราฟเรียงแนวตั้งบนมือถือ */
+            .dashboard-grid { grid-template-columns: 1fr 1fr; gap: 10px; }
             .page-header-flex { flex-direction: column; align-items: flex-start; gap: 10px; }
             .page-header-actions { width: 100%; }
-            .page-header-actions .btn { flex: 1; padding: 10px; font-size: 0.9rem; }
-
-            /* Dashboard: แก้กรอบตก */
-            .charts-row { grid-template-columns: 1fr; }
-            /* บังคับเหลือ 1 คอลัมน์เต็มๆ ในมือถือ */
-            .dashboard-grid { grid-template-columns: 1fr; gap: 10px; }
-            .kpi-card { padding: 15px; }
-            .kpi-info .value { font-size: 1.5rem; }
-            .kpi-icon { font-size: 1.5rem; }
+            .page-header-actions .btn { flex: 1; }
         }
     </style>
 </head>
@@ -198,8 +173,8 @@
 
     <div class="container">
         <div class="header">
-            <h1>☁️ QC System v4.8</h1>
-            <p>ระบบตรวจสอบคุณภาพวัตถุดิบ (Green Active Tab & Fixed Overflow)</p>
+            <h1>☁️ QC System v4.9</h1>
+            <p>ระบบตรวจสอบคุณภาพวัตถุดิบ (Fixed & Polished)</p>
         </div>
         
         <div class="tabs">
@@ -236,14 +211,14 @@
                 </div>
 
                 <div class="form-section">
-                    <div class="section-title"><div class="section-icon">B</div> ผลการตรวจสอบจริง (QC Results)</div>
+                    <div class="section-title"><div class="section-icon">B</div> ผลจาก COA & ไฟล์แนบ</div>
                     <div class="form-row">
-                        <div class="form-group"><label>สี (Color)</label><input type="text" name="qcColor"></div>
-                        <div class="form-group"><label>กลิ่น (Odor)</label><input type="text" name="qcOdor"></div>
+                        <div class="form-group"><label>สี (COA Color)</label><input type="text" name="coaColor"></div>
+                        <div class="form-group"><label>กลิ่น (COA Odor)</label><input type="text" name="coaOdor"></div>
                     </div>
                     <div class="form-row">
-                        <div class="form-group"><label>ค่า pH</label><input type="text" name="qcPh"></div>
-                        <div class="form-group"><label>อุณหภูมิ (Temp)</label><input type="text" name="qcTemp"></div>
+                        <div class="form-group"><label>ค่า pH (COA)</label><input type="text" name="coaPh"></div>
+                        <div class="form-group"><label>อุณหภูมิ (COA Temp)</label><input type="text" name="coaTemp"></div>
                     </div>
                     <div class="form-group" style="margin-top:15px;">
                         <label>แนบไฟล์ COA</label>
@@ -258,6 +233,14 @@
 
                 <div class="form-section">
                     <div class="section-title"><div class="section-icon">C</div> ผลการตรวจสอบ (Result)</div>
+                    <div class="form-row">
+                        <div class="form-group"><label>สี (QC Color)</label><input type="text" name="qcColor" required></div>
+                        <div class="form-group"><label>กลิ่น (QC Odor)</label><input type="text" name="qcOdor" required></div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group"><label>ค่า pH (QC)</label><input type="text" name="qcPh" required></div>
+                        <div class="form-group"><label>อุณหภูมิ (QC)</label><input type="text" name="qcTemp" required></div>
+                    </div>
                     <div class="form-row">
                         <div class="form-group">
                             <label>Result <span class="required">*</span></label>
@@ -292,7 +275,7 @@
                 <table id="masterTable">
                     <thead>
                         <tr>
-                            <th>Date</th><th>RM Code</th><th>Lot No.</th><th>Status</th><th>File</th><th>Edit</th>
+                            <th>Date</th><th>RM Code</th><th>Lot No.</th><th>Result</th><th>File</th><th>Edit</th>
                         </tr>
                     </thead>
                     <tbody id="masterTableBody">
@@ -317,13 +300,13 @@
                     <div style="height: 250px; position: relative;"><canvas id="qcPieChart"></canvas></div>
                 </div>
                 <div class="chart-box">
-                    <div class="chart-header">⏳ รอผล (Pending / Hold)</div>
+                    <div class="chart-header">⏳ รอผล (Pending / Hold / No COA)</div>
                     <div style="overflow-x:auto;">
                         <table style="width:100%;">
                             <thead>
                                 <tr style="border-bottom:2px solid #eee;">
                                     <th style="background:white;">RM Code</th>
-                                    <th style="background:white;">Lot</th>
+                                    <th style="background:white;">Status</th>
                                     <th style="background:white;">Aging</th>
                                 </tr>
                             </thead>
@@ -363,10 +346,31 @@
                     <div class="form-group"><label>Internal Lot</label><input type="text" id="edit_internalLotNo" required></div>
                     <div class="form-group"><label>Rec. Date</label><input type="date" id="edit_receivedDate" required></div>
                 </div>
-                <div style="background:#f8f9fa; padding:15px; border-radius:10px; margin:15px 0; border:1px solid #eee;">
-                    <div class="form-row"><div class="form-group"><label>Color</label><input type="text" id="edit_qcColor"></div><div class="form-group"><label>Odor</label><input type="text" id="edit_qcOdor"></div></div>
-                    <div class="form-row"><div class="form-group"><label>pH</label><input type="text" id="edit_qcPh"></div><div class="form-group"><label>Temp</label><input type="text" id="edit_qcTemp"></div></div>
+                
+                <div style="background:#f0f7f6; padding:15px; border-radius:10px; margin:10px 0;">
+                    <label style="font-weight:600; color:var(--primary);">COA Info</label>
+                    <div class="form-row" style="margin-top:10px;">
+                        <div class="form-group"><label>COA Color</label><input type="text" id="edit_coaColor"></div>
+                        <div class="form-group"><label>COA Odor</label><input type="text" id="edit_coaOdor"></div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group"><label>COA pH</label><input type="text" id="edit_coaPh"></div>
+                        <div class="form-group"><label>COA Temp</label><input type="text" id="edit_coaTemp"></div>
+                    </div>
                 </div>
+
+                <div style="background:#f8f9fa; padding:15px; border-radius:10px; margin:15px 0; border:1px solid #eee;">
+                    <label style="font-weight:600; color:#333;">QC Results</label>
+                    <div class="form-row" style="margin-top:10px;">
+                        <div class="form-group"><label>QC Color</label><input type="text" id="edit_qcColor"></div>
+                        <div class="form-group"><label>QC Odor</label><input type="text" id="edit_qcOdor"></div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group"><label>QC pH</label><input type="text" id="edit_qcPh"></div>
+                        <div class="form-group"><label>QC Temp</label><input type="text" id="edit_qcTemp"></div>
+                    </div>
+                </div>
+
                 <div class="form-row">
                     <div class="form-group">
                         <label>Result</label>
@@ -456,7 +460,7 @@
                     originalTimestamp: document.getElementById('editOriginalTimestamp').value,
                     rmCode: document.getElementById('edit_rmCode').value, rmName: document.getElementById('edit_rmName').value, supplier: document.getElementById('edit_supplier').value,
                     lotNo: document.getElementById('edit_lotNo').value, internalLotNo: document.getElementById('edit_internalLotNo').value, receivedDate: document.getElementById('edit_receivedDate').value,
-                    coaColor: '', coaOdor: '', coaPh: '', coaTemp: '',
+                    coaColor: document.getElementById('edit_coaColor').value, coaOdor: document.getElementById('edit_coaOdor').value, coaPh: document.getElementById('edit_coaPh').value, coaTemp: document.getElementById('edit_coaTemp').value,
                     qcColor: document.getElementById('edit_qcColor').value, qcOdor: document.getElementById('edit_qcOdor').value, qcPh: document.getElementById('edit_qcPh').value, qcTemp: document.getElementById('edit_qcTemp').value,
                     passFail: document.getElementById('edit_passFail').value, approvedBy: document.getElementById('edit_approvedBy').value, approvedDate: document.getElementById('edit_approvedDate').value,
                     coaFile: editCoaFileData, isFileRemoved: isEditFileRemoved, originalFileUrl: currentEditOriginalUrl
@@ -480,9 +484,7 @@
             if (inspections.length === 0) { tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;">ไม่พบข้อมูล</td></tr>'; return; }
             tbody.innerHTML = inspections.map((item, index) => {
                 let badgeClass = item.passFail === 'Pass' ? 'pass' : (item.passFail === 'Fail' ? 'fail' : (item.passFail === 'Hold' ? 'hold' : 'pending'));
-                // ตัด RM Name ให้สั้นถ้าดูในมือถือ
                 let rmDisplay = `<strong>${item.rmCode}</strong>`;
-                
                 return `<tr>
                     <td>${item.receivedDate}</td>
                     <td>${rmDisplay}<br><span style="font-size:0.75rem; color:#888;">${item.rmName}</span></td>
@@ -503,18 +505,43 @@
             animateValue("dashTotal", 0, total, 1000); animateValue("dashPass", 0, passed, 1000); animateValue("dashFail", 0, failed, 1000);
             document.getElementById('dashRate').textContent = rate + '%';
 
+            // FIX 3: Chart with % (DataLabels)
             if (myPieChart) myPieChart.destroy();
             myPieChart = new Chart(document.getElementById('qcPieChart').getContext('2d'), {
                 type: 'doughnut',
+                plugins: [ChartDataLabels],
                 data: { labels: ['Pass', 'Fail', 'Pending', 'Hold'], datasets: [{ data: [passed, failed, inspections.filter(i=>i.passFail==='Pending').length, inspections.filter(i=>i.passFail==='Hold').length], backgroundColor: ['#27ae60', '#e74c3c', '#f39c12', '#95a5a6'], borderWidth: 0 }] },
-                options: { responsive: true, maintainAspectRatio: false, cutout: '70%', plugins: { legend: { position: 'bottom', labels: { font: { family: 'Prompt', size: 11 } } } } }
+                options: { 
+                    responsive: true, maintainAspectRatio: false, cutout: '65%', 
+                    plugins: { 
+                        legend: { position: 'bottom', labels: { font: { family: 'Prompt', size: 11 } } },
+                        datalabels: { color: '#fff', font: { weight: 'bold', size: 12 }, formatter: (val, ctx) => val > 0 ? val : '' }
+                    } 
+                }
             });
 
-            const pendingItems = inspections.filter(i => i.passFail === 'Pending' || i.passFail === 'Hold');
+            // FIX 4: Pending Logic (Include No COA)
+            const pendingItems = inspections.filter(i => 
+                i.passFail === 'Pending' || 
+                i.passFail === 'Hold' || 
+                (!i.coaFile || !i.coaFile.data) // Added: No COA check
+            );
+            
             document.getElementById('dashPendingBody').innerHTML = pendingItems.length === 0 ? '<tr><td colspan="3" style="text-align:center; padding:15px; color:#999; font-size:0.9rem;">No pending items</td></tr>' : pendingItems.map(item => {
                 const days = Math.floor((new Date() - new Date(item.receivedDate)) / (1000 * 60 * 60 * 24));
                 let agingColor = days > 7 ? '#e74c3c' : (days > 3 ? '#f39c12' : '#27ae60');
-                return `<tr style="border-bottom:1px solid #f5f5f5;"><td style="padding:10px; font-weight:600; font-size:0.85rem;">${item.rmCode}</td><td style="font-size:0.85rem;">${item.lotNo}</td><td><span style="color:${agingColor}; font-weight:bold; font-size:0.85rem;">${days} วัน</span></td></tr>`;
+                
+                // Determine Status Display
+                let statusBadge = '';
+                if(item.passFail === 'Pending') statusBadge = '<span class="status-badge pending">Pending</span>';
+                else if(item.passFail === 'Hold') statusBadge = '<span class="status-badge hold">Hold</span>';
+                else if(!item.coaFile || !item.coaFile.data) statusBadge = '<span class="status-badge no-file">No COA</span>';
+
+                return `<tr style="border-bottom:1px solid #f5f5f5;">
+                    <td style="padding:10px; font-weight:600; font-size:0.85rem;">${item.rmCode}</td>
+                    <td>${statusBadge}</td>
+                    <td><span style="color:${agingColor}; font-weight:bold; font-size:0.85rem;">${days} วัน</span></td>
+                </tr>`;
             }).join('');
         }
 
@@ -537,7 +564,11 @@
         function openEditModal(index) {
             const item = inspections[index];
             document.getElementById('editOriginalTimestamp').value = item.timestamp;
-            ['rmCode','rmName','supplier','lotNo','internalLotNo','receivedDate','qcColor','qcOdor','qcPh','qcTemp','passFail','approvedBy','approvedDate'].forEach(id => document.getElementById('edit_'+id).value = item[id] || '');
+            // Map all fields including new COA ones
+            ['rmCode','rmName','supplier','lotNo','internalLotNo','receivedDate','coaColor','coaOdor','coaPh','coaTemp','qcColor','qcOdor','qcPh','qcTemp','passFail','approvedBy','approvedDate'].forEach(id => {
+                const el = document.getElementById('edit_'+id);
+                if(el) el.value = item[id] || '';
+            });
             editCoaFileData = null; isEditFileRemoved = false; document.getElementById('edit_fileInput').value = "";
             currentEditOriginalUrl = item.coaFile?.isLink ? item.coaFile.data : "";
             document.getElementById('edit_fileStatus').textContent = currentEditOriginalUrl ? "มีไฟล์" : "ว่าง";
@@ -553,7 +584,16 @@
         document.getElementById('edit_fileInput').addEventListener('change', e => readFile(e.target, d => { editCoaFileData = d; document.getElementById('edit_fileStatus').textContent = "ไฟล์ใหม่"; isEditFileRemoved = false; }));
         function showLoading(show, text) { document.getElementById('loading-overlay').style.display = show ? 'flex' : 'none'; if(text) document.getElementById('loading-text').textContent = text; }
         function showTab(t) { document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active')); document.querySelectorAll('.tab-content').forEach(x=>x.classList.remove('active')); document.getElementById(t).classList.add('active'); if(t==='master'||t==='summary') fetchData(); else if(t==='form') document.querySelector('.tab[onclick="showTab(\'form\')"]').classList.add('active'); }
-        function handleAutocomplete(e, f) { const listDiv = document.getElementById(f + '-autocomplete-list'); const val = e.target.value.toLowerCase(); if (val.length < 1) { listDiv.style.display = 'none'; return; } const matches = MASTER_LIST.filter(i => i.code.toLowerCase().includes(val) || i.name.toLowerCase().includes(val)).slice(0, 5); listDiv.innerHTML = matches.map(item => `<div class="autocomplete-item" onclick="selectRM('${item.code}', '${item.name}')">${item.code} - ${item.name}</div>`).join(''); listDiv.style.display = matches.length ? 'block' : 'none'; }
+        
+        // FIX 1: Autocomplete Z-Index Bug
+        function handleAutocomplete(e, f) { 
+            const listDiv = document.getElementById(f + '-autocomplete-list'); 
+            const val = e.target.value.toLowerCase(); 
+            if (val.length < 1) { listDiv.style.display = 'none'; return; } 
+            const matches = MASTER_LIST.filter(i => i.code.toLowerCase().includes(val) || i.name.toLowerCase().includes(val)).slice(0, 5); 
+            listDiv.innerHTML = matches.map(item => `<div class="autocomplete-item" onclick="selectRM('${item.code}', '${item.name}')">${item.code} - ${item.name}</div>`).join(''); 
+            listDiv.style.display = matches.length ? 'block' : 'none'; 
+        }
         function selectRM(code, name) { document.getElementById('rmCode').value = code; document.getElementById('rmName').value = name; document.querySelectorAll('.autocomplete-list').forEach(l => l.style.display = 'none'); }
         document.addEventListener('click', e => { if (!e.target.closest('.form-group')) document.querySelectorAll('.autocomplete-list').forEach(l => l.style.display = 'none'); });
 
