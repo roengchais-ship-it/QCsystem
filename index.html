@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>QC System v5.0 (Final Perfected)</title>
+    <title>QC System v6.3 (Clear Edit Modal)</title>
     
     <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
@@ -15,7 +15,7 @@
         :root {
             --primary: #2c4b46;       /* Deep Teal */
             --primary-soft: #3d6e66;
-            --active-green: #27ae60;  /* ✅ สีเขียวสำหรับปุ่ม Active */
+            --active-green: #27ae60;  /* Active Green */
             --bg-body: #f0f2f5;
             --text-main: #2d3436;
             --text-light: #636e72;
@@ -49,9 +49,8 @@
             box-shadow: var(--shadow-md); position: relative; overflow: hidden;
         }
         .header h1 { font-size: 1.5rem; margin-bottom: 5px; font-weight: 600; }
-        .header p { font-size: 0.9rem; opacity: 0.9; }
 
-        /* --- TABS (Fixed Logic) --- */
+        /* Tabs */
         .tabs { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 20px; }
         .tab { 
             padding: 12px 10px; background: white; border: none; border-radius: 12px; cursor: pointer; 
@@ -60,20 +59,13 @@
             display: flex; align-items: center; justify-content: center; gap: 8px;
         }
         .tab:hover { transform: translateY(-2px); color: var(--primary); }
-        
-        /* ✅ Active State Style */
-        .tab.active { 
-            background: var(--active-green); 
-            color: white; 
-            box-shadow: 0 4px 12px rgba(39, 174, 96, 0.4); 
-            transform: translateY(-1px);
-        }
+        .tab.active { background: var(--active-green); color: white; box-shadow: 0 4px 12px rgba(39, 174, 96, 0.4); transform: translateY(-1px); }
         
         .tab-content { display: none; background: white; padding: 25px; border-radius: 16px; box-shadow: var(--shadow-md); min-height: 400px; }
         .tab-content.active { display: block; animation: fadeIn 0.3s ease-out; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-        /* Form Styling */
+        /* Form */
         .form-section { margin-bottom: 30px; padding: 20px; border-radius: 12px; background: #fcfcfc; border: 1px solid #f0f0f0; }
         .section-title { font-size: 1rem; font-weight: 600; color: var(--primary); margin-bottom: 20px; display: flex; align-items: center; gap: 8px; border-bottom: 2px solid rgba(44, 75, 70, 0.1); padding-bottom: 8px; }
         .section-icon { background: rgba(44, 75, 70, 0.1); color: var(--primary); width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; border-radius: 6px; font-size: 0.9rem; }
@@ -87,12 +79,8 @@
         }
         .form-group input:focus, .form-group select:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 3px rgba(44, 75, 70, 0.15); }
         
-        /* Autocomplete Fixed */
-        .autocomplete-list { 
-            position: absolute; z-index: 1000; top: 100%; left: 0; right: 0; 
-            background: white; border: 1px solid #ddd; border-radius: 0 0 10px 10px; 
-            box-shadow: 0 10px 20px rgba(0,0,0,0.15); max-height: 200px; overflow-y: auto; 
-        }
+        /* Autocomplete */
+        .autocomplete-list { position: absolute; z-index: 1000; top: 100%; left: 0; right: 0; background: white; border: 1px solid #ddd; border-radius: 0 0 10px 10px; box-shadow: 0 10px 20px rgba(0,0,0,0.15); max-height: 200px; overflow-y: auto; }
         .autocomplete-item { padding: 10px 15px; cursor: pointer; border-bottom: 1px solid #f9f9f9; font-size: 0.9rem; }
         .autocomplete-item:hover { background: #f0f7f6; color: var(--primary); }
 
@@ -110,8 +98,12 @@
         .btn-sm { padding: 6px 10px; font-size: 0.8rem; border-radius: 8px; }
 
         /* Table */
-        .table-container { border-radius: 12px; overflow-x: auto; border: 1px solid #eee; margin-top: 15px; width: 100%; }
-        table { width: 100%; border-collapse: collapse; min-width: 600px; }
+        .table-container-scroll { border-radius: 12px; overflow-x: auto; border: 1px solid #eee; margin-top: 15px; width: 100%; }
+        .table-container-scroll table { width: 100%; border-collapse: collapse; min-width: 800px; }
+        
+        .table-container-fit { border-radius: 12px; overflow-x: hidden; border: 1px solid #eee; margin-top: 0; width: 100%; }
+        .table-container-fit table { width: 100%; border-collapse: collapse; } 
+
         th { background: #f8f9fa; color: var(--text-light); padding: 12px 10px; text-align: left; font-weight: 600; font-size: 0.85rem; white-space: nowrap; }
         td { padding: 12px 10px; border-bottom: 1px solid #f0f0f0; color: var(--text-main); font-size: 0.9rem; vertical-align: middle; }
         tr:hover { background-color: #fafafa; }
@@ -131,14 +123,29 @@
         .chart-box { background: white; padding: 20px; border-radius: 16px; box-shadow: var(--shadow-sm); border: 1px solid #f5f5f5; width: 100%; overflow: hidden; }
         .chart-header { font-size: 1rem; font-weight: 600; color: var(--primary); margin-bottom: 15px; }
 
-        /* Search */
+        /* Search & Filters */
         .search-hero { background: white; padding: 30px 20px; border-radius: 16px; text-align: center; border: 1px solid #eee; margin-bottom: 20px; }
         .search-input-modern { 
             width: 100%; max-width: 100%; padding: 14px 20px 14px 45px;
             font-size: 1rem; border: 2px solid #eee; border-radius: 50px; font-family: 'Prompt';
             background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="%232c4b46" stroke-width="2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>') no-repeat 15px center;
         }
-        .result-card { background: white; padding: 15px; border-radius: 12px; margin-bottom: 10px; border-left: 4px solid var(--primary); box-shadow: var(--shadow-sm); }
+        
+        .filter-bar { display: flex; justify-content: center; gap: 15px; margin-top: 15px; align-items: center; flex-wrap: wrap; }
+        .filter-group { display: flex; align-items: center; gap: 8px; background: #f8f9fa; padding: 8px 20px; border-radius: 30px; border: 1px solid #ddd; box-shadow: 0 2px 5px rgba(0,0,0,0.03); }
+        .filter-group input { border: none; background: transparent; font-family: 'Prompt'; font-size: 0.95rem; color: #333; outline: none; font-weight: 500; cursor: pointer; }
+        .filter-label { font-size: 0.85rem; color: #666; font-weight: 600; }
+
+        .result-card { background: white; border-radius: 12px; margin-bottom: 20px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); overflow: hidden; border: 1px solid #eee; }
+        .result-header { background: #fcfcfc; padding: 15px 20px; border-bottom: 1px solid #eee; display: flex; justify-content: space-between; align-items: center; }
+        .result-content { padding: 20px; }
+        .result-section-label { font-size: 0.8rem; font-weight: 700; color: var(--primary); margin-bottom: 10px; display: flex; align-items: center; gap: 5px; }
+        .result-info-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 15px; font-size: 0.9rem; margin-bottom: 15px; }
+        .info-box { padding: 10px; border-radius: 8px; background: #fff; border: 1px solid #f0f0f0; }
+        .info-box.coa { background: #f9fbfd; border-color: #e3effd; }
+        .info-box.qc { background: #f0fff4; border-color: #dcfce7; }
+        .info-label { font-size: 0.7rem; color: #888; text-transform: uppercase; display: block; margin-bottom: 2px; font-weight: 600; }
+        .lot-badge { display: inline-block; margin-left: 8px; padding: 4px 10px; background: var(--primary); color: white; border-radius: 6px; font-size: 0.85rem; font-weight: 600; letter-spacing: 0.5px; }
 
         /* Status Badges */
         .status-badge { padding: 4px 10px; border-radius: 20px; font-size: 0.75rem; font-weight: 600; display: inline-block; white-space: nowrap; }
@@ -153,6 +160,16 @@
         .modal.active { display: flex; justify-content: center; align-items: center; }
         .modal-content { background: white; padding: 25px; border-radius: 16px; width: 95%; max-width: 600px; max-height: 90vh; overflow-y: auto; }
 
+        /* ✅ Edit File Label Styles */
+        .edit-file-label {
+            display: block; 
+            margin-bottom: 8px; 
+            font-size: 0.95rem; 
+            font-weight: 600; 
+            color: #333;
+        }
+        .edit-file-label i { margin-right: 5px; }
+
         @media (max-width: 768px) {
             .tabs { gap: 5px; }
             .tab { flex-direction: row; padding: 10px 5px; border-radius: 10px; font-size: 0.85rem; white-space: nowrap; }
@@ -163,6 +180,8 @@
             .page-header-flex { flex-direction: column; align-items: flex-start; gap: 10px; }
             .page-header-actions { width: 100%; }
             .page-header-actions .btn { flex: 1; }
+            .result-header { flex-direction: column; align-items: flex-start; gap: 10px; }
+            .status-badge { align-self: flex-start; }
         }
     </style>
 </head>
@@ -171,8 +190,8 @@
 
     <div class="container">
         <div class="header">
-            <h1>☁️ QC System v5.0</h1>
-            <p>ระบบตรวจสอบคุณภาพวัตถุดิบ (Perfect Fit)</p>
+            <h1>☁️ QC System v6.3</h1>
+            <p>ระบบตรวจสอบคุณภาพวัตถุดิบ (Clear Edit Modal)</p>
         </div>
         
         <div class="tabs">
@@ -219,11 +238,11 @@
                         <div class="form-group"><label>อุณหภูมิ (COA Temp)</label><input type="text" name="coaTemp"></div>
                     </div>
                     <div class="form-group" style="margin-top:15px;">
-                        <label>แนบไฟล์ COA</label>
+                        <label>แนบไฟล์ COA (PDF/รูป)</label>
                         <div class="file-upload" onclick="document.getElementById('coaFile').click()">
                             <input type="file" id="coaFile" accept=".pdf,.jpg,.jpeg,.png" style="display:none"> 
                             <span style="font-size:1.5rem;">📎</span>
-                            <span style="color:#666; font-size:0.9rem;">คลิกเลือกไฟล์</span>
+                            <span style="color:#666; font-size:0.9rem;">คลิกเลือกไฟล์ COA</span>
                             <div id="fileName" style="color:var(--primary); font-weight:600; font-size:0.85rem; margin-top:5px;"></div>
                         </div>
                     </div>
@@ -239,6 +258,17 @@
                         <div class="form-group"><label>ค่า pH (QC)</label><input type="text" name="qcPh" required></div>
                         <div class="form-group"><label>อุณหภูมิ (QC)</label><input type="text" name="qcTemp" required></div>
                     </div>
+                    
+                    <div class="form-group" style="margin-bottom:15px;">
+                        <label>📷 แนบรูปการตรวจ (QC Photo)</label>
+                        <div class="file-upload" style="border-color:#27ae60; background:#f0fff4;" onclick="document.getElementById('qcFile').click()">
+                            <input type="file" id="qcFile" accept=".jpg,.jpeg,.png" style="display:none"> 
+                            <span style="font-size:1.5rem;">📸</span>
+                            <span style="color:#27ae60; font-size:0.9rem;">คลิกเลือกรูป QC</span>
+                            <div id="qcFileName" style="color:#27ae60; font-weight:600; font-size:0.85rem; margin-top:5px;"></div>
+                        </div>
+                    </div>
+
                     <div class="form-row">
                         <div class="form-group">
                             <label>Result <span class="required">*</span></label>
@@ -269,15 +299,23 @@
                     <button class="btn btn-secondary" onclick="fetchData()">🔄 Refresh</button>
                 </div>
             </div>
-            <div class="table-container">
+            
+            <div class="filter-bar" style="justify-content: flex-start; margin-bottom: 15px;">
+                <div class="filter-group">
+                    <span class="filter-label">📅 ประจำเดือน:</span>
+                    <input type="month" id="historyMonthFilter" onchange="renderMasterTable()">
+                </div>
+            </div>
+
+            <div class="table-container-scroll">
                 <table id="masterTable">
                     <thead>
                         <tr>
-                            <th>Date</th><th>RM Code</th><th>Lot No.</th><th>Result</th><th>File</th><th>Edit</th>
+                            <th>Date</th><th>RM Code</th><th>Lot No.</th><th>Result</th><th>COA</th><th>QC Pic</th><th>Edit</th>
                         </tr>
                     </thead>
                     <tbody id="masterTableBody">
-                        <tr><td colspan="6" style="text-align:center; padding:30px; color:#999;">กำลังโหลด...</td></tr>
+                        <tr><td colspan="7" style="text-align:center; padding:30px; color:#999;">กำลังโหลด...</td></tr>
                     </tbody>
                 </table>
             </div>
@@ -299,11 +337,12 @@
                 </div>
                 <div class="chart-box">
                     <div class="chart-header">⏳ รอผล (Pending / Hold / No COA)</div>
-                    <div style="overflow-x:auto;">
+                    <div class="table-container-fit">
                         <table style="width:100%;">
                             <thead>
                                 <tr style="border-bottom:2px solid #eee;">
                                     <th style="background:white;">RM Code</th>
+                                    <th style="background:white;">Lot</th>
                                     <th style="background:white;">Status</th>
                                     <th style="background:white;">Aging</th>
                                 </tr>
@@ -317,9 +356,22 @@
 
         <div id="search" class="tab-content">
             <h2 class="page-header-title" style="margin-bottom:20px;">🔍 Advanced Search</h2>
+            
             <div class="search-hero">
                 <input type="text" id="searchInput" class="search-input-modern" placeholder="ค้นหา RM Code, Name, Lot..." oninput="performSearch()">
+                
+                <div class="filter-bar">
+                    <div class="filter-group">
+                        <span class="filter-label">ตั้งแต่:</span>
+                        <input type="month" id="searchStartMonth" onchange="performSearch()">
+                    </div>
+                    <div class="filter-group">
+                        <span class="filter-label">ถึง:</span>
+                        <input type="month" id="searchEndMonth" onchange="performSearch()">
+                    </div>
+                </div>
             </div>
+
             <div id="searchResults"></div>
         </div>
     </div>
@@ -380,14 +432,25 @@
                 </div>
                 <div class="form-group"><label>Date</label><input type="date" id="edit_approvedDate" required></div>
                 
-                <div class="form-group" style="margin:15px 0;">
-                    <div style="display:flex; align-items:center; gap:10px; padding:10px; background:#f0f4ff; border-radius:8px;">
-                        <span id="edit_fileStatus" style="font-weight:600; font-size:0.85rem; color:#555;">Checking...</span>
-                        <button type="button" id="edit_btnRemoveFile" class="btn btn-danger btn-sm" onclick="markFileRemoved()" style="display:none;">ลบ</button>
+                <div class="form-group" style="background:#e3f2fd; padding:15px; border-radius:10px; margin-bottom:15px; border:1px solid #bbdefb;">
+                    <label class="edit-file-label" style="color:#1976d2;">📄 แก้ไขไฟล์ COA (PDF/รูป)</label>
+                    <div style="display:flex; align-items:center; gap:10px; margin-bottom:10px;">
+                        <span id="edit_fileStatus" style="font-size:0.85rem; font-weight:600; color:#555;">กำลังโหลด...</span>
+                        <button type="button" id="edit_btnRemoveFile" class="btn btn-danger btn-sm" onclick="markFileRemoved()" style="display:none; padding:4px 8px;">ลบไฟล์เดิม</button>
                     </div>
-                    <input type="file" id="edit_fileInput" accept=".pdf,.jpg,.jpeg,.png" style="margin-top:10px; font-size:0.85rem;">
+                    <input type="file" id="edit_fileInput" accept=".pdf,.jpg,.jpeg,.png" style="font-size:0.85rem;">
                 </div>
-                <div style="text-align: center; margin-top: 20px;"><button type="submit" class="btn btn-primary" style="width:100%;">💾 บันทึก</button></div>
+
+                <div class="form-group" style="background:#e8f5e9; padding:15px; border-radius:10px; margin-bottom:15px; border:1px solid #c8e6c9;">
+                    <label class="edit-file-label" style="color:#2e7d32;">📷 แก้ไขรูป QC (รูปถ่าย)</label>
+                    <div style="display:flex; align-items:center; gap:10px; margin-bottom:10px;">
+                        <span id="edit_qcFileStatus" style="font-size:0.85rem; font-weight:600; color:#555;">กำลังโหลด...</span>
+                        <button type="button" id="edit_btnRemoveQcFile" class="btn btn-danger btn-sm" onclick="markQcFileRemoved()" style="display:none; padding:4px 8px;">ลบรูปเดิม</button>
+                    </div>
+                    <input type="file" id="edit_qcFileInput" accept=".jpg,.jpeg,.png" style="font-size:0.85rem;">
+                </div>
+
+                <div style="text-align: center; margin-top: 20px;"><button type="submit" class="btn btn-primary" style="width:100%;">💾 บันทึกการแก้ไข</button></div>
             </form>
         </div>
     </div>
@@ -399,16 +462,62 @@
         const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbyIrW6R8QPEkvxoO4p-cMIv3T3Eqcp2xIhI26kgReu6g42s2kYon1IBS2foAyd3TBROmA/exec"; 
         
         const MASTER_LIST = [
-             { code: 'RM1-SV-WT', name: 'Water' }, { code: 'RM2-CA-LRGS', name: 'Plantacare 1200 UP' },
-             { code: 'RM2-CA-DG-DGS', name: 'Plantacare 2000 UP' }, { code: 'RM2-SV-ETNS', name: 'Sciwis' },
-             { code: 'RM2-CA-SCG', name: 'Galsoft SCG' }, { code: 'RM2-PT-RDFE', name: 'Koprafinol' }
+            { code: "RM1-SV-WT", name: "Water" },
+            { code: "RM2-CA-LRGS", name: "Plantacare 1200 UP" },
+            { code: "RM2-CA-DG-DGS", name: "Plantacare 2000 UP" },
+            { code: "RM2-CA-CGS", name: "Plantacare 810 UP" },
+            { code: "RM2-CA-SCG", name: "Galsoft SCG" },
+            { code: "RM2-CA-CG-GO", name: "LAMESOFT PO 65" },
+            { code: "RM2-CA-DHY", name: "Dehyton K/I5" },
+            { code: "RM2-HT-ABLE", name: "Organic aloe vera extract" },
+            { code: "RM2-HT-WTE", name: "White tea extract" },
+            { code: "RM2-HT-SPCA", name: "Ajidew NL-50 (Sodium PCA)" },
+            { code: "RM2-HT-PPG20", name: "Glucam P-20" },
+            { code: "RM2-HT-GCR", name: "Glycerine 99.7% USP Food Grade" },
+            { code: "RM3-SR-LPEZ", name: "Lipase enzyme" },
+            { code: "RM3-SR-VCM", name: "Aristocare Smart" },
+            { code: "RM2-AO-PSME-BA210", name: "Pancil BA-210" },
+            { code: "RM2-AO-PSME-V20", name: "Pancil V-20" },
+            { code: "RM2-AO-PSME-FG70", name: "Pancil FG-70" },
+            { code: "RM2-AO-DKE", name: "Pancil TOA-1" },
+            { code: "RM2-PT-SDB", name: "Sodium benzoate" },
+            { code: "RM-CTA-8HQ", name: "8-HQ" },
+            { code: "RM2-PH-LTA", name: "Lactic acid" },
+            { code: "RM2-PH-CTA", name: "Citric acid" },
+            { code: "RM2-CTA-2EDTA", name: "Disodium EDTA" },
+            { code: "RM2-SV-ETN", name: "Sciwis" },
+            { code: "RM2-SV-ETN95", name: "DEB 95 (Ethyl alcohol 95% v/v)" },
+            { code: "RM2-SV-DPM", name: "Dipropylene Glycol Monomethyl Ether (DPM)" },
+            { code: "RM2-EM-DPG", name: "Dipropylene glycol" },
+            { code: "RM2-PF-PF", name: "Pine Forest Perfume" },
+            { code: "RM2-PF-WTR", name: "White Tea Retreats Perfume" },
+            { code: "RM2-PF-NG", name: "Neroli Garden Perfume" },
+            { code: "RM2-PF-CLR", name: "Chalene Rose Perfume" },
+            { code: "RM2-PF-ST", name: "Serene Tea Perfume" },
+            { code: "RM2-PF-CM", name: "Cotton Musk Perfume" },
+            { code: "RM2-PF-WM", name: "Wild Mint Perfume" },
+            { code: "RM2-PF-CTF", name: "Citropol F" },
+            { code: "RM2-PF-BPL", name: "Black pepper oil" },
+            { code: "RM2-PT-RDFE", name: "Koprafinol" },
+            { code: "RM2-PT-KOP", name: "Kopcerin PE1090" },
+            { code: "RM2-PT-STS", name: "Sodium thiosulfate" },
+            { code: "RM1-OT-SG", name: "Sucrose" },
+            { code: "RM2-EM-PG40", name: "Eumulgin CO 40" },
+            { code: "RM2-EM-IPM", name: "Isopropyl myristate (IPM)" }
         ];
 
         let inspections = [];
         let currentCoaFileData = null;
+        let currentQcFileData = null; 
+        
         let editCoaFileData = null;
         let isEditFileRemoved = false;
         let currentEditOriginalUrl = "";
+        
+        let editQcFileData = null;
+        let isEditQcFileRemoved = false;
+        let currentEditQcUrl = "";
+
         let myPieChart = null;
 
         async function fetchData() {
@@ -429,7 +538,9 @@
             await submitData(new FormData(e.target), 'insert');
             e.target.reset();
             document.getElementById('fileName').textContent = "";
+            document.getElementById('qcFileName').textContent = "";
             currentCoaFileData = null;
+            currentQcFileData = null;
         });
 
         document.getElementById('editForm').addEventListener('submit', async function(e) {
@@ -450,7 +561,8 @@
                     coaColor: formData.get('coaColor'), coaOdor: formData.get('coaOdor'), coaPh: formData.get('coaPh'), coaTemp: formData.get('coaTemp'),
                     qcColor: formData.get('qcColor'), qcOdor: formData.get('qcOdor'), qcPh: formData.get('qcPh'), qcTemp: formData.get('qcTemp'),
                     passFail: formData.get('passFail'), approvedBy: formData.get('approvedBy'), approvedDate: formData.get('approvedDate'),
-                    coaFile: currentCoaFileData
+                    coaFile: currentCoaFileData,
+                    qcFile: currentQcFileData 
                 };
             } else {
                 data = {
@@ -461,7 +573,8 @@
                     coaColor: document.getElementById('edit_coaColor').value, coaOdor: document.getElementById('edit_coaOdor').value, coaPh: document.getElementById('edit_coaPh').value, coaTemp: document.getElementById('edit_coaTemp').value,
                     qcColor: document.getElementById('edit_qcColor').value, qcOdor: document.getElementById('edit_qcOdor').value, qcPh: document.getElementById('edit_qcPh').value, qcTemp: document.getElementById('edit_qcTemp').value,
                     passFail: document.getElementById('edit_passFail').value, approvedBy: document.getElementById('edit_approvedBy').value, approvedDate: document.getElementById('edit_approvedDate').value,
-                    coaFile: editCoaFileData, isFileRemoved: isEditFileRemoved, originalFileUrl: currentEditOriginalUrl
+                    coaFile: editCoaFileData, isFileRemoved: isEditFileRemoved, originalFileUrl: currentEditOriginalUrl,
+                    qcFile: editQcFileData, isQcFileRemoved: isEditQcFileRemoved, originalQcUrl: currentEditQcUrl
                 };
             }
             try {
@@ -479,17 +592,35 @@
 
         function renderMasterTable() {
             const tbody = document.getElementById('masterTableBody');
-            if (inspections.length === 0) { tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;">ไม่พบข้อมูล</td></tr>'; return; }
-            tbody.innerHTML = inspections.map((item, index) => {
+            
+            const selectedMonth = document.getElementById('historyMonthFilter').value; // YYYY-MM
+
+            // Filter Logic
+            const filteredInspections = inspections.filter(item => {
+                if (!selectedMonth) return true;
+                const itemMonth = item.receivedDate.substring(0, 7);
+                return itemMonth === selectedMonth;
+            });
+
+            if (filteredInspections.length === 0) { tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;">ไม่พบข้อมูลในช่วงเวลานี้</td></tr>'; return; }
+            
+            tbody.innerHTML = filteredInspections.map(item => {
+                const originalIndex = inspections.indexOf(item); 
+                
                 let badgeClass = item.passFail === 'Pass' ? 'pass' : (item.passFail === 'Fail' ? 'fail' : (item.passFail === 'Hold' ? 'hold' : 'pending'));
                 let rmDisplay = `<strong>${item.rmCode}</strong>`;
+                
+                let coaHtml = item.coaFile && item.coaFile.isLink ? `<a href="${item.coaFile.data}" target="_blank" class="btn btn-info btn-sm" style="padding:2px 6px;">COA</a>` : '-';
+                let qcHtml = item.qcFile && item.qcFile.isLink ? `<a href="${item.qcFile.data}" target="_blank" class="btn btn-success btn-sm" style="padding:2px 6px;">QC</a>` : '-';
+
                 return `<tr>
                     <td>${item.receivedDate}</td>
                     <td>${rmDisplay}<br><span style="font-size:0.75rem; color:#888;">${item.rmName}</span></td>
                     <td>${item.lotNo}</td>
                     <td><span class="status-badge ${badgeClass}">${item.passFail}</span></td>
-                    <td>${item.coaFile && item.coaFile.isLink ? `<a href="${item.coaFile.data}" target="_blank" class="btn btn-info btn-sm" style="padding:4px 8px;">📄</a>` : '-'}</td>
-                    <td><div style="display:flex; gap:5px;"><button class="btn btn-warning btn-sm" onclick="openEditModal(${index})" style="padding:4px 8px;">✏️</button><button class="btn btn-danger btn-sm" onclick="deleteRecord(${index})" style="padding:4px 8px;">🗑️</button></div></td>
+                    <td>${coaHtml}</td>
+                    <td>${qcHtml}</td>
+                    <td><div style="display:flex; gap:5px;"><button class="btn btn-warning btn-sm" onclick="openEditModal(${originalIndex})" style="padding:4px 8px;">✏️</button><button class="btn btn-danger btn-sm" onclick="deleteRecord(${originalIndex})" style="padding:4px 8px;">🗑️</button></div></td>
                 </tr>`;
             }).join('');
         }
@@ -523,7 +654,7 @@
                 (!i.coaFile || !i.coaFile.data) 
             );
             
-            document.getElementById('dashPendingBody').innerHTML = pendingItems.length === 0 ? '<tr><td colspan="3" style="text-align:center; padding:15px; color:#999; font-size:0.9rem;">No pending items</td></tr>' : pendingItems.map(item => {
+            document.getElementById('dashPendingBody').innerHTML = pendingItems.length === 0 ? '<tr><td colspan="4" style="text-align:center; padding:15px; color:#999; font-size:0.9rem;">No pending items</td></tr>' : pendingItems.map(item => {
                 const days = Math.floor((new Date() - new Date(item.receivedDate)) / (1000 * 60 * 60 * 24));
                 let agingColor = days > 7 ? '#e74c3c' : (days > 3 ? '#f39c12' : '#27ae60');
                 
@@ -534,6 +665,7 @@
 
                 return `<tr style="border-bottom:1px solid #f5f5f5;">
                     <td style="padding:10px; font-weight:600; font-size:0.85rem;">${item.rmCode}</td>
+                    <td style="font-size:0.85rem;">${item.lotNo}</td>
                     <td>${statusBadge}</td>
                     <td><span style="color:${agingColor}; font-weight:bold; font-size:0.85rem;">${days} วัน</span></td>
                 </tr>`;
@@ -542,18 +674,77 @@
 
         function performSearch() {
             const term = document.getElementById('searchInput').value.toLowerCase().trim();
-            const results = inspections.filter(item => String(item.rmCode).toLowerCase().includes(term) || String(item.rmName).toLowerCase().includes(term) || String(item.lotNo).toLowerCase().includes(term));
-            document.getElementById('searchResults').innerHTML = results.map(item => `
-                <div class="result-card" style="background:white; padding:15px; border-radius:12px; margin-bottom:10px; border-left:4px solid var(--primary); box-shadow:0 2px 8px rgba(0,0,0,0.05);">
-                    <div style="display:flex; justify-content:space-between; margin-bottom:8px; border-bottom:1px solid #f0f0f0; padding-bottom:5px;">
-                        <h3 style="margin:0; font-size:1rem; color:var(--primary);">${item.rmCode}</h3>
-                        <span class="status-badge ${item.passFail === 'Pass' ? 'pass' : (item.passFail === 'Fail' ? 'fail' : 'pending')}">${item.passFail}</span>
-                    </div>
-                    <div style="display:grid; grid-template-columns: repeat(2, 1fr); gap:10px; font-size:0.85rem;">
-                        <div><label style="color:#999;">LOT</label> <b>${item.lotNo}</b></div>
-                        <div><label style="color:#999;">QC</label> ${item.qcColor}</div>
-                    </div>
-                </div>`).join('');
+            const startMonth = document.getElementById('searchStartMonth').value; 
+            const endMonth = document.getElementById('searchEndMonth').value;     
+
+            const results = inspections.filter(item => {
+                const matchTerm = String(item.rmCode).toLowerCase().includes(term) || 
+                                  String(item.rmName).toLowerCase().includes(term) || 
+                                  String(item.lotNo).toLowerCase().includes(term);
+                let matchDate = true;
+                if (startMonth && endMonth) {
+                    const itemDate = item.receivedDate.substring(0, 7); 
+                    if (itemDate < startMonth || itemDate > endMonth) matchDate = false;
+                }
+                return matchTerm && matchDate;
+            });
+            
+            document.getElementById('searchResults').innerHTML = results.length === 0 ? 
+                '<div style="text-align:center; padding:30px; color:#999;">🚫 ไม่พบข้อมูล</div>' :
+                results.map(item => {
+                    let filesHtml = '';
+                    if(item.coaFile && item.coaFile.isLink) filesHtml += `<a href="${item.coaFile.data}" target="_blank" style="color:var(--primary); text-decoration:underline; margin-right:10px;">COA</a>`;
+                    if(item.qcFile && item.qcFile.isLink) filesHtml += `<a href="${item.qcFile.data}" target="_blank" style="color:#27ae60; text-decoration:underline;">QC Photo</a>`;
+                    if(filesHtml === '') filesHtml = '-';
+
+                    return `
+                    <div class="result-card">
+                        <div class="result-header">
+                            <div>
+                                <h3 style="margin:0; font-size:1.1rem; color:var(--primary);">
+                                    ${item.rmCode} <span style="font-size:0.9rem; color:#666; font-weight:400;">(${item.rmName})</span>
+                                    <span class="lot-badge">LOT: ${item.lotNo}</span>
+                                </h3>
+                            </div>
+                            <span class="status-badge ${item.passFail === 'Pass' ? 'pass' : (item.passFail === 'Fail' ? 'fail' : 'pending')}">${item.passFail}</span>
+                        </div>
+                        
+                        <div class="result-content">
+                            <div class="result-info-grid">
+                                <div><span class="info-label">Supplier</span> <span class="info-value">${item.supplier}</span></div>
+                                <div><span class="info-label">Int. Lot</span> <span class="info-value">${item.internalLotNo || '-'}</span></div>
+                                <div><span class="info-label">Rec. Date</span> <span class="info-value">${item.receivedDate}</span></div>
+                            </div>
+
+                            <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap:15px;">
+                                <div class="info-box coa">
+                                    <div class="result-section-label">📄 ผล COA</div>
+                                    <div class="result-info-grid" style="margin-bottom:0;">
+                                        <div><span class="info-label">Color</span> ${item.coaColor}</div>
+                                        <div><span class="info-label">Odor</span> ${item.coaOdor}</div>
+                                        <div><span class="info-label">pH</span> ${item.coaPh}</div>
+                                        <div><span class="info-label">Temp</span> ${item.coaTemp}</div>
+                                    </div>
+                                </div>
+
+                                <div class="info-box qc">
+                                    <div class="result-section-label">🧪 ผล QC</div>
+                                    <div class="result-info-grid" style="margin-bottom:0;">
+                                        <div><span class="info-label">Color</span> ${item.qcColor}</div>
+                                        <div><span class="info-label">Odor</span> ${item.qcOdor}</div>
+                                        <div><span class="info-label">pH</span> ${item.qcPh}</div>
+                                        <div><span class="info-label">Temp</span> ${item.qcTemp}</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div style="margin-top:15px; display:flex; justify-content:space-between; align-items:center; border-top:1px solid #eee; padding-top:10px;">
+                                <div><span style="color:#999; font-size:0.8rem;">APPROVED BY:</span> <b>${item.approvedBy}</b></div>
+                                <div>${filesHtml}</div>
+                            </div>
+                        </div>
+                    </div>`;
+                }).join('');
         }
 
         function openEditModal(index) {
@@ -563,28 +754,42 @@
                 const el = document.getElementById('edit_'+id);
                 if(el) el.value = item[id] || '';
             });
+            
+            // COA File Init
             editCoaFileData = null; isEditFileRemoved = false; document.getElementById('edit_fileInput').value = "";
             currentEditOriginalUrl = item.coaFile?.isLink ? item.coaFile.data : "";
-            document.getElementById('edit_fileStatus').textContent = currentEditOriginalUrl ? "มีไฟล์" : "ว่าง";
+            document.getElementById('edit_fileStatus').innerHTML = currentEditOriginalUrl ? `<a href="${currentEditOriginalUrl}" target="_blank">🔗 ดูไฟล์เดิม</a>` : "ไม่มีไฟล์";
             document.getElementById('edit_btnRemoveFile').style.display = currentEditOriginalUrl ? "inline-block" : "none";
+
+            // QC File Init
+            editQcFileData = null; isEditQcFileRemoved = false; document.getElementById('edit_qcFileInput').value = "";
+            currentEditQcUrl = item.qcFile?.isLink ? item.qcFile.data : "";
+            document.getElementById('edit_qcFileStatus').innerHTML = currentEditQcUrl ? `<a href="${currentEditQcUrl}" target="_blank">🔗 ดูรูปเดิม</a>` : "ไม่มีรูป";
+            document.getElementById('edit_btnRemoveQcFile').style.display = currentEditQcUrl ? "inline-block" : "none";
+
             document.getElementById('editModal').classList.add('active');
         }
         function closeEditModal() { document.getElementById('editModal').classList.remove('active'); }
-        function markFileRemoved() { isEditFileRemoved = true; document.getElementById('edit_fileStatus').textContent = "ลบแล้ว"; document.getElementById('edit_btnRemoveFile').style.display = "none"; }
+        function markFileRemoved() { isEditFileRemoved = true; document.getElementById('edit_fileStatus').textContent = "❌ ลบแล้ว (รอ Save)"; document.getElementById('edit_btnRemoveFile').style.display = "none"; }
+        function markQcFileRemoved() { isEditQcFileRemoved = true; document.getElementById('edit_qcFileStatus').textContent = "❌ ลบแล้ว (รอ Save)"; document.getElementById('edit_btnRemoveQcFile').style.display = "none"; }
+
         function animateValue(id, start, end, duration) { const obj = document.getElementById(id); let startTimestamp = null; const step = (timestamp) => { if (!startTimestamp) startTimestamp = timestamp; const progress = Math.min((timestamp - startTimestamp) / duration, 1); obj.innerHTML = Math.floor(progress * (end - start) + start); if (progress < 1) window.requestAnimationFrame(step); else obj.innerHTML = end; }; window.requestAnimationFrame(step); }
-        function exportToExcel() { const ws = XLSX.utils.json_to_sheet(inspections.map(i => ({...i, coaFile: i.coaFile?.data || '-'}))); const wb = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb, ws, "QC_Data"); XLSX.writeFile(wb, `QC_Report.xlsx`); }
+        function exportToExcel() { const ws = XLSX.utils.json_to_sheet(inspections.map(i => ({...i, coaFile: i.coaFile?.data || '-', qcFile: i.qcFile?.data || '-'}))); const wb = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb, ws, "QC_Data"); XLSX.writeFile(wb, `QC_Report.xlsx`); }
+        
         function readFile(input, callback) { const file = input.files[0]; if(file) { const reader = new FileReader(); reader.onload = e => callback({ name: file.name, data: e.target.result }); reader.readAsDataURL(file); } }
         document.getElementById('coaFile').addEventListener('change', e => readFile(e.target, d => { currentCoaFileData = d; document.getElementById('fileName').textContent = "📦 " + d.name; }));
-        document.getElementById('edit_fileInput').addEventListener('change', e => readFile(e.target, d => { editCoaFileData = d; document.getElementById('edit_fileStatus').textContent = "ไฟล์ใหม่"; isEditFileRemoved = false; }));
+        document.getElementById('qcFile').addEventListener('change', e => readFile(e.target, d => { currentQcFileData = d; document.getElementById('qcFileName').textContent = "📸 " + d.name; })); 
+        
+        document.getElementById('edit_fileInput').addEventListener('change', e => readFile(e.target, d => { editCoaFileData = d; document.getElementById('edit_fileStatus').textContent = "🆕 เลือกไฟล์ใหม่แล้ว"; isEditFileRemoved = false; }));
+        document.getElementById('edit_qcFileInput').addEventListener('change', e => readFile(e.target, d => { editQcFileData = d; document.getElementById('edit_qcFileStatus').textContent = "🆕 เลือกรูปใหม่แล้ว"; isEditQcFileRemoved = false; }));
+
         function showLoading(show, text) { document.getElementById('loading-overlay').style.display = show ? 'flex' : 'none'; if(text) document.getElementById('loading-text').textContent = text; }
         
-        // ✅ Fixed showTab Logic
         function showTab(t) { 
             document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active')); 
             document.querySelectorAll('.tab-content').forEach(x=>x.classList.remove('active')); 
             document.getElementById(t).classList.add('active'); 
             
-            // Highlight the correct button
             const btn = document.querySelector(`.tab[onclick*="${t}"]`);
             if(btn) btn.classList.add('active');
 
