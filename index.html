@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>QC System v4.9 (Final Polish)</title>
+    <title>QC System v5.0 (Final Perfected)</title>
     
     <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
@@ -15,7 +15,7 @@
         :root {
             --primary: #2c4b46;       /* Deep Teal */
             --primary-soft: #3d6e66;
-            --active-green: #27ae60;  /* Green for Active State */
+            --active-green: #27ae60;  /* ✅ สีเขียวสำหรับปุ่ม Active */
             --bg-body: #f0f2f5;
             --text-main: #2d3436;
             --text-light: #636e72;
@@ -32,7 +32,7 @@
             padding: 15px;
             color: var(--text-main); 
             line-height: 1.5;
-            overflow-x: hidden; 
+            overflow-x: hidden;
         }
         
         .container { max-width: 1200px; margin: 0 auto; width: 100%; }
@@ -51,7 +51,7 @@
         .header h1 { font-size: 1.5rem; margin-bottom: 5px; font-weight: 600; }
         .header p { font-size: 0.9rem; opacity: 0.9; }
 
-        /* Tabs (Balanced & Green Active) */
+        /* --- TABS (Fixed Logic) --- */
         .tabs { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 20px; }
         .tab { 
             padding: 12px 10px; background: white; border: none; border-radius: 12px; cursor: pointer; 
@@ -60,7 +60,14 @@
             display: flex; align-items: center; justify-content: center; gap: 8px;
         }
         .tab:hover { transform: translateY(-2px); color: var(--primary); }
-        .tab.active { background: var(--active-green); color: white; box-shadow: 0 4px 12px rgba(39, 174, 96, 0.3); }
+        
+        /* ✅ Active State Style */
+        .tab.active { 
+            background: var(--active-green); 
+            color: white; 
+            box-shadow: 0 4px 12px rgba(39, 174, 96, 0.4); 
+            transform: translateY(-1px);
+        }
         
         .tab-content { display: none; background: white; padding: 25px; border-radius: 16px; box-shadow: var(--shadow-md); min-height: 400px; }
         .tab-content.active { display: block; animation: fadeIn 0.3s ease-out; }
@@ -71,7 +78,7 @@
         .section-title { font-size: 1rem; font-weight: 600; color: var(--primary); margin-bottom: 20px; display: flex; align-items: center; gap: 8px; border-bottom: 2px solid rgba(44, 75, 70, 0.1); padding-bottom: 8px; }
         .section-icon { background: rgba(44, 75, 70, 0.1); color: var(--primary); width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; border-radius: 6px; font-size: 0.9rem; }
         .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px; }
-        .form-group { position: relative; /* สำคัญสำหรับ Autocomplete */ }
+        .form-group { position: relative; }
         .form-group label { display: block; margin-bottom: 6px; font-weight: 500; font-size: 0.9rem; color: var(--text-main); }
         .required { color: #e74c3c; margin-left: 2px; }
         .form-group input, .form-group select { 
@@ -80,19 +87,11 @@
         }
         .form-group input:focus, .form-group select:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 3px rgba(44, 75, 70, 0.15); }
         
-        /* FIX 1: Autocomplete Styling (แก้บั๊กตกขอบ/บัง) */
+        /* Autocomplete Fixed */
         .autocomplete-list { 
-            position: absolute; 
-            z-index: 1000; /* ให้ลอยเหนือสุด */
-            top: 100%; 
-            left: 0; 
-            right: 0; 
-            background: white; 
-            border: 1px solid #ddd; 
-            border-radius: 0 0 10px 10px; 
-            box-shadow: 0 10px 20px rgba(0,0,0,0.15); 
-            max-height: 200px; 
-            overflow-y: auto; 
+            position: absolute; z-index: 1000; top: 100%; left: 0; right: 0; 
+            background: white; border: 1px solid #ddd; border-radius: 0 0 10px 10px; 
+            box-shadow: 0 10px 20px rgba(0,0,0,0.15); max-height: 200px; overflow-y: auto; 
         }
         .autocomplete-item { padding: 10px 15px; cursor: pointer; border-bottom: 1px solid #f9f9f9; font-size: 0.9rem; }
         .autocomplete-item:hover { background: #f0f7f6; color: var(--primary); }
@@ -128,7 +127,6 @@
         .card-fail { border-bottom-color: #e74c3c; } .card-fail .kpi-icon { color: #e74c3c; }
         .card-rate { border-bottom-color: #f39c12; } .card-rate .kpi-icon { color: #f39c12; }
 
-        /* FIX 5: Mobile Overflow & Layout */
         .charts-row { display: grid; grid-template-columns: 1fr 1.5fr; gap: 20px; }
         .chart-box { background: white; padding: 20px; border-radius: 16px; box-shadow: var(--shadow-sm); border: 1px solid #f5f5f5; width: 100%; overflow: hidden; }
         .chart-header { font-size: 1rem; font-weight: 600; color: var(--primary); margin-bottom: 15px; }
@@ -160,7 +158,7 @@
             .tab { flex-direction: row; padding: 10px 5px; border-radius: 10px; font-size: 0.85rem; white-space: nowrap; }
             .tab span { font-size: 1.1rem; }
             .form-row { grid-template-columns: 1fr; gap: 12px; }
-            .charts-row { grid-template-columns: 1fr; } /* กราฟเรียงแนวตั้งบนมือถือ */
+            .charts-row { grid-template-columns: 1fr; } 
             .dashboard-grid { grid-template-columns: 1fr 1fr; gap: 10px; }
             .page-header-flex { flex-direction: column; align-items: flex-start; gap: 10px; }
             .page-header-actions { width: 100%; }
@@ -173,8 +171,8 @@
 
     <div class="container">
         <div class="header">
-            <h1>☁️ QC System v4.9</h1>
-            <p>ระบบตรวจสอบคุณภาพวัตถุดิบ (Fixed & Polished)</p>
+            <h1>☁️ QC System v5.0</h1>
+            <p>ระบบตรวจสอบคุณภาพวัตถุดิบ (Perfect Fit)</p>
         </div>
         
         <div class="tabs">
@@ -505,7 +503,6 @@
             animateValue("dashTotal", 0, total, 1000); animateValue("dashPass", 0, passed, 1000); animateValue("dashFail", 0, failed, 1000);
             document.getElementById('dashRate').textContent = rate + '%';
 
-            // FIX 3: Chart with % (DataLabels)
             if (myPieChart) myPieChart.destroy();
             myPieChart = new Chart(document.getElementById('qcPieChart').getContext('2d'), {
                 type: 'doughnut',
@@ -520,18 +517,16 @@
                 }
             });
 
-            // FIX 4: Pending Logic (Include No COA)
             const pendingItems = inspections.filter(i => 
                 i.passFail === 'Pending' || 
                 i.passFail === 'Hold' || 
-                (!i.coaFile || !i.coaFile.data) // Added: No COA check
+                (!i.coaFile || !i.coaFile.data) 
             );
             
             document.getElementById('dashPendingBody').innerHTML = pendingItems.length === 0 ? '<tr><td colspan="3" style="text-align:center; padding:15px; color:#999; font-size:0.9rem;">No pending items</td></tr>' : pendingItems.map(item => {
                 const days = Math.floor((new Date() - new Date(item.receivedDate)) / (1000 * 60 * 60 * 24));
                 let agingColor = days > 7 ? '#e74c3c' : (days > 3 ? '#f39c12' : '#27ae60');
                 
-                // Determine Status Display
                 let statusBadge = '';
                 if(item.passFail === 'Pending') statusBadge = '<span class="status-badge pending">Pending</span>';
                 else if(item.passFail === 'Hold') statusBadge = '<span class="status-badge hold">Hold</span>';
@@ -564,7 +559,6 @@
         function openEditModal(index) {
             const item = inspections[index];
             document.getElementById('editOriginalTimestamp').value = item.timestamp;
-            // Map all fields including new COA ones
             ['rmCode','rmName','supplier','lotNo','internalLotNo','receivedDate','coaColor','coaOdor','coaPh','coaTemp','qcColor','qcOdor','qcPh','qcTemp','passFail','approvedBy','approvedDate'].forEach(id => {
                 const el = document.getElementById('edit_'+id);
                 if(el) el.value = item[id] || '';
@@ -583,9 +577,20 @@
         document.getElementById('coaFile').addEventListener('change', e => readFile(e.target, d => { currentCoaFileData = d; document.getElementById('fileName').textContent = "📦 " + d.name; }));
         document.getElementById('edit_fileInput').addEventListener('change', e => readFile(e.target, d => { editCoaFileData = d; document.getElementById('edit_fileStatus').textContent = "ไฟล์ใหม่"; isEditFileRemoved = false; }));
         function showLoading(show, text) { document.getElementById('loading-overlay').style.display = show ? 'flex' : 'none'; if(text) document.getElementById('loading-text').textContent = text; }
-        function showTab(t) { document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active')); document.querySelectorAll('.tab-content').forEach(x=>x.classList.remove('active')); document.getElementById(t).classList.add('active'); if(t==='master'||t==='summary') fetchData(); else if(t==='form') document.querySelector('.tab[onclick="showTab(\'form\')"]').classList.add('active'); }
         
-        // FIX 1: Autocomplete Z-Index Bug
+        // ✅ Fixed showTab Logic
+        function showTab(t) { 
+            document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active')); 
+            document.querySelectorAll('.tab-content').forEach(x=>x.classList.remove('active')); 
+            document.getElementById(t).classList.add('active'); 
+            
+            // Highlight the correct button
+            const btn = document.querySelector(`.tab[onclick*="${t}"]`);
+            if(btn) btn.classList.add('active');
+
+            if(t==='master'||t==='summary') fetchData(); 
+        }
+        
         function handleAutocomplete(e, f) { 
             const listDiv = document.getElementById(f + '-autocomplete-list'); 
             const val = e.target.value.toLowerCase(); 
