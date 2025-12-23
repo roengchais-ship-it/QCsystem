@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>QC System (Cloud Edit Supported)</title>
+    <title>QC System (Cloud + Edit + Search)</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <style>
         /* CSS Styles */
@@ -63,6 +63,10 @@
         .stat-card h3 { font-size: 14px; margin-bottom: 10px; opacity: 0.9; }
         .stat-card .value { font-size: 36px; font-weight: 700; }
 
+        /* Search Box */
+        .search-box input { width: 100%; padding: 16px; border: 2px solid #667eea; border-radius: 8px; font-size: 16px; margin-bottom: 20px; }
+        .result-card { background: #f8f9ff; border-left: 4px solid #667eea; padding: 20px; margin-bottom: 15px; border-radius: 6px; }
+
         /* Modal */
         .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); overflow: auto; }
         .modal.active { display: block; }
@@ -76,15 +80,15 @@
 
     <div class="container">
         <div class="header">
-            <h1>☁️ QC System (Cloud Edit Supported)</h1>
-            <p>ระบบ QC เชื่อมต่อ Google Sheets (เพิ่ม/แก้ไข ข้อมูลได้)</p>
+            <h1>☁️ QC System (Cloud + Edit + Search)</h1>
+            <p>ระบบ QC เชื่อมต่อ Google Sheets (ค้นหา/เพิ่ม/แก้ไข ข้อมูลได้)</p>
         </div>
         
         <div class="tabs">
             <button class="tab active" onclick="showTab('form')">📝 Inspection Form</button>
             <button class="tab" onclick="showTab('master')">📊 Master Data</button>
             <button class="tab" onclick="showTab('summary')">📈 Summary</button>
-        </div>
+            <button class="tab" onclick="showTab('search')">🔍 Search</button> </div>
 
         <div id="form" class="tab-content active">
             <form id="qcForm">
@@ -193,6 +197,14 @@
                 <div class="stat-card" style="background: linear-gradient(135deg, #eb3349 0%, #f45c43 100%);"><h3>Failed</h3><div class="value" id="totalFailed">0</div></div>
             </div>
         </div>
+
+        <div id="search" class="tab-content">
+            <h2 style="margin-bottom: 30px;">🔍 Search (Cloud Data)</h2>
+            <div class="search-box">
+                <input type="text" id="searchInput" placeholder="Type RM Code or Lot No..." oninput="performSearch()">
+            </div>
+            <div id="searchResults" class="result-grid"></div>
+        </div>
     </div>
 
     <div id="editModal" class="modal">
@@ -267,7 +279,7 @@
 
     <script>
         // ============================================
-        // ⚙️ URL ที่คุณระบุมา
+        // ⚙️ URL ของคุณ
         // ============================================
         const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbyIrW6R8QPEkvxoO4p-cMIv3T3Eqcp2xIhI26kgReu6g42s2kYon1IBS2foAyd3TBROmA/exec"; 
         // ============================================
@@ -380,8 +392,6 @@
                     alert("❌ Error from Server: " + result.message);
                 }
             } catch (error) {
-                // Google Script sometimes returns opaque response for no-cors, but we use text/plain hack usually. 
-                // If it fails but saves, just refresh.
                 console.warn(error);
                 alert("✅ Request Sent! (Click Refresh if data doesn't appear)");
                 fetchData();
@@ -515,6 +525,39 @@
             const wb = XLSX.utils.book_new();
             XLSX.utils.book_append_sheet(wb, ws, "QC_Data");
             XLSX.writeFile(wb, `QC_Report_${new Date().toISOString().split('T')[0]}.xlsx`);
+        }
+
+        // Search Function (เพิ่มกลับมาแล้ว)
+        function performSearch() {
+            const term = document.getElementById('searchInput').value.toLowerCase().trim();
+            const resultsDiv = document.getElementById('searchResults');
+            
+            if (!term) { 
+                resultsDiv.innerHTML = '<p style="text-align:center;color:#999;width:100%;">Type to search...</p>'; 
+                return; 
+            }
+            
+            const results = inspections.filter(item => 
+                item.rmCode.toLowerCase().includes(term) || 
+                item.lotNo.toLowerCase().includes(term) || 
+                item.supplier.toLowerCase().includes(term)
+            );
+
+            if (results.length === 0) {
+                resultsDiv.innerHTML = '<div style="text-align:center;">No results found</div>';
+                return;
+            }
+
+            resultsDiv.innerHTML = results.map((item) => `
+                <div class="result-card">
+                    <h3>${item.rmCode} - ${item.rmName}</h3>
+                    <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
+                        <div><small>Lot:</small> <b>${item.lotNo}</b></div>
+                        <div><small>Result:</small> <b>${item.passFail}</b></div>
+                    </div>
+                    ${item.coaFile && item.coaFile.isLink ? `<a href="${item.coaFile.data}" target="_blank" style="display:block; margin-top:10px; color:#667eea;">📄 Open COA</a>` : ''}
+                </div>
+            `).join('');
         }
 
         function showLoading(show, text) {
