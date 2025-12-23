@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>QC System v4.7 (Perfect Fit)</title>
+    <title>QC System v4.8 (Green Active Tab & Fixed Overflow)</title>
     
     <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
@@ -12,9 +12,9 @@
     <style>
         /* --- THEME CONFIG --- */
         :root {
-            --primary: #2c4b46;       /* Deep Teal */
-            --primary-soft: #3d6e66;  /* Lighter Teal */
-            --accent: #d4a373;        /* Gold/Brown */
+            --primary: #2c4b46;       /* Deep Teal (สีหลักเดิม) */
+            --primary-soft: #3d6e66;
+            --active-green: #27ae60;  /* สีเขียวสำหรับปุ่ม Active */
             --bg-body: #f0f2f5;
             --text-main: #2d3436;
             --text-light: #636e72;
@@ -28,12 +28,13 @@
         body { 
             font-family: 'Prompt', sans-serif; 
             background: var(--bg-body); 
-            padding: 20px; /* ลด Padding รวม */
+            padding: 20px;
             color: var(--text-main); 
             line-height: 1.5;
+            overflow-x: hidden; /* ป้องกันการเลื่อนซ้ายขวาในระดับ Body */
         }
         
-        .container { max-width: 1200px; margin: 0 auto; }
+        .container { max-width: 1200px; margin: 0 auto; width: 100%; }
 
         /* Loading */
         #loading-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255, 255, 255, 0.95); display: none; justify-content: center; align-items: center; flex-direction: column; z-index: 9999; backdrop-filter: blur(5px); }
@@ -50,16 +51,23 @@
         .header h1 { font-size: 1.6rem; margin-bottom: 5px; font-weight: 600; }
         .header p { font-size: 0.9rem; opacity: 0.9; }
 
-        /* Tabs */
+        /* --- TABS (ปรับปรุงใหม่) --- */
         .tabs { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 20px; }
         .tab { 
-            padding: 12px 5px; background: white; border: none; border-radius: 12px; cursor: pointer; 
-            font-size: 0.9rem; font-weight: 500; color: var(--text-light); transition: all 0.2s ease; 
+            padding: 12px 15px; background: white; border: none; border-radius: 12px; cursor: pointer; 
+            font-size: 0.95rem; font-weight: 600; color: var(--text-light); transition: all 0.2s ease; 
             box-shadow: var(--shadow-sm); font-family: 'Prompt', sans-serif; 
-            display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 5px;
+            display: flex; align-items: center; justify-content: center; gap: 8px; /* แนวนอน */
         }
         .tab:hover { transform: translateY(-2px); color: var(--primary); }
-        .tab.active { background: var(--primary); color: white; box-shadow: 0 4px 12px rgba(44, 75, 70, 0.3); }
+        
+        /* ปุ่ม Active เป็นสีเขียว */
+        .tab.active { 
+            background: var(--active-green); 
+            color: white; 
+            box-shadow: 0 4px 12px rgba(39, 174, 96, 0.3); 
+        }
+        .tab span { font-size: 1.2rem; }
         
         .tab-content { 
             display: none; background: white; padding: 25px; border-radius: 16px; 
@@ -68,7 +76,7 @@
         .tab-content.active { display: block; animation: fadeIn 0.3s ease-out; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-        /* Page Headers inside Tabs (Flexbox for responsive) */
+        /* Page Headers inside Tabs */
         .page-header-flex {
             display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 15px;
         }
@@ -90,7 +98,7 @@
         .file-upload { border: 2px dashed #cbd5e0; padding: 20px; text-align: center; border-radius: 10px; cursor: pointer; transition: 0.3s; background: #f8fafc; }
         .file-upload:hover { border-color: var(--primary); background: #f0f7f6; }
 
-        /* Buttons (ปรับขนาดให้กระชับ) */
+        /* Buttons */
         .btn { 
             padding: 10px 20px; border: none; border-radius: 10px; font-size: 0.95rem; font-weight: 500; 
             cursor: pointer; transition: 0.2s; display: inline-flex; align-items: center; justify-content: center; gap: 6px; font-family: 'Prompt', sans-serif; 
@@ -103,9 +111,9 @@
         .btn-danger { background: #e74c3c; color: white; padding: 6px 10px; font-size: 0.85rem; }
         .btn-sm { padding: 6px 10px; font-size: 0.8rem; border-radius: 8px; }
 
-        /* Table (ปรับฟอนต์ให้เล็กลงในมือถือ) */
+        /* Table */
         .table-container { border-radius: 12px; overflow-x: auto; border: 1px solid #eee; margin-top: 15px; }
-        table { width: 100%; border-collapse: collapse; min-width: 600px; } /* Min-width ป้องกันตารางบี้ */
+        table { width: 100%; border-collapse: collapse; min-width: 600px; }
         th { background: #f8f9fa; color: var(--text-light); padding: 12px 10px; text-align: left; font-weight: 600; font-size: 0.85rem; text-transform: uppercase; white-space: nowrap; }
         td { padding: 12px 10px; border-bottom: 1px solid #f0f0f0; color: var(--text-main); font-size: 0.9rem; vertical-align: middle; }
         tr:hover { background-color: #fafafa; }
@@ -135,7 +143,7 @@
         /* Search */
         .search-hero { background: white; padding: 30px 20px; border-radius: 16px; text-align: center; border: 1px solid #eee; margin-bottom: 20px; }
         .search-input-modern { 
-            width: 100%; max-width: 100%; padding: 14px 20px 14px 45px; /* ปรับ Padding ให้พอดี */
+            width: 100%; max-width: 100%; padding: 14px 20px 14px 45px;
             font-size: 1rem; border: 2px solid #eee; border-radius: 50px; font-family: 'Prompt';
             background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="%232c4b46" stroke-width="2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>') no-repeat 15px center;
         }
@@ -148,30 +156,37 @@
         .autocomplete-item { padding: 12px 16px; cursor: pointer; border-bottom: 1px solid #f9f9f9; font-size: 0.9rem; }
         .autocomplete-item:hover { background: #f0f7f6; color: var(--primary); }
 
-        /* --- MOBILE RESPONSIVE FIXES --- */
+        /* --- MOBILE RESPONSIVE FIXES (V4.8) --- */
         @media (max-width: 600px) {
-            body { padding: 15px 10px; }
+            body { padding: 15px 10px; } /* ลด padding body */
             .header { padding: 20px; border-radius: 12px; }
             .header h1 { font-size: 1.4rem; }
             
-            .tab-content { padding: 15px; } /* ลด padding ในการ์ด */
+            .tab-content { padding: 15px; }
             
-            /* Tabs */
+            /* Tabs: ปรับให้ Balance ในมือถือ (แนวนอน) */
             .tabs { gap: 5px; }
-            .tab { font-size: 0.75rem; padding: 8px 4px; border-radius: 8px; }
-            .tab span { font-size: 1.2rem; } /* ไอคอนใหญ่ขึ้นนิดนึง */
+            .tab { 
+                flex-direction: row; /* บังคับแนวนอนในมือถือ */
+                padding: 10px 5px; 
+                border-radius: 10px; 
+                font-size: 0.85rem;
+                white-space: nowrap; /* ห้ามตัดบรรทัด */
+            }
+            .tab span { font-size: 1.1rem; }
 
             /* Form */
             .form-row { grid-template-columns: 1fr; gap: 12px; }
             
-            /* Header Flex (แก้ปัญหาปุ่มใหญ่) */
+            /* Header Flex */
             .page-header-flex { flex-direction: column; align-items: flex-start; gap: 10px; }
             .page-header-actions { width: 100%; }
-            .page-header-actions .btn { flex: 1; padding: 10px; font-size: 0.9rem; } /* ปุ่มขยายเต็ม */
+            .page-header-actions .btn { flex: 1; padding: 10px; font-size: 0.9rem; }
 
-            /* Dashboard */
+            /* Dashboard: แก้กรอบตก */
             .charts-row { grid-template-columns: 1fr; }
-            .dashboard-grid { grid-template-columns: 1fr 1fr; gap: 10px; }
+            /* บังคับเหลือ 1 คอลัมน์เต็มๆ ในมือถือ */
+            .dashboard-grid { grid-template-columns: 1fr; gap: 10px; }
             .kpi-card { padding: 15px; }
             .kpi-info .value { font-size: 1.5rem; }
             .kpi-icon { font-size: 1.5rem; }
@@ -183,15 +198,15 @@
 
     <div class="container">
         <div class="header">
-            <h1>☁️ QC System v4.7</h1>
-            <p>ระบบตรวจสอบคุณภาพวัตถุดิบ (Perfect Fit)</p>
+            <h1>☁️ QC System v4.8</h1>
+            <p>ระบบตรวจสอบคุณภาพวัตถุดิบ (Green Active Tab & Fixed Overflow)</p>
         </div>
         
         <div class="tabs">
-            <button class="tab active" onclick="showTab('form')"><span>📝</span><br>Form</button>
-            <button class="tab" onclick="showTab('master')"><span>📊</span><br>History</button>
-            <button class="tab" onclick="showTab('summary')"><span>📈</span><br>Dash</button>
-            <button class="tab" onclick="showTab('search')"><span>🔍</span><br>Search</button>
+            <button class="tab active" onclick="showTab('form')"><span>📝</span> Form</button>
+            <button class="tab" onclick="showTab('master')"><span>📊</span> History</button>
+            <button class="tab" onclick="showTab('summary')"><span>📈</span> Dash</button>
+            <button class="tab" onclick="showTab('search')"><span>🔍</span> Search</button>
         </div>
 
         <div id="form" class="tab-content active">
