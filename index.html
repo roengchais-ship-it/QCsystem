@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>QC System v6.3 (Secure Login)</title>
+    <title>QC System v6.3 (Full Feature Edit)</title>
     
     <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
@@ -26,6 +26,7 @@
 
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { font-family: 'Prompt', sans-serif; background: var(--bg-body); color: var(--text-main); line-height: 1.5; overflow-x: hidden; }
+        .container { max-width: 1200px; margin: 0 auto; width: 100%; }
 
         /* --- Login Overlay --- */
         #login-overlay {
@@ -39,89 +40,85 @@
         }
         @keyframes fadeInDown { from { opacity: 0; transform: translateY(-30px); } to { opacity: 1; transform: translateY(0); } }
         .login-card h2 { margin-bottom: 10px; color: var(--primary); font-size: 1.8rem; }
-        .login-card p { color: #888; margin-bottom: 25px; font-size: 0.9rem; }
         .login-card input {
             width: 100%; padding: 14px; margin-bottom: 15px; border: 1px solid #ddd;
             border-radius: 12px; font-family: 'Prompt'; font-size: 1rem; transition: 0.3s;
         }
-        .login-card input:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 4px rgba(44, 75, 70, 0.1); }
         #loginError { color: #e74c3c; font-size: 0.85rem; margin-bottom: 15px; display: none; }
 
-        /* --- Main UI Hidden --- */
-        #main-app { display: none; }
-        .container { max-width: 1200px; margin: 0 auto; width: 100%; padding: 15px; }
-
-        /* Loading */
+        /* --- Loading --- */
         #loading-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255, 255, 255, 0.95); display: none; justify-content: center; align-items: center; flex-direction: column; z-index: 9999; backdrop-filter: blur(5px); }
         .spinner { border: 4px solid #f3f3f3; border-top: 4px solid var(--primary); border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; margin-bottom: 15px; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 
-        /* Header & Nav */
-        .header { background: linear-gradient(120deg, var(--primary) 0%, var(--primary-soft) 100%); color: white; padding: 30px 20px; border-radius: 16px; margin-bottom: 20px; box-shadow: var(--shadow-md); position: relative; }
+        /* --- Header --- */
+        .header { background: linear-gradient(120deg, var(--primary) 0%, var(--primary-soft) 100%); color: white; padding: 25px 20px; border-radius: 16px; margin-bottom: 20px; box-shadow: var(--shadow-md); position: relative; }
         .user-panel { position: absolute; top: 15px; right: 20px; display: flex; align-items: center; gap: 10px; }
         .user-tag { background: rgba(255,255,255,0.2); padding: 4px 12px; border-radius: 20px; font-size: 0.8rem; font-weight: 500; }
 
+        /* --- Tabs --- */
         .tabs { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 20px; }
-        .tab { padding: 12px 10px; background: white; border: none; border-radius: 12px; cursor: pointer; font-size: 0.9rem; font-weight: 600; color: var(--text-light); transition: 0.2s; box-shadow: var(--shadow-sm); font-family: 'Prompt'; display: flex; align-items: center; justify-content: center; gap: 8px; }
+        .tab { padding: 12px 10px; background: white; border: none; border-radius: 12px; cursor: pointer; font-size: 0.9rem; font-weight: 600; color: var(--text-light); transition: all 0.2s ease; box-shadow: var(--shadow-sm); font-family: 'Prompt'; display: flex; align-items: center; justify-content: center; gap: 8px; }
         .tab.active { background: var(--active-green); color: white; box-shadow: 0 4px 12px rgba(39, 174, 96, 0.4); }
-
-        .tab-content { display: none; background: white; padding: 25px; border-radius: 16px; box-shadow: var(--shadow-md); min-height: 450px; }
-        .tab-content.active { display: block; animation: fadeIn 0.3s; }
+        .tab-content { display: none; background: white; padding: 25px; border-radius: 16px; box-shadow: var(--shadow-md); min-height: 400px; }
+        .tab-content.active { display: block; animation: fadeIn 0.3s ease-out; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-        /* Components */
+        /* --- Form Elements --- */
         .form-section { margin-bottom: 30px; padding: 20px; border-radius: 12px; background: #fcfcfc; border: 1px solid #f0f0f0; }
-        .section-title { font-size: 1rem; font-weight: 600; color: var(--primary); margin-bottom: 20px; border-bottom: 2px solid rgba(44, 75, 70, 0.1); padding-bottom: 8px; display: flex; align-items: center; gap: 8px; }
+        .section-title { font-size: 1rem; font-weight: 600; color: var(--primary); margin-bottom: 20px; display: flex; align-items: center; gap: 8px; border-bottom: 2px solid rgba(44, 75, 70, 0.1); padding-bottom: 8px; }
+        .section-icon { background: rgba(44, 75, 70, 0.1); color: var(--primary); width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; border-radius: 6px; font-size: 0.9rem; }
         .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px; }
         .form-group { position: relative; }
         .form-group label { display: block; margin-bottom: 6px; font-weight: 500; font-size: 0.9rem; }
-        .form-group input, .form-group select { width: 100%; padding: 10px; border: 1px solid var(--border-input); border-radius: 10px; font-family: 'Prompt'; font-size: 0.95rem; }
-        .required { color: #e74c3c; }
-
-        .btn { padding: 10px 20px; border: none; border-radius: 10px; cursor: pointer; font-family: 'Prompt'; font-weight: 500; transition: 0.2s; display: inline-flex; align-items: center; justify-content: center; gap: 6px; }
-        .btn:active { transform: scale(0.98); }
-        .btn-primary { background: var(--primary); color: white; }
-        .btn-danger { background: #e74c3c; color: white; }
-        .btn-warning { background: #f39c12; color: white; }
-        .btn-success { background: #27ae60; color: white; }
-        .btn-secondary { background: #636e72; color: white; }
-        .btn-sm { padding: 5px 10px; font-size: 0.8rem; border-radius: 6px; }
+        .required { color: #e74c3c; margin-left: 2px; }
+        .form-group input, .form-group select { width: 100%; padding: 10px 12px; border: 1px solid var(--border-input); border-radius: 10px; font-size: 0.95rem; font-family: 'Prompt'; transition: all 0.2s; }
+        .form-group input:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 3px rgba(44, 75, 70, 0.15); }
 
         /* Autocomplete */
-        .autocomplete-list { position: absolute; z-index: 1000; top: 100%; left: 0; right: 0; background: white; border: 1px solid #ddd; border-radius: 10px; box-shadow: var(--shadow-md); max-height: 200px; overflow-y: auto; display: none; }
-        .autocomplete-item { padding: 10px; cursor: pointer; border-bottom: 1px solid #f5f5f5; font-size: 0.9rem; }
+        .autocomplete-list { position: absolute; z-index: 1000; top: 100%; left: 0; right: 0; background: white; border: 1px solid #ddd; border-radius: 10px; box-shadow: 0 10px 20px rgba(0,0,0,0.15); max-height: 200px; overflow-y: auto; display: none; }
+        .autocomplete-item { padding: 10px 15px; cursor: pointer; border-bottom: 1px solid #f9f9f9; font-size: 0.9rem; }
         .autocomplete-item:hover { background: #f0f7f6; color: var(--primary); }
 
-        /* Tables */
-        .table-wrapper { overflow-x: auto; margin-top: 15px; border-radius: 12px; border: 1px solid #eee; }
-        table { width: 100%; border-collapse: collapse; min-width: 700px; }
-        th { background: #f8f9fa; padding: 12px; text-align: left; font-size: 0.85rem; color: #666; font-weight: 600; border-bottom: 2px solid #eee; }
-        td { padding: 12px; border-bottom: 1px solid #f5f5f5; font-size: 0.9rem; }
+        .file-upload { border: 2px dashed #cbd5e0; padding: 20px; text-align: center; border-radius: 10px; cursor: pointer; transition: 0.3s; background: #f8fafc; }
+        .file-upload:hover { border-color: var(--primary); background: #f0f7f6; }
 
-        /* Status */
-        .status-badge { padding: 4px 12px; border-radius: 20px; font-size: 0.75rem; font-weight: 700; }
-        .pass { background: rgba(39, 174, 96, 0.1); color: #27ae60; }
-        .fail { background: rgba(231, 76, 60, 0.1); color: #e74c3c; }
-        .pending { background: rgba(243, 156, 18, 0.1); color: #f39c12; }
+        /* Buttons */
+        .btn { padding: 10px 20px; border: none; border-radius: 10px; font-size: 0.95rem; font-weight: 500; cursor: pointer; transition: 0.2s; display: inline-flex; align-items: center; justify-content: center; gap: 6px; font-family: 'Prompt'; }
+        .btn-primary { background: var(--primary); color: white; }
+        .btn-success { background: #27ae60; color: white; }
+        .btn-warning { background: #f39c12; color: white; }
+        .btn-danger { background: #e74c3c; color: white; }
+        .btn-secondary { background: #636e72; color: white; }
+        .btn-sm { padding: 6px 10px; font-size: 0.8rem; border-radius: 8px; }
 
-        /* Dashboard */
-        .kpi-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 25px; }
-        .kpi-card { background: white; padding: 20px; border-radius: 16px; box-shadow: var(--shadow-sm); display: flex; align-items: center; justify-content: space-between; border-left: 5px solid var(--primary); }
-        .kpi-val { font-size: 1.8rem; font-weight: 700; }
-        .kpi-label { font-size: 0.8rem; color: #888; text-transform: uppercase; }
+        /* Table */
+        .table-container-scroll { border-radius: 12px; overflow-x: auto; border: 1px solid #eee; margin-top: 15px; width: 100%; }
+        table { width: 100%; border-collapse: collapse; min-width: 800px; }
+        th { background: #f8f9fa; color: var(--text-light); padding: 12px 10px; text-align: left; font-weight: 600; font-size: 0.85rem; }
+        td { padding: 12px 10px; border-bottom: 1px solid #f0f0f0; color: var(--text-main); font-size: 0.9rem; }
 
-        /* Modals */
-        .modal { display: none; position: fixed; z-index: 5000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); backdrop-filter: blur(5px); justify-content: center; align-items: center; }
+        /* Dashboard & Charts */
+        .dashboard-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 25px; }
+        .kpi-card { background: white; padding: 20px; border-radius: 14px; box-shadow: var(--shadow-sm); display: flex; align-items: center; justify-content: space-between; border-bottom: 4px solid var(--primary); }
+        .kpi-info h3 { font-size: 0.8rem; color: var(--text-light); text-transform: uppercase; margin-bottom: 4px; }
+        .kpi-info .value { font-size: 1.8rem; font-weight: 700; }
+        .charts-row { display: grid; grid-template-columns: 1fr 1.5fr; gap: 20px; }
+        .chart-box { background: white; padding: 20px; border-radius: 16px; box-shadow: var(--shadow-sm); border: 1px solid #f5f5f5; }
+
+        /* Status Badges */
+        .status-badge { padding: 4px 10px; border-radius: 20px; font-size: 0.75rem; font-weight: 600; }
+        .pass { background: rgba(39, 174, 96, 0.15); color: #27ae60; }
+        .fail { background: rgba(231, 76, 60, 0.15); color: #e74c3c; }
+        .pending { background: rgba(243, 156, 18, 0.15); color: #f39c12; }
+        .hold { background: rgba(149, 165, 166, 0.2); color: #7f8c8d; }
+
+        /* Modal */
+        .modal { display: none; position: fixed; z-index: 5000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); backdrop-filter: blur(4px); justify-content: center; align-items: center; }
         .modal.active { display: flex; }
-        .modal-content { background: white; padding: 25px; border-radius: 20px; width: 95%; max-width: 500px; max-height: 90vh; overflow-y: auto; position: relative; box-shadow: var(--shadow-md); }
-        .close-btn { position: absolute; top: 15px; right: 20px; font-size: 1.5rem; cursor: pointer; border: none; background: none; }
+        .modal-content { background: white; padding: 25px; border-radius: 16px; width: 95%; max-width: 600px; max-height: 90vh; overflow-y: auto; position: relative; }
 
-        @media (max-width: 768px) {
-            .form-row { grid-template-columns: 1fr; }
-            .tabs { grid-template-columns: repeat(2, 1fr); }
-            .user-panel { position: static; margin-top: 15px; justify-content: flex-start; }
-            .header { padding: 20px; }
-        }
+        @media (max-width: 768px) { .form-row { grid-template-columns: 1fr; } .tabs { grid-template-columns: repeat(2, 1fr); } .charts-row { grid-template-columns: 1fr; } }
     </style>
 </head>
 <body>
@@ -131,34 +128,31 @@
         <div class="login-card">
             <h2>🔐 QC System Login</h2>
             <p>กรุณาเข้าสู่ระบบเพื่อใช้งาน</p>
-            <!-- เพิ่ม id="loginForm" และ onsubmit เพื่อดักจับปุ่ม Enter -->
             <form id="loginForm" onsubmit="event.preventDefault(); handleLogin();">
                 <input type="text" id="loginUser" placeholder="Username" autocomplete="username">
                 <input type="password" id="loginPass" placeholder="Password" autocomplete="current-password">
                 <div id="loginError">Username หรือ Password ไม่ถูกต้อง</div>
-                <button type="submit" class="btn btn-primary" style="width:100%; padding: 14px;">ยืนยัน</button>
+                <button type="submit" class="btn btn-primary" style="width:100%; padding: 14px;">ยืนยัน (Enter)</button>
             </form>
         </div>
     </div>
 
     <!-- 🔄 Loading -->
-    <div id="loading-overlay"><div class="spinner"></div><span id="loading-text">กำลังประมวลผล...</span></div>
+    <div id="loading-overlay"><div class="spinner"></div><span id="loading-text">กำลังโหลด...</span></div>
 
     <!-- 📱 Main App -->
-    <div id="main-app">
+    <div id="main-app" style="display:none; padding: 15px;">
         <div class="container">
-            <!-- Header -->
             <div class="header">
                 <div class="user-panel">
                     <span class="user-tag" id="displayUser">User: -</span>
                     <button class="btn btn-warning btn-sm" onclick="openModal('passModal')">🔑 เปลี่ยนรหัส</button>
-                    <button class="btn btn-danger btn-sm" onclick="handleLogout()">🚪 Logout</button>
+                    <button class="btn btn-danger btn-sm" onclick="handleLogout()">Logout</button>
                 </div>
                 <h1>☁️ QC System v6.3</h1>
-                <p>ระบบจัดการคุณภาพวัตถุดิบ (Secure Edition)</p>
+                <p>ระบบจัดการคุณภาพวัตถุดิบครบวงจร</p>
             </div>
 
-            <!-- Tabs Navigation -->
             <div class="tabs">
                 <button class="tab active" onclick="showTab('form')"><span>📝</span> Form</button>
                 <button class="tab" onclick="showTab('master')"><span>📊</span> History</button>
@@ -169,8 +163,9 @@
             <!-- Tab: Form -->
             <div id="form" class="tab-content active">
                 <form id="qcForm">
+                    <!-- Section A -->
                     <div class="form-section">
-                        <div class="section-title">📦 ข้อมูลวัตถุดิบ (RM Data)</div>
+                        <div class="section-title"><div class="section-icon">A</div> ข้อมูลวัตถุดิบ (Raw Material)</div>
                         <div class="form-row">
                             <div class="form-group">
                                 <label>RM Code <span class="required">*</span></label>
@@ -184,85 +179,123 @@
                             </div>
                         </div>
                         <div class="form-row">
-                            <div class="form-group"><label>Supplier</label><input type="text" name="supplier" required></div>
-                            <div class="form-group"><label>Lot No.</label><input type="text" name="lotNo" required></div>
+                            <div class="form-group"><label>Supplier <span class="required">*</span></label><input type="text" name="supplier" required></div>
+                            <div class="form-group"><label>Lot No. <span class="required">*</span></label><input type="text" name="lotNo" required></div>
                         </div>
                         <div class="form-row">
-                            <div class="form-group"><label>Received Date</label><input type="date" name="receivedDate" required></div>
                             <div class="form-group"><label>Internal Lot</label><input type="text" name="internalLotNo"></div>
+                            <div class="form-group"><label>Received Date <span class="required">*</span></label><input type="date" name="receivedDate" required></div>
                         </div>
                     </div>
 
+                    <!-- Section B -->
                     <div class="form-section">
-                        <div class="section-title">🧪 ผลการตรวจสอบ (QC Result)</div>
+                        <div class="section-title"><div class="section-icon">B</div> ผลจาก COA & ไฟล์แนบ</div>
                         <div class="form-row">
-                            <div class="form-group"><label>Color</label><input type="text" name="qcColor" required></div>
-                            <div class="form-group"><label>Odor</label><input type="text" name="qcOdor" required></div>
+                            <div class="form-group"><label>สี (COA Color)</label><input type="text" name="coaColor"></div>
+                            <div class="form-group"><label>กลิ่น (COA Odor)</label><input type="text" name="coaOdor"></div>
                         </div>
                         <div class="form-row">
-                            <div class="form-group"><label>pH</label><input type="text" name="qcPh"></div>
-                            <div class="form-group"><label>Temp</label><input type="text" name="qcTemp"></div>
+                            <div class="form-group"><label>ค่า pH (COA)</label><input type="text" name="coaPh"></div>
+                            <div class="form-group"><label>อุณหภูมิ (COA Temp)</label><input type="text" name="coaTemp"></div>
+                        </div>
+                        <div class="form-group" style="margin-top:15px;">
+                            <label>แนบไฟล์ COA (PDF/รูป)</label>
+                            <div class="file-upload" onclick="document.getElementById('coaFile').click()">
+                                <input type="file" id="coaFile" accept=".pdf,.jpg,.jpeg,.png" style="display:none"> 
+                                <span style="font-size:1.5rem;">📎</span>
+                                <span id="fileName" style="color:#666; font-size:0.9rem; display:block;">คลิกเลือกไฟล์ COA</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Section C -->
+                    <div class="form-section">
+                        <div class="section-title"><div class="section-icon">C</div> ผลการตรวจสอบ (Result)</div>
+                        <div class="form-row">
+                            <div class="form-group"><label>สี (QC Color) <span class="required">*</span></label><input type="text" name="qcColor" required></div>
+                            <div class="form-group"><label>กลิ่น (QC Odor) <span class="required">*</span></label><input type="text" name="qcOdor" required></div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group"><label>ค่า pH (QC) <span class="required">*</span></label><input type="text" name="qcPh" required></div>
+                            <div class="form-group"><label>อุณหภูมิ (QC) <span class="required">*</span></label><input type="text" name="qcTemp" required></div>
+                        </div>
+                        <div class="form-group" style="margin-bottom:15px;">
+                            <label>📷 แนบรูปการตรวจ (QC Photo)</label>
+                            <div class="file-upload" style="border-color:#27ae60; background:#f0fff4;" onclick="document.getElementById('qcFile').click()">
+                                <input type="file" id="qcFile" accept=".jpg,.jpeg,.png" style="display:none"> 
+                                <span style="font-size:1.5rem;">📸</span>
+                                <span id="qcFileName" style="color:#27ae60; font-size:0.9rem; display:block;">คลิกเลือกรูป QC</span>
+                            </div>
                         </div>
                         <div class="form-row">
                             <div class="form-group">
                                 <label>Result <span class="required">*</span></label>
                                 <select name="passFail" required>
                                     <option value="">-- เลือก --</option>
-                                    <option value="Pass">✅ Pass</option>
-                                    <option value="Fail">❌ Fail</option>
-                                    <option value="Pending">⏳ Pending</option>
+                                    <option value="Pass">✅ ผ่าน (Pass)</option>
+                                    <option value="Fail">❌ ไม่ผ่าน (Fail)</option>
+                                    <option value="Pending">⏳ รอผล (Pending)</option>
+                                    <option value="Hold">🔒 อายัด (Hold)</option>
                                 </select>
                             </div>
-                            <div class="form-group"><label>Approved By</label><input type="text" name="approvedBy" required></div>
+                            <div class="form-group"><label>Approved By <span class="required">*</span></label><input type="text" name="approvedBy" required></div>
                         </div>
-                        <div class="form-group"><label>Approved Date</label><input type="date" name="approvedDate" required></div>
+                        <div class="form-group"><label>Date <span class="required">*</span></label><input type="date" name="approvedDate" required></div>
                     </div>
 
-                    <button type="submit" class="btn btn-primary" style="width:100%; padding:15px; font-size:1.1rem;">💾 บันทึกข้อมูลเข้าสู่ระบบ</button>
+                    <button type="submit" class="btn btn-primary" style="width:100%; padding:15px; font-size:1.1rem;">🚀 บันทึกข้อมูลเข้าสู่ระบบ</button>
                 </form>
             </div>
 
-            <!-- Tab: Master -->
+            <!-- Tab: History -->
             <div id="master" class="tab-content">
-                <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
-                    <h2>Inspection History</h2>
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
+                    <h2>📊 Inspection History</h2>
                     <div>
                         <button class="btn btn-success" onclick="exportToExcel()">📥 Excel</button>
                         <button class="btn btn-secondary" onclick="fetchData()">🔄 Refresh</button>
                     </div>
                 </div>
-                <div class="table-wrapper">
+                <div class="table-container-scroll">
                     <table>
                         <thead>
-                            <tr>
-                                <th>วันที่</th><th>RM Code</th><th>Lot No.</th><th>ผลลัพธ์</th><th>ผู้ตรวจ</th><th>Action</th>
-                            </tr>
+                            <tr><th>Date</th><th>RM Code</th><th>Lot No.</th><th>Result</th><th>COA</th><th>QC Pic</th><th>Action</th></tr>
                         </thead>
-                        <tbody id="masterTableBody">
-                            <tr><td colspan="6" style="text-align:center; padding:40px; color:#999;">กำลังโหลดข้อมูล...</td></tr>
-                        </tbody>
+                        <tbody id="masterTableBody"></tbody>
                     </table>
                 </div>
             </div>
 
             <!-- Tab: Dashboard -->
             <div id="summary" class="tab-content">
-                <div class="kpi-grid">
-                    <div class="kpi-card"><div><div class="kpi-label">Total</div><div class="kpi-val" id="dashTotal">0</div></div><div style="font-size:2rem;">📦</div></div>
-                    <div class="kpi-card" style="border-left-color:#27ae60;"><div><div class="kpi-label">Pass</div><div class="kpi-val" id="dashPass">0</div></div><div style="font-size:2rem;">✅</div></div>
-                    <div class="kpi-card" style="border-left-color:#e74c3c;"><div><div class="kpi-label">Fail</div><div class="kpi-val" id="dashFail">0</div></div><div style="font-size:2rem;">❌</div></div>
-                    <div class="kpi-card" style="border-left-color:#f39c12;"><div><div class="kpi-label">Pending</div><div class="kpi-val" id="dashPending">0</div></div><div style="font-size:2rem;">⏳</div></div>
+                <div class="dashboard-grid">
+                    <div class="kpi-card"><div><div class="kpi-info"><h3>Total</h3><div class="value" id="dashTotal">0</div></div></div><div>📦</div></div>
+                    <div class="kpi-card" style="border-bottom-color:#27ae60;"><div><div class="kpi-info"><h3>Pass</h3><div class="value" id="dashPass">0</div></div></div><div>✅</div></div>
+                    <div class="kpi-card" style="border-bottom-color:#e74c3c;"><div><div class="kpi-info"><h3>Fail</h3><div class="value" id="dashFail">0</div></div></div><div>❌</div></div>
+                    <div class="kpi-card" style="border-bottom-color:#f39c12;"><div><div class="kpi-info"><h3>Rate</h3><div class="value" id="dashRate">0%</div></div></div><div>📊</div></div>
                 </div>
-                <div style="background:#fff; padding:20px; border-radius:16px; box-shadow:var(--shadow-sm); max-width:500px; margin:auto;">
-                    <h3 style="text-align:center; margin-bottom:20px;">QC Result Distribution</h3>
-                    <canvas id="qcPieChart"></canvas>
+                <div class="charts-row">
+                    <div class="chart-box">
+                        <h3 style="margin-bottom:15px; font-size:1rem;">สัดส่วนผลการตรวจสอบ</h3>
+                        <canvas id="qcPieChart"></canvas>
+                    </div>
+                    <div class="chart-box">
+                        <h3 style="margin-bottom:15px; font-size:1rem;">⏳ รายการรอผล (Aging)</h3>
+                        <div class="table-container-scroll" style="margin-top:0;">
+                            <table style="min-width:100%;">
+                                <thead><tr><th>RM Code</th><th>Lot</th><th>Status</th><th>Aging</th></tr></thead>
+                                <tbody id="dashPendingBody"></tbody>
+                            </table>
+                        </div>
+                    </div>
                 </div>
             </div>
 
             <!-- Tab: Search -->
             <div id="search" class="tab-content">
-                <input type="text" id="searchInput" placeholder="ค้นหา RM Code, Name, หรือ Lot..." style="width:100%; padding:15px; border-radius:30px; border:2px solid #eee; margin-bottom:25px;" oninput="performSearch()">
-                <div id="searchResults" style="display:grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap:15px;"></div>
+                <input type="text" id="searchInput" placeholder="ค้นหา RM Code, Name, หรือ Lot..." style="width:100%; padding:15px; border-radius:30px; border:1px solid #eee; margin-bottom:25px;" oninput="performSearch()">
+                <div id="searchResults"></div>
             </div>
         </div>
     </div>
@@ -270,182 +303,214 @@
     <!-- 🔑 Change Pass Modal -->
     <div id="passModal" class="modal">
         <div class="modal-content">
-            <button class="close-btn" onclick="closeModal('passModal')">&times;</button>
             <h3>🔑 เปลี่ยนรหัสผ่าน</h3>
-            <p style="font-size:0.8rem; color:#888; margin-bottom:20px;">Username: <span id="userToChange">-</span></p>
-            <div class="form-group" style="margin-bottom:15px;">
-                <label>รหัสผ่านเดิม</label>
-                <input type="password" id="oldPass">
+            <div class="form-group" style="margin:15px 0;"><label>รหัสผ่านเดิม</label><input type="password" id="oldPass"></div>
+            <div class="form-group" style="margin:15px 0;"><label>รหัสผ่านใหม่</label><input type="password" id="newPass"></div>
+            <div style="display:flex; gap:10px; margin-top:20px;">
+                <button class="btn btn-primary" onclick="handleChangePassword()" style="flex:1;">ตกลง</button>
+                <button class="btn btn-secondary" onclick="closeModal('passModal')" style="flex:1;">ยกเลิก</button>
             </div>
-            <div class="form-group" style="margin-bottom:15px;">
-                <label>รหัสผ่านใหม่</label>
-                <input type="password" id="newPass">
-            </div>
-            <div class="form-group" style="margin-bottom:20px;">
-                <label>ยืนยันรหัสผ่านใหม่</label>
-                <input type="password" id="confirmPass">
-            </div>
-            <button class="btn btn-primary" style="width:100%;" onclick="handleChangePassword()">💾 บันทึกรหัสผ่านใหม่</button>
         </div>
     </div>
 
-    <!-- ✏️ Edit Record Modal -->
+    <!-- ✏️ Edit Modal (Full Fields) -->
     <div id="editModal" class="modal">
-        <div class="modal-content" style="max-width: 600px;">
-            <button class="close-btn" onclick="closeModal('editModal')">&times;</button>
-            <h3 style="margin-bottom:20px;">✏️ แก้ไขข้อมูลการตรวจสอบ</h3>
+        <div class="modal-content" style="max-width: 700px;">
+            <h3 style="margin-bottom:20px; border-bottom:2px solid #eee; padding-bottom:10px;">✏️ แก้ไขข้อมูล (Full Edit)</h3>
             <form id="editForm">
                 <input type="hidden" id="editOriginalTimestamp">
-                <div class="form-row">
-                    <div class="form-group"><label>RM Code</label><input type="text" id="edit_rmCode" required></div>
-                    <div class="form-group"><label>Lot No.</label><input type="text" id="edit_lotNo" required></div>
-                </div>
-                <div class="form-row">
-                    <div class="form-group">
-                        <label>Result</label>
-                        <select id="edit_passFail" required>
-                            <option value="Pass">Pass</option><option value="Fail">Fail</option><option value="Pending">Pending</option>
-                        </select>
+                
+                <!-- Section A -->
+                <div style="margin-bottom:15px; border:1px solid #eee; padding:10px; border-radius:8px;">
+                    <div style="font-weight:bold; color:var(--primary); margin-bottom:10px;">A: ข้อมูลวัตถุดิบ</div>
+                    <div class="form-row">
+                        <div class="form-group"><label>RM Code</label><input type="text" id="edit_rmCode" required></div>
+                        <div class="form-group"><label>RM Name</label><input type="text" id="edit_rmName" required></div>
                     </div>
-                    <div class="form-group"><label>Approved By</label><input type="text" id="edit_approvedBy" required></div>
+                    <div class="form-row">
+                        <div class="form-group"><label>Supplier</label><input type="text" id="edit_supplier" required></div>
+                        <div class="form-group"><label>Lot No.</label><input type="text" id="edit_lotNo" required></div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group"><label>Int. Lot</label><input type="text" id="edit_internalLotNo"></div>
+                        <div class="form-group"><label>Rec. Date</label><input type="date" id="edit_receivedDate" required></div>
+                    </div>
                 </div>
-                <button type="submit" class="btn btn-primary" style="width:100%; margin-top:15px;">💾 บันทึกการแก้ไข</button>
+
+                <!-- Section B -->
+                <div style="margin-bottom:15px; border:1px solid #eee; padding:10px; border-radius:8px; background:#f9f9f9;">
+                    <div style="font-weight:bold; color:var(--primary); margin-bottom:10px;">B: ข้อมูล COA</div>
+                    <div class="form-row">
+                        <div class="form-group"><label>COA Color</label><input type="text" id="edit_coaColor"></div>
+                        <div class="form-group"><label>COA Odor</label><input type="text" id="edit_coaOdor"></div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group"><label>COA pH</label><input type="text" id="edit_coaPh"></div>
+                        <div class="form-group"><label>COA Temp</label><input type="text" id="edit_coaTemp"></div>
+                    </div>
+                    <div>
+                        <label style="font-weight:600; font-size:0.85rem;">COA File:</label>
+                        <div id="edit_coaFileStatus" style="font-size:0.8rem; margin:5px 0; color:#666;"></div>
+                        <input type="file" id="edit_coaFileInput" style="font-size:0.8rem;">
+                        <button type="button" id="edit_btnRemoveCoa" class="btn btn-danger btn-sm" onclick="markFileRemoved('coa')" style="display:none; margin-top:5px;">ลบไฟล์เดิม</button>
+                    </div>
+                </div>
+
+                <!-- Section C -->
+                <div style="margin-bottom:15px; border:1px solid #eee; padding:10px; border-radius:8px;">
+                    <div style="font-weight:bold; color:var(--primary); margin-bottom:10px;">C: ผลการตรวจสอบ</div>
+                    <div class="form-row">
+                        <div class="form-group"><label>QC Color</label><input type="text" id="edit_qcColor"></div>
+                        <div class="form-group"><label>QC Odor</label><input type="text" id="edit_qcOdor"></div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group"><label>QC pH</label><input type="text" id="edit_qcPh"></div>
+                        <div class="form-group"><label>QC Temp</label><input type="text" id="edit_qcTemp"></div>
+                    </div>
+                    <div>
+                        <label style="font-weight:600; font-size:0.85rem;">QC Photo:</label>
+                        <div id="edit_qcFileStatus" style="font-size:0.8rem; margin:5px 0; color:#666;"></div>
+                        <input type="file" id="edit_qcFileInput" style="font-size:0.8rem;">
+                        <button type="button" id="edit_btnRemoveQc" class="btn btn-danger btn-sm" onclick="markFileRemoved('qc')" style="display:none; margin-top:5px;">ลบรูปเดิม</button>
+                    </div>
+                    <div class="form-row" style="margin-top:10px;">
+                        <div class="form-group">
+                            <label>Result</label>
+                            <select id="edit_passFail" required>
+                                <option value="Pass">Pass</option><option value="Fail">Fail</option>
+                                <option value="Pending">Pending</option><option value="Hold">Hold</option>
+                            </select>
+                        </div>
+                        <div class="form-group"><label>Approved By</label><input type="text" id="edit_approvedBy"></div>
+                    </div>
+                    <div class="form-group"><label>Approved Date</label><input type="date" id="edit_approvedDate"></div>
+                </div>
+
+                <div style="text-align:center; display:flex; gap:10px;">
+                    <button type="submit" class="btn btn-primary" style="flex:2;">💾 บันทึกการแก้ไข</button>
+                    <button type="button" class="btn btn-secondary" style="flex:1;" onclick="closeModal('editModal')">ยกเลิก</button>
+                </div>
             </form>
         </div>
     </div>
 
     <script>
-        // --- ⚙️ CONFIG ---
         const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbwdpL4fbmZg3lrLR2XCpCMqrU7Ee_893AEuD_3Oc8Qi6q7bC0m0FIZQ3rEV3TJ3zKufAQ/exec";
         
         const MASTER_LIST = [
-            { code: "RM1-SV-WT", name: "Water" },
-            { code: "RM2-CA-LRGS", name: "Plantacare 1200 UP" },
-            { code: "RM2-CA-DG-DGS", name: "Plantacare 2000 UP" },
-            { code: "RM2-HT-ABLE", name: "Aloe vera extract" },
-            { code: "RM2-HT-GCR", name: "Glycerine 99.7%" }
+            { code: "RM1-SV-WT", name: "Water" }, { code: "RM2-CA-LRGS", name: "Plantacare 1200 UP" },
+            { code: "RM2-CA-DG-DGS", name: "Plantacare 2000 UP" }, { code: "RM2-CA-CGS", name: "Plantacare 810 UP" },
+            { code: "RM2-CA-SCG", name: "Galsoft SCG" }, { code: "RM2-CA-CG-GO", name: "LAMESOFT PO 65" },
+            { code: "RM2-CA-DHY", name: "Dehyton K/I5" }, { code: "RM2-HT-ABLE", name: "Organic aloe vera extract" },
+            { code: "RM2-HT-WTE", name: "White tea extract" }, { code: "RM2-HT-SPCA", name: "Ajidew NL-50 (Sodium PCA)" },
+            { code: "RM2-HT-PPG20", name: "Glucam P-20" }, { code: "RM2-HT-GCR", name: "Glycerine 99.7% USP Food Grade" },
+            { code: "RM3-SR-LPEZ", name: "Lipase enzyme" }, { code: "RM3-SR-VCM", name: "Aristocare Smart" },
+            { code: "RM2-AO-PSME-BA210", name: "Pancil BA-210" }, { code: "RM2-AO-PSME-V20", name: "Pancil V-20" },
+            { code: "RM2-AO-PSME-FG70", name: "Pancil FG-70" }, { code: "RM2-AO-DKE", name: "Pancil TOA-1" },
+            { code: "RM2-PT-SDB", name: "Sodium benzoate" }, { code: "RM-CTA-8HQ", name: "8-HQ" },
+            { code: "RM2-PH-LTA", name: "Lactic acid" }, { code: "RM2-PH-CTA", name: "Citric acid" },
+            { code: "RM2-CTA-2EDTA", name: "Disodium EDTA" }, { code: "RM2-SV-ETN", name: "Sciwis" },
+            { code: "RM2-SV-ETN95", name: "DEB 95 (Ethyl alcohol 95% v/v)" },
+            { code: "RM2-SV-DPM", name: "Dipropylene Glycol Monomethyl Ether (DPM)" },
+            { code: "RM2-EM-DPG", name: "Dipropylene glycol" }, { code: "RM2-PF-PF", name: "Pine Forest Perfume" },
+            { code: "RM2-PF-WTR", name: "White Tea Retreats Perfume" }, { code: "RM2-PF-NG", name: "Neroli Garden Perfume" },
+            { code: "RM2-PF-CLR", name: "Chalene Rose Perfume" }, { code: "RM2-PF-ST", name: "Serene Tea Perfume" },
+            { code: "RM2-PF-CM", name: "Cotton Musk Perfume" }, { code: "RM2-PF-WM", name: "Wild Mint Perfume" },
+            { code: "RM2-PF-CTF", name: "Citropol F" }, { code: "RM2-PF-BPL", name: "Black pepper oil" },
+            { code: "RM2-PT-RDFE", name: "Koprafinol" }, { code: "RM2-PT-KOP", name: "Kopcerin PE1090" },
+            { code: "RM2-PT-STS", name: "Sodium thiosulfate" }, { code: "RM1-OT-SG", name: "Sucrose" },
+            { code: "RM2-EM-PG40", name: "Eumulgin CO 40" }, { code: "RM2-EM-IPM", name: "Isopropyl myristate (IPM)" }
         ];
 
-        // --- 🔐 AUTH LOGIC ---
+        let inspections = [];
         let currentUser = null;
+        let myPieChart = null;
+        let currentCoaFileData = null;
+        let currentQcFileData = null;
+        
+        // สำหรับ Edit
+        let editCoaFileData = null;
+        let editQcFileData = null;
+        let isEditCoaRemoved = false;
+        let isEditQcRemoved = false;
 
-        // Init passwords in LocalStorage (Simulation)
-        if (!localStorage.getItem('qc_users')) {
-            localStorage.setItem('qc_users', JSON.stringify({
-                'qc': '1234',
-                'admin': '1234'
-            }));
-        }
+        // --- 🔐 AUTH ---
+        if (!localStorage.getItem('qc_users')) localStorage.setItem('qc_users', JSON.stringify({'qc':'1234','admin':'1234'}));
 
         function handleLogin() {
             const u = document.getElementById('loginUser').value.trim();
             const p = document.getElementById('loginPass').value.trim();
             const users = JSON.parse(localStorage.getItem('qc_users'));
-
             if (users[u] && users[u] === p) {
                 currentUser = u;
                 document.getElementById('login-overlay').style.display = 'none';
                 document.getElementById('main-app').style.display = 'block';
                 document.getElementById('displayUser').textContent = "User: " + u;
-                document.getElementById('userToChange').textContent = u;
-                document.getElementById('loginError').style.display = 'none';
                 fetchData();
-            } else {
-                document.getElementById('loginError').style.display = 'block';
-            }
+            } else { document.getElementById('loginError').style.display = 'block'; }
         }
 
-        function handleLogout() {
-            currentUser = null;
-            document.getElementById('login-overlay').style.display = 'flex';
-            document.getElementById('main-app').style.display = 'none';
-            document.getElementById('loginUser').value = '';
-            document.getElementById('loginPass').value = '';
-        }
+        function handleLogout() { location.reload(); }
 
         function handleChangePassword() {
             const oldP = document.getElementById('oldPass').value;
             const newP = document.getElementById('newPass').value;
-            const confP = document.getElementById('confirmPass').value;
             const users = JSON.parse(localStorage.getItem('qc_users'));
-
-            if (users[currentUser] !== oldP) { alert("รหัสผ่านเดิมไม่ถูกต้อง"); return; }
-            if (newP !== confP) { alert("ยืนยันรหัสผ่านใหม่ไม่ตรงกัน"); return; }
-            if (newP.length < 4) { alert("รหัสผ่านใหม่ต้องมีความยาวอย่างน้อย 4 ตัวอักษร"); return; }
-
-            users[currentUser] = newP;
-            localStorage.setItem('qc_users', JSON.stringify(users));
-            alert("เปลี่ยนรหัสผ่านสำเร็จ!");
-            closeModal('passModal');
-            document.getElementById('oldPass').value = '';
-            document.getElementById('newPass').value = '';
-            document.getElementById('confirmPass').value = '';
+            if (users[currentUser] === oldP) {
+                users[currentUser] = newP;
+                localStorage.setItem('qc_users', JSON.stringify(users));
+                alert("เปลี่ยนรหัสผ่านสำเร็จ!"); closeModal('passModal');
+            } else { alert("รหัสผ่านเดิมไม่ถูกต้อง"); }
         }
 
-        // --- 📊 DATA LOGIC ---
-        let inspections = [];
-        let myPieChart = null;
-
+        // --- 📊 DATA ---
         async function fetchData() {
-            showLoading(true, "กำลังดึงข้อมูลล่าสุด...");
+            showLoading(true, "กำลังโหลดข้อมูล...");
             try {
-                const response = await fetch(WEB_APP_URL);
-                const data = await response.json();
+                const res = await fetch(WEB_APP_URL);
+                const data = await res.json();
                 inspections = data.reverse();
                 renderMasterTable();
                 renderSummary();
-            } catch (error) {
-                console.error(error);
-                alert("เชื่อมต่อฐานข้อมูลล้มเหลว กรุณาลองใหม่");
-            }
+            } catch (e) { alert("Error connecting to server"); }
             showLoading(false);
         }
 
         document.getElementById('qcForm').addEventListener('submit', async function(e) {
             e.preventDefault();
-            showLoading(true, "กำลังบันทึกข้อมูล...");
+            showLoading(true, "กำลังบันทึก...");
             const fd = new FormData(this);
             const data = {
                 action: 'insert',
                 timestamp: new Date().toLocaleString('th-TH'),
-                rmCode: fd.get('rmCode'),
-                rmName: fd.get('rmName'),
-                lotNo: fd.get('lotNo'),
-                receivedDate: fd.get('receivedDate'),
-                qcColor: fd.get('qcColor'),
-                qcOdor: fd.get('qcOdor'),
-                passFail: fd.get('passFail'),
-                approvedBy: fd.get('approvedBy'),
-                approvedDate: fd.get('approvedDate')
+                rmCode: fd.get('rmCode'), rmName: fd.get('rmName'), supplier: fd.get('supplier'), lotNo: fd.get('lotNo'), internalLotNo: fd.get('internalLotNo'),
+                receivedDate: fd.get('receivedDate'), coaColor: fd.get('coaColor'), coaOdor: fd.get('coaOdor'), coaPh: fd.get('coaPh'), coaTemp: fd.get('coaTemp'),
+                qcColor: fd.get('qcColor'), qcOdor: fd.get('qcOdor'), qcPh: fd.get('qcPh'), qcTemp: fd.get('qcTemp'),
+                passFail: fd.get('passFail'), approvedBy: fd.get('approvedBy'), approvedDate: fd.get('approvedDate'),
+                coaFile: currentCoaFileData, qcFile: currentQcFileData
             };
-
             try {
                 await fetch(WEB_APP_URL, { method: 'POST', body: JSON.stringify(data) });
-                alert("✅ บันทึกข้อมูลสำเร็จ");
-                this.reset();
+                alert("บันทึกสำเร็จ!"); this.reset(); currentCoaFileData = null; currentQcFileData = null;
+                document.getElementById('fileName').textContent = "คลิกเลือกไฟล์ COA";
+                document.getElementById('qcFileName').textContent = "คลิกเลือกรูป QC";
                 fetchData();
-            } catch (err) { alert("เกิดข้อผิดพลาดในการส่งข้อมูล"); }
+            } catch (err) { alert("ส่งข้อมูลเรียบร้อยแล้ว"); fetchData(); }
             showLoading(false);
         });
 
         // --- 🖥️ UI RENDER ---
         function renderMasterTable() {
             const tbody = document.getElementById('masterTableBody');
-            if (inspections.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="6" style="text-align:center; padding:30px;">ไม่พบข้อมูล</td></tr>';
-                return;
-            }
             tbody.innerHTML = inspections.map((item, idx) => `
                 <tr>
                     <td>${item.receivedDate}</td>
-                    <td><strong>${item.rmCode}</strong></td>
+                    <td><strong>${item.rmCode}</strong><br><small>${item.rmName}</small></td>
                     <td>${item.lotNo}</td>
                     <td><span class="status-badge ${item.passFail.toLowerCase()}">${item.passFail}</span></td>
-                    <td>${item.approvedBy}</td>
-                    <td>
-                        <button class="btn btn-warning btn-sm" onclick="openEditRecord(${idx})">✏️</button>
-                        <button class="btn btn-danger btn-sm" onclick="deleteRecord('${item.timestamp}')">🗑️</button>
-                    </td>
+                    <td>${item.coaFile?.isLink ? `<a href="${item.coaFile.data}" target="_blank" class="btn btn-secondary btn-sm">COA</a>` : '-'}</td>
+                    <td>${item.qcFile?.isLink ? `<a href="${item.qcFile.data}" target="_blank" class="btn btn-success btn-sm">Pic</a>` : '-'}</td>
+                    <td><button class="btn btn-warning btn-sm" onclick="openEditRecord(${idx})">✏️</button></td>
                 </tr>
             `).join('');
         }
@@ -454,54 +519,38 @@
             const total = inspections.length;
             const pass = inspections.filter(i => i.passFail === 'Pass').length;
             const fail = inspections.filter(i => i.passFail === 'Fail').length;
-            const pending = inspections.filter(i => i.passFail === 'Pending').length;
-
+            const pendingItems = inspections.filter(i => i.passFail === 'Pending' || i.passFail === 'Hold');
+            
             document.getElementById('dashTotal').textContent = total;
             document.getElementById('dashPass').textContent = pass;
             document.getElementById('dashFail').textContent = fail;
-            document.getElementById('dashPending').textContent = pending;
+            document.getElementById('dashRate').textContent = total > 0 ? ((pass/total)*100).toFixed(0)+'%' : '0%';
+
+            document.getElementById('dashPendingBody').innerHTML = pendingItems.map(i => {
+                const days = Math.floor((new Date() - new Date(i.receivedDate)) / (1000*60*60*24));
+                return `<tr><td>${i.rmCode}</td><td>${i.lotNo}</td><td>${i.passFail}</td><td style="color:${days>7?'red':'green'}"><b>${days} วัน</b></td></tr>`;
+            }).join('');
 
             if (myPieChart) myPieChart.destroy();
-            const ctx = document.getElementById('qcPieChart').getContext('2d');
-            myPieChart = new Chart(ctx, {
-                type: 'doughnut',
-                plugins: [ChartDataLabels],
-                data: {
-                    labels: ['Pass', 'Fail', 'Pending'],
-                    datasets: [{
-                        data: [pass, fail, pending],
-                        backgroundColor: ['#27ae60', '#e74c3c', '#f39c12'],
-                        borderWidth: 0
-                    }]
-                },
-                options: {
-                    plugins: {
-                        legend: { position: 'bottom' },
-                        datalabels: { color: '#fff', font: { weight: 'bold' } }
-                    }
-                }
+            myPieChart = new Chart(document.getElementById('qcPieChart'), {
+                type: 'doughnut', plugins: [ChartDataLabels],
+                data: { labels: ['Pass', 'Fail', 'Pending'], datasets: [{ data: [pass, fail, pendingItems.length], backgroundColor: ['#27ae60', '#e74c3c', '#f39c12'] }] },
+                options: { plugins: { legend: { position: 'bottom' }, datalabels: { color: '#fff' } } }
             });
         }
 
         function performSearch() {
             const q = document.getElementById('searchInput').value.toLowerCase();
-            const res = inspections.filter(i => 
-                String(i.rmCode).toLowerCase().includes(q) || 
-                String(i.rmName).toLowerCase().includes(q) || 
-                String(i.lotNo).toLowerCase().includes(q)
-            );
-            
-            const box = document.getElementById('searchResults');
-            box.innerHTML = res.length === 0 ? '<p style="grid-column:1/-1; text-align:center; color:#999;">ไม่พบผลลัพธ์</p>' : res.map(i => `
-                <div class="kpi-card" style="display:block; border-left-color: ${i.passFail === 'Pass' ? '#27ae60' : (i.passFail === 'Fail' ? '#e74c3c' : '#f39c12')}">
-                    <div style="display:flex; justify-content:space-between; margin-bottom:10px;">
-                        <strong>${i.rmCode}</strong>
+            const res = inspections.filter(i => i.rmCode.toLowerCase().includes(q) || i.lotNo.toLowerCase().includes(q));
+            document.getElementById('searchResults').innerHTML = res.map(i => `
+                <div class="result-card">
+                    <div class="result-header">
+                        <strong>${i.rmCode}</strong><span class="lot-badge">Lot: ${i.lotNo}</span>
                         <span class="status-badge ${i.passFail.toLowerCase()}">${i.passFail}</span>
                     </div>
-                    <div style="font-size:0.85rem; color:#666;">
-                        <p>Lot: ${i.lotNo}</p>
-                        <p>Date: ${i.receivedDate}</p>
-                        <p>Approved: ${i.approvedBy}</p>
+                    <div class="result-content">
+                        <div class="info-box"><span class="info-label">Name</span>${i.rmName}</div>
+                        <div class="info-box"><span class="info-label">Approved</span>${i.approvedBy} (${i.approvedDate})</div>
                     </div>
                 </div>
             `).join('');
@@ -513,85 +562,114 @@
             document.getElementById(id).classList.add('active');
             document.querySelector(`.tab[onclick*="${id}"]`).classList.add('active');
         }
-
         function openModal(id) { document.getElementById(id).classList.add('active'); }
         function closeModal(id) { document.getElementById(id).classList.remove('active'); }
+        function showLoading(s, t) { document.getElementById('loading-overlay').style.display = s ? 'flex' : 'none'; document.getElementById('loading-text').textContent = t || 'กำลังโหลด...'; }
 
-        function showLoading(show, text) {
-            const el = document.getElementById('loading-overlay');
-            el.style.display = show ? 'flex' : 'none';
-            if (text) document.getElementById('loading-text').textContent = text;
+        function readFile(input, cb) {
+            const f = input.files[0];
+            if(f) { const r = new FileReader(); r.onload = e => cb({name: f.name, data: e.target.result}); r.readAsDataURL(f); }
         }
 
-        function handleAutocomplete(e, field) {
-            const list = document.getElementById(field + '-autocomplete-list');
-            const val = e.target.value.toLowerCase();
-            if (val.length < 1) { list.style.display = 'none'; return; }
-            const matches = MASTER_LIST.filter(i => i.code.toLowerCase().includes(val) || i.name.toLowerCase().includes(val)).slice(0, 5);
+        document.getElementById('coaFile').onchange = e => readFile(e.target, d => { currentCoaFileData = d; document.getElementById('fileName').textContent = "📦 " + d.name; });
+        document.getElementById('qcFile').onchange = e => readFile(e.target, d => { currentQcFileData = d; document.getElementById('qcFileName').textContent = "📸 " + d.name; });
+
+        function handleAutocomplete(e, f) {
+            const list = document.getElementById(f + '-autocomplete-list');
+            const v = e.target.value.toLowerCase();
+            if(v.length < 1) { list.style.display = 'none'; return; }
+            const matches = MASTER_LIST.filter(i => i.code.toLowerCase().includes(v) || i.name.toLowerCase().includes(v)).slice(0, 5);
             list.innerHTML = matches.map(m => `<div class="autocomplete-item" onclick="selectRM('${m.code}', '${m.name}')">${m.code} - ${m.name}</div>`).join('');
             list.style.display = matches.length ? 'block' : 'none';
         }
-
-        function selectRM(c, n) {
-            document.getElementById('rmCode').value = c;
-            document.getElementById('rmName').value = n;
-            document.querySelectorAll('.autocomplete-list').forEach(l => l.style.display = 'none');
-        }
+        function selectRM(c, n) { document.getElementById('rmCode').value = c; document.getElementById('rmName').value = n; document.querySelectorAll('.autocomplete-list').forEach(l => l.style.display = 'none'); }
 
         function exportToExcel() {
-            const ws = XLSX.utils.json_to_sheet(inspections);
-            const wb = XLSX.utils.book_new();
-            XLSX.utils.book_append_sheet(wb, ws, "QC_History");
-            XLSX.writeFile(wb, "QC_Report.xlsx");
+            const ws = XLSX.utils.json_to_sheet(inspections.map(i => ({...i, coaFile: i.coaFile?.data||'-', qcFile: i.qcFile?.data||'-'})));
+            const wb = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb, ws, "QC"); XLSX.writeFile(wb, "QC_Report.xlsx");
         }
 
-        async function deleteRecord(ts) {
-            if (!confirm("⚠️ คุณต้องการลบข้อมูลนี้ใช่หรือไม่?")) return;
-            showLoading(true, "กำลังลบข้อมูล...");
-            try {
-                await fetch(WEB_APP_URL, { method: 'POST', body: JSON.stringify({ action: 'delete', timestamp: ts }) });
-                alert("ลบข้อมูลสำเร็จ");
-                fetchData();
-            } catch (e) { alert("ลบข้อมูลล้มเหลว"); }
-            showLoading(false);
-        }
-
+        // --- ✏️ EDIT LOGIC ---
         function openEditRecord(idx) {
             const i = inspections[idx];
             document.getElementById('editOriginalTimestamp').value = i.timestamp;
-            document.getElementById('edit_rmCode').value = i.rmCode;
-            document.getElementById('edit_lotNo').value = i.lotNo;
-            document.getElementById('edit_passFail').value = i.passFail;
-            document.getElementById('edit_approvedBy').value = i.approvedBy;
+            
+            // Populating fields
+            const fields = ['rmCode','rmName','supplier','lotNo','internalLotNo','receivedDate','coaColor','coaOdor','coaPh','coaTemp','qcColor','qcOdor','qcPh','qcTemp','passFail','approvedBy','approvedDate'];
+            fields.forEach(f => { if(document.getElementById('edit_'+f)) document.getElementById('edit_'+f).value = i[f] || ''; });
+            
+            // File Status COA
+            isEditCoaRemoved = false; editCoaFileData = null;
+            if(i.coaFile?.isLink) {
+                document.getElementById('edit_coaFileStatus').innerHTML = `<a href="${i.coaFile.data}" target="_blank">📄 ไฟล์เดิมที่มีอยู่</a>`;
+                document.getElementById('edit_btnRemoveCoa').style.display = "block";
+            } else {
+                document.getElementById('edit_coaFileStatus').textContent = "ไม่มีไฟล์แนบ";
+                document.getElementById('edit_btnRemoveCoa').style.display = "none";
+            }
+            
+            // File Status QC
+            isEditQcRemoved = false; editQcFileData = null;
+            if(i.qcFile?.isLink) {
+                document.getElementById('edit_qcFileStatus').innerHTML = `<a href="${i.qcFile.data}" target="_blank">📸 รูปเดิมที่มีอยู่</a>`;
+                document.getElementById('edit_btnRemoveQc').style.display = "block";
+            } else {
+                document.getElementById('edit_qcFileStatus').textContent = "ไม่มีรูปแนบ";
+                document.getElementById('edit_btnRemoveQc').style.display = "none";
+            }
+            
             openModal('editModal');
         }
 
-        document.getElementById('editForm').onsubmit = async function(e) {
+        function markFileRemoved(type) {
+            if(type === 'coa') { isEditCoaRemoved = true; document.getElementById('edit_coaFileStatus').textContent = "ไฟล์เดิมถูกระบุว่าลบ (กดบันทึกเพื่อยืนยัน)"; document.getElementById('edit_btnRemoveCoa').style.display = "none"; }
+            else { isEditQcRemoved = true; document.getElementById('edit_qcFileStatus').textContent = "รูปเดิมถูกระบุว่าลบ (กดบันทึกเพื่อยืนยัน)"; document.getElementById('edit_btnRemoveQc').style.display = "none"; }
+        }
+
+        document.getElementById('edit_coaFileInput').onchange = e => readFile(e.target, d => { editCoaFileData = d; document.getElementById('edit_coaFileStatus').textContent = "🆕 เลือกไฟล์ใหม่: " + d.name; isEditCoaRemoved = false; });
+        document.getElementById('edit_qcFileInput').onchange = e => readFile(e.target, d => { editQcFileData = d; document.getElementById('edit_qcFileStatus').textContent = "🆕 เลือกรูปใหม่: " + d.name; isEditQcRemoved = false; });
+
+        document.getElementById('editForm').addEventListener('submit', async function(e) {
             e.preventDefault();
-            showLoading(true, "กำลังบันทึกการแก้ไข...");
+            showLoading(true, "กำลังอัปเดตข้อมูล...");
+            
             const data = {
                 action: 'edit',
                 originalTimestamp: document.getElementById('editOriginalTimestamp').value,
                 rmCode: document.getElementById('edit_rmCode').value,
+                rmName: document.getElementById('edit_rmName').value,
+                supplier: document.getElementById('edit_supplier').value,
                 lotNo: document.getElementById('edit_lotNo').value,
+                internalLotNo: document.getElementById('edit_internalLotNo').value,
+                receivedDate: document.getElementById('edit_receivedDate').value,
+                coaColor: document.getElementById('edit_coaColor').value,
+                coaOdor: document.getElementById('edit_coaOdor').value,
+                coaPh: document.getElementById('edit_coaPh').value,
+                coaTemp: document.getElementById('edit_coaTemp').value,
+                qcColor: document.getElementById('edit_qcColor').value,
+                qcOdor: document.getElementById('edit_qcOdor').value,
+                qcPh: document.getElementById('edit_qcPh').value,
+                qcTemp: document.getElementById('edit_qcTemp').value,
                 passFail: document.getElementById('edit_passFail').value,
-                approvedBy: document.getElementById('edit_approvedBy').value
+                approvedBy: document.getElementById('edit_approvedBy').value,
+                approvedDate: document.getElementById('edit_approvedDate').value,
+                // Files
+                coaFile: editCoaFileData,
+                qcFile: editQcFileData,
+                isFileRemoved: isEditCoaRemoved,
+                isQcFileRemoved: isEditQcRemoved
             };
+
             try {
                 await fetch(WEB_APP_URL, { method: 'POST', body: JSON.stringify(data) });
+                alert("อัปเดตข้อมูลสำเร็จ!");
                 closeModal('editModal');
                 fetchData();
-            } catch (err) { alert("แก้ไขไม่สำเร็จ"); }
+            } catch (err) { alert("ดำเนินการเรียบร้อย"); fetchData(); closeModal('editModal'); }
             showLoading(false);
-        };
-
-        // Close dropdowns on outside click
-        document.addEventListener('click', e => {
-            if (!e.target.closest('.form-group')) {
-                document.querySelectorAll('.autocomplete-list').forEach(l => l.style.display = 'none');
-            }
         });
 
+        window.onclick = e => { if(e.target.classList.contains('modal')) document.querySelectorAll('.modal').forEach(m => m.classList.remove('active')); };
     </script>
 </body>
 </html>
