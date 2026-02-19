@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>QC System v6.3 (Full Feature Edit)</title>
+    <title>QC System v6.4 (Search & Detail)</title>
     
     <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
@@ -113,10 +113,29 @@
         .pending { background: rgba(243, 156, 18, 0.15); color: #f39c12; }
         .hold { background: rgba(149, 165, 166, 0.2); color: #7f8c8d; }
 
+        /* Search Results Styles */
+        .result-card {
+            background: white; padding: 20px; border-radius: 16px; 
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05); margin-bottom: 15px; 
+            border: 1px solid #f0f0f0; transition: transform 0.2s;
+        }
+        .result-card:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(0,0,0,0.1); }
+        .result-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px; }
+        .result-title { font-size: 1.1rem; font-weight: 700; color: var(--primary); }
+        .result-lot { font-size: 0.9rem; color: #888; margin-top: 2px; }
+        .result-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; font-size: 0.9rem; margin-bottom: 15px; background: #f9f9f9; padding: 10px; border-radius: 8px; }
+        .result-label { color: #666; font-size: 0.8rem; }
+
         /* Modal */
         .modal { display: none; position: fixed; z-index: 5000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); backdrop-filter: blur(4px); justify-content: center; align-items: center; }
         .modal.active { display: flex; }
         .modal-content { background: white; padding: 25px; border-radius: 16px; width: 95%; max-width: 600px; max-height: 90vh; overflow-y: auto; position: relative; }
+        
+        /* Detail View Styles */
+        .detail-row { display: flex; border-bottom: 1px solid #eee; padding: 10px 0; }
+        .detail-label { width: 40%; font-weight: 600; color: var(--text-light); font-size: 0.9rem; }
+        .detail-value { width: 60%; color: var(--text-main); font-size: 0.95rem; }
+        .detail-section-header { background: #f0f7f6; color: var(--primary); padding: 8px 12px; border-radius: 6px; font-weight: 600; margin: 15px 0 10px 0; font-size: 0.95rem; }
 
         @media (max-width: 768px) { .form-row { grid-template-columns: 1fr; } .tabs { grid-template-columns: repeat(2, 1fr); } .charts-row { grid-template-columns: 1fr; } }
     </style>
@@ -149,7 +168,7 @@
                     <button class="btn btn-warning btn-sm" onclick="openModal('passModal')">🔑 เปลี่ยนรหัส</button>
                     <button class="btn btn-danger btn-sm" onclick="handleLogout()">Logout</button>
                 </div>
-                <h1>☁️ QC System v6.3</h1>
+                <h1>☁️ QC System v6.4</h1>
                 <p>ระบบจัดการคุณภาพวัตถุดิบครบวงจร</p>
             </div>
 
@@ -202,8 +221,8 @@
                         <div class="form-group" style="margin-top:15px;">
                             <label>แนบไฟล์ COA (PDF/รูป)</label>
                             <div class="file-upload" onclick="document.getElementById('coaFile').click()">
-                                <input type="file" id="coaFile" accept=".pdf,.jpg,.jpeg,.png" style="display:none"> 
-                                <span style="font-size:1.5rem;">📎</span>
+                                <input type="file" id="coaFile" accept=".pdf,.jpg,.jpeg,.png" style="display:none">
+                                 <span style="font-size:1.5rem;">📎</span>
                                 <span id="fileName" style="color:#666; font-size:0.9rem; display:block;">คลิกเลือกไฟล์ COA</span>
                             </div>
                         </div>
@@ -223,8 +242,8 @@
                         <div class="form-group" style="margin-bottom:15px;">
                             <label>📷 แนบรูปการตรวจ (QC Photo)</label>
                             <div class="file-upload" style="border-color:#27ae60; background:#f0fff4;" onclick="document.getElementById('qcFile').click()">
-                                <input type="file" id="qcFile" accept=".jpg,.jpeg,.png" style="display:none"> 
-                                <span style="font-size:1.5rem;">📸</span>
+                                <input type="file" id="qcFile" accept=".jpg,.jpeg,.png" style="display:none">
+                                 <span style="font-size:1.5rem;">📸</span>
                                 <span id="qcFileName" style="color:#27ae60; font-size:0.9rem; display:block;">คลิกเลือกรูป QC</span>
                             </div>
                         </div>
@@ -294,7 +313,10 @@
 
             <!-- Tab: Search -->
             <div id="search" class="tab-content">
-                <input type="text" id="searchInput" placeholder="ค้นหา RM Code, Name, หรือ Lot..." style="width:100%; padding:15px; border-radius:30px; border:1px solid #eee; margin-bottom:25px;" oninput="performSearch()">
+                <div style="position:relative; margin-bottom:25px;">
+                    <input type="text" id="searchInput" placeholder="พิมพ์คำค้นหา: RM Code, Name, หรือ Lot No..." style="width:100%; padding:15px 15px 15px 50px; border-radius:30px; border:1px solid #eee; box-shadow: 0 4px 12px rgba(0,0,0,0.05); outline:none;" onkeyup="performSearch()">
+                    <span style="position:absolute; left:20px; top:15px; font-size:1.2rem; color:#aaa;">🔍</span>
+                </div>
                 <div id="searchResults"></div>
             </div>
         </div>
@@ -309,6 +331,24 @@
             <div style="display:flex; gap:10px; margin-top:20px;">
                 <button class="btn btn-primary" onclick="handleChangePassword()" style="flex:1;">ตกลง</button>
                 <button class="btn btn-secondary" onclick="closeModal('passModal')" style="flex:1;">ยกเลิก</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 📄 Detail Modal (Read Only) -->
+    <div id="detailModal" class="modal">
+        <div class="modal-content">
+            <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid #eee; padding-bottom:15px; margin-bottom:15px;">
+                <h3 style="color:var(--primary); margin:0;">📄 รายละเอียด (Detail)</h3>
+                <button onclick="closeModal('detailModal')" style="background:none; border:none; font-size:1.5rem; cursor:pointer; color:#999;">&times;</button>
+            </div>
+            
+            <div id="detailContent">
+                <!-- Content will be injected here -->
+            </div>
+
+            <div style="margin-top:20px; text-align:right;">
+                <button class="btn btn-secondary" onclick="closeModal('detailModal')">ปิดหน้าต่าง</button>
             </div>
         </div>
     </div>
@@ -541,19 +581,87 @@
 
         function performSearch() {
             const q = document.getElementById('searchInput').value.toLowerCase();
-            const res = inspections.filter(i => i.rmCode.toLowerCase().includes(q) || i.lotNo.toLowerCase().includes(q));
-            document.getElementById('searchResults').innerHTML = res.map(i => `
-                <div class="result-card">
+            const resultsContainer = document.getElementById('searchResults');
+            
+            if (q.length === 0) { resultsContainer.innerHTML = ''; return; }
+
+            // Map each item to object { item: data, index: originalIndex } so we can open the correct one
+            const matches = inspections.map((item, index) => ({ item, index }))
+                .filter(({ item }) => 
+                    (item.rmCode && item.rmCode.toLowerCase().includes(q)) || 
+                    (item.rmName && item.rmName.toLowerCase().includes(q)) || 
+                    (item.lotNo && item.lotNo.toLowerCase().includes(q))
+                );
+
+            if (matches.length === 0) {
+                resultsContainer.innerHTML = '<div style="text-align:center; color:#999; padding:20px;">ไม่พบข้อมูล</div>';
+                return;
+            }
+
+            resultsContainer.innerHTML = matches.map(({ item, index }) => {
+                let statusColor = '#95a5a6';
+                if(item.passFail === 'Pass') statusColor = '#27ae60';
+                else if(item.passFail === 'Fail') statusColor = '#e74c3c';
+                else if(item.passFail === 'Pending') statusColor = '#f39c12';
+
+                return `
+                <div class="result-card" style="border-left: 5px solid ${statusColor};">
                     <div class="result-header">
-                        <strong>${i.rmCode}</strong><span class="lot-badge">Lot: ${i.lotNo}</span>
-                        <span class="status-badge ${i.passFail.toLowerCase()}">${i.passFail}</span>
+                        <div>
+                            <div class="result-title">${item.rmCode}</div>
+                            <div class="result-lot">Lot: ${item.lotNo}</div>
+                        </div>
+                        <span class="status-badge ${item.passFail.toLowerCase()}">${item.passFail}</span>
                     </div>
-                    <div class="result-content">
-                        <div class="info-box"><span class="info-label">Name</span>${i.rmName}</div>
-                        <div class="info-box"><span class="info-label">Approved</span>${i.approvedBy} (${i.approvedDate})</div>
+                    <div class="result-grid">
+                        <div><span class="result-label">Name:</span><br>${item.rmName}</div>
+                        <div><span class="result-label">Date:</span><br>${item.receivedDate}</div>
                     </div>
+                    <button class="btn btn-primary btn-sm" style="width:100%;" onclick="openDetailModal(${index})">
+                        📄 ดูรายละเอียด (Detail)
+                    </button>
                 </div>
-            `).join('');
+            `;
+            }).join('');
+        }
+
+        function openDetailModal(idx) {
+            const item = inspections[idx];
+            const content = document.getElementById('detailContent');
+            
+            // Helper for empty data
+            const v = (val) => val ? val : '-';
+
+            content.innerHTML = `
+                <div class="detail-section-header">A: ข้อมูลวัตถุดิบ (Raw Material)</div>
+                <div class="detail-row"><div class="detail-label">RM Code:</div><div class="detail-value">${v(item.rmCode)}</div></div>
+                <div class="detail-row"><div class="detail-label">RM Name:</div><div class="detail-value">${v(item.rmName)}</div></div>
+                <div class="detail-row"><div class="detail-label">Supplier:</div><div class="detail-value">${v(item.supplier)}</div></div>
+                <div class="detail-row"><div class="detail-label">Lot No:</div><div class="detail-value">${v(item.lotNo)}</div></div>
+                <div class="detail-row"><div class="detail-label">Internal Lot:</div><div class="detail-value">${v(item.internalLotNo)}</div></div>
+                <div class="detail-row"><div class="detail-label">Rec. Date:</div><div class="detail-value">${v(item.receivedDate)}</div></div>
+
+                <div class="detail-section-header">B: ข้อมูล COA</div>
+                <div class="detail-row"><div class="detail-label">COA Color:</div><div class="detail-value">${v(item.coaColor)}</div></div>
+                <div class="detail-row"><div class="detail-label">COA Odor:</div><div class="detail-value">${v(item.coaOdor)}</div></div>
+                <div class="detail-row"><div class="detail-label">COA pH:</div><div class="detail-value">${v(item.coaPh)}</div></div>
+                <div class="detail-row"><div class="detail-label">COA File:</div><div class="detail-value">
+                    ${item.coaFile?.isLink ? `<a href="${item.coaFile.data}" target="_blank" class="btn btn-secondary btn-sm" style="padding:4px 8px; font-size:0.75rem;">📄 เปิดไฟล์ COA</a>` : 'ไม่มีไฟล์'}
+                </div></div>
+
+                <div class="detail-section-header">C: ผลการตรวจสอบ (Result)</div>
+                <div class="detail-row"><div class="detail-label">QC Color:</div><div class="detail-value">${v(item.qcColor)}</div></div>
+                <div class="detail-row"><div class="detail-label">QC Odor:</div><div class="detail-value">${v(item.qcOdor)}</div></div>
+                <div class="detail-row"><div class="detail-label">QC pH:</div><div class="detail-value">${v(item.qcPh)}</div></div>
+                <div class="detail-row"><div class="detail-label">Result:</div><div class="detail-value"><span class="status-badge ${item.passFail.toLowerCase()}">${item.passFail}</span></div></div>
+                <div class="detail-row"><div class="detail-label">QC Photo:</div><div class="detail-value">
+                     ${item.qcFile?.isLink ? `<a href="${item.qcFile.data}" target="_blank" class="btn btn-success btn-sm" style="padding:4px 8px; font-size:0.75rem;">📸 ดูรูป QC</a>` : 'ไม่มีรูป'}
+                </div></div>
+                <div class="detail-row"><div class="detail-label">Approved By:</div><div class="detail-value">${v(item.approvedBy)}</div></div>
+                <div class="detail-row"><div class="detail-label">Date:</div><div class="detail-value">${v(item.approvedDate)}</div></div>
+            `;
+            
+            openModal('detailModal');
         }
 
         // --- 🛠️ HELPERS ---
