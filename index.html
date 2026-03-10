@@ -41,7 +41,8 @@
             width: 90%; max-width: 400px; text-align: center; animation: fadeInDown 0.5s ease-out;
         }
         @keyframes fadeInDown { from { opacity: 0; transform: translateY(-30px); } to { opacity: 1; transform: translateY(0); } }
-        .login-card h2 { margin-bottom: 10px; color: var(--primary); font-size: 1.8rem; }
+        .login-card h2 { margin-bottom: 5px; color: var(--primary); font-size: 1.8rem; }
+        .login-card p.version { color: var(--text-light); font-size: 0.9rem; margin-bottom: 20px; font-weight: 500;}
         .login-card input {
             width: 100%; padding: 14px; margin-bottom: 15px; border: 1px solid #ddd;
             border-radius: 12px; font-family: 'Prompt'; font-size: 1rem; transition: 0.3s;
@@ -274,7 +275,8 @@
     <!-- 🔐 Login Overlay -->
     <div id="login-overlay">
         <div class="login-card">
-            <h2>🔐 QC System Login</h2>
+            <h2>🔐 QC System</h2>
+            <p class="version">v6.4 (Firebase Edition)</p>
             
             <!-- เพิ่มคำแนะนำการเข้าระบบที่ชัดเจนตรงนี้ -->
             <div class="login-hint">
