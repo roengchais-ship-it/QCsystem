@@ -106,6 +106,12 @@
         .checklist-item input[type="checkbox"] { width: 24px; height: 24px; accent-color: var(--active-green); cursor: pointer; }
         .checklist-item label { margin-bottom: 0 !important; cursor: pointer; font-size: 1rem; color: #475569; }
 
+        /* Detail Modal specific styling */
+        .detail-checklist-box { display: flex; flex-direction: column; background: #f8fafc; border-radius: 8px; margin-bottom: 15px; border: 1px solid #e2e8f0; padding: 15px; }
+        .detail-checklist-box .chk-title { font-weight: 600; color: #3b82f6; margin-bottom: 10px; }
+        .detail-checklist-box .chk-item { display: flex; gap: 8px; align-items: center; margin-bottom: 6px; font-size: 0.95rem; }
+        .chk-icon { color: var(--active-green); font-size: 1.2rem; }
+
         /* Autocomplete */
         .autocomplete-list { position: absolute; z-index: 1000; top: 100%; left: 0; right: 0; background: white; border: 1px solid #e2e8f0; border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); max-height: 220px; overflow-y: auto; display: none; margin-top: 5px; }
         .autocomplete-item { padding: 12px 16px; cursor: pointer; border-bottom: 1px solid #f8fafc; font-size: 0.95rem; transition: background 0.2s; }
@@ -174,16 +180,17 @@
         .detail-section-header { background: #f0fdfa; color: var(--primary); padding: 10px 16px; border-radius: 8px; font-weight: 700; margin: 25px 0 15px 0; font-size: 1.1rem; border-left: 4px solid var(--active-green); }
 
         /* =========================================
-           🖨️ PRINT STYLES (ปรับขนาดตัวอักษรให้เล็กลงอีก และระยะขอบให้กระชับที่สุด)
+           🖨️ PRINT STYLES (ปรับบีบอัดขั้นสุดและเพิ่มกรอบเอกสาร)
            ========================================= */
         @media print {
-            @page { size: A4 portrait; margin: 10mm; } /* ขอบเล็กลงอีก */
+            @page { size: A4 portrait; margin: 8mm; } 
             
-            /* รีเซ็ตค่าพื้นฐานให้ตัวหนังสือเล็กมากๆ (ประมาณ 8.5pt) */
+            /* รีเซ็ตค่าพื้นฐานให้ตัวหนังสือเล็กมากๆ (ประมาณ 8pt) และบีบความสูงบรรทัด */
             html, body { 
                 background: white !important; 
                 color: black !important; 
-                font-size: 8.5pt !important; 
+                font-size: 8pt !important; 
+                line-height: 1.2 !important;
                 height: auto !important; 
                 overflow: visible !important; 
                 font-family: 'Prompt', sans-serif !important;
@@ -194,84 +201,95 @@
 
             /* ปรับ Modal ให้กางเต็มจอ ไร้ Scrollbar */
             body.printing-detail .modal { 
-                position: absolute !important; 
-                left: 0 !important; top: 0 !important; 
-                display: block !important; 
-                background: transparent !important; 
-                backdrop-filter: none !important; 
-                width: 100% !important; height: auto !important; 
-                min-height: 100% !important; overflow: visible !important; 
-                align-items: flex-start !important;
+                position: absolute !important; left: 0 !important; top: 0 !important; 
+                display: block !important; background: transparent !important; 
+                backdrop-filter: none !important; width: 100% !important; 
+                height: auto !important; min-height: 100% !important; 
+                overflow: visible !important; align-items: flex-start !important;
             }
             body.printing-detail .modal-content { 
                 box-shadow: none !important; width: 100% !important; max-width: 100% !important; 
                 padding: 0 !important; border-radius: 0 !important; height: auto !important; 
                 max-height: none !important; overflow: visible !important;
             }
+
+            /* 🌟 กรอบเอกสารล้อมรอบทั้งหมด 🌟 */
+            body.printing-detail .print-container {
+                border: 2px solid #000 !important;
+                width: 100% !important;
+                box-sizing: border-box !important;
+                margin: 0 !important;
+            }
             
             /* ส่วนหัวกระดาษเวลาพริ้นท์ (Title) */
             body.printing-detail .print-header { 
-                display: block !important; margin-bottom: 10px !important; 
-                border-bottom: 2px solid #000 !important; padding-bottom: 8px !important; 
-                text-align: center !important;
+                display: block !important; margin-bottom: 0 !important; 
+                border-bottom: 2px solid #000 !important; padding: 10px !important; 
+                text-align: center !important; background-color: #fff !important;
             }
-            body.printing-detail .print-header h2 { font-size: 12pt !important; margin: 0 0 3px 0 !important; font-weight: bold !important; }
-            body.printing-detail .print-header p { font-size: 8.5pt !important; margin: 0 !important; }
+            body.printing-detail .print-header h2 { font-size: 11pt !important; margin: 0 0 3px 0 !important; font-weight: bold !important; }
+            body.printing-detail .print-header p { font-size: 8pt !important; margin: 0 !important; }
             
-            /* กรอบตารางข้อมูล */
-            body.printing-detail .print-wrapper { border: 1px solid #000 !important; border-bottom: none !important; }
+            /* กรอบตารางข้อมูล (เอาขอบนอกออก เพราะใส่ที่ print-container แล้ว) */
+            body.printing-detail .print-wrapper { border: none !important; }
             
             /* หัวข้อ Section ย่อย (1, 2, 3, 4) */
             body.printing-detail .detail-section-header { 
                 background-color: #e5e7eb !important; color: #000 !important; 
-                border-bottom: 1px solid #000 !important; border-top: 1px solid #000 !important;
-                padding: 4px 6px !important; /* ลด Padding ให้แคบมาก */
+                border-bottom: 1px solid #000 !important; border-top: none !important;
+                padding: 4px 6px !important; 
                 -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; 
-                margin: 0 !important; font-size: 9.5pt !important; /* เล็กลงอีก */
+                margin: 0 !important; font-size: 8.5pt !important; font-weight: bold !important;
                 border-left: none !important; border-radius: 0 !important;
             }
-            body.printing-detail .print-wrapper > .detail-section-header:first-child { border-top: none !important; }
+            /* ป้องกันเส้นซ้อนทับกัน */
+            body.printing-detail .detail-row:last-of-type { border-bottom: 1px solid #000 !important; }
+            body.printing-detail .detail-section-header + .detail-row { border-top: none !important; }
             
             /* แถวข้อมูล (Row) */
             body.printing-detail .detail-row { 
                 border-bottom: 1px solid #000 !important; page-break-inside: avoid !important; 
                 margin: 0 !important; padding: 0 !important; border-radius: 0 !important; 
-                background: #fff !important; align-items: stretch !important;
+                background: #fff !important; align-items: stretch !important; display: flex !important;
             }
             
             /* คอลัมน์ซ้าย (ชื่อฟิลด์) */
             body.printing-detail .detail-label {
                 border-right: 1px solid #000 !important; color: #000 !important; background-color: #f9fafb !important;
                 -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; 
-                width: 35% !important; /* ปรับลดพื้นที่ฝั่งชื่อฟิลด์เล็กน้อย */
-                padding: 3px 6px !important; /* ลด Padding ลงอีก */
+                width: 35% !important; padding: 3px 6px !important; 
                 display: flex; align-items: center; font-weight: bold !important;
             }
             
             /* คอลัมน์ขวา (ค่าข้อมูล) */
             body.printing-detail .detail-value {
                 color: #000 !important; width: 65% !important;
-                padding: 3px 6px !important; /* ลด Padding ลงอีก */
-                display: flex; align-items: center;
+                padding: 3px 6px !important; display: flex; align-items: center;
             }
             
             /* ส่วน Checklist */
-            body.printing-detail .checklist-row { padding: 6px 10px !important; display: block !important; border-bottom: 1px solid #000 !important; }
-            body.printing-detail .chk-title { color: #000 !important; font-weight: bold !important; margin-bottom: 4px !important; text-decoration: underline !important; }
-            body.printing-detail .chk-item { margin-bottom: 2px !important; }
-            body.printing-detail .chk-item span { color: #000 !important; font-size: 8.5pt !important; }
-            body.printing-detail .status-badge { border: 1px solid #000 !important; color: #000 !important; background: transparent !important; padding: 1px 4px !important; font-size: 8.5pt !important; }
+            body.printing-detail .detail-checklist-box { 
+                padding: 6px 10px !important; display: block !important; 
+                border-bottom: 1px solid #000 !important; border-radius: 0 !important; 
+                border-top: none !important; border-left: none !important; border-right: none !important;
+                margin: 0 !important; background: #fff !important;
+            }
+            body.printing-detail .chk-title { color: #000 !important; font-weight: bold !important; margin-bottom: 3px !important; text-decoration: underline !important; font-size: 8pt !important; }
+            body.printing-detail .chk-item { margin-bottom: 1px !important; display: flex !important; align-items: center !important; gap: 4px !important; }
+            body.printing-detail .chk-item span { color: #000 !important; font-size: 8pt !important; }
+            body.printing-detail .chk-icon { font-size: 10pt !important; margin-right: 2px !important; }
+            body.printing-detail .status-badge { border: 1px solid #000 !important; color: #000 !important; background: transparent !important; padding: 1px 4px !important; font-size: 8pt !important; }
 
             /* กล่องเซ็นชื่อด้านล่างสุด (Signature) */
             body.printing-detail .signature-area {
                 display: flex !important; justify-content: space-around !important;
                 margin-top: 0 !important;
-                padding: 25px 0 10px 0 !important; /* ลดช่องว่างแนวตั้งให้กระชับมาก */
-                border-bottom: 1px solid #000 !important; border-left: 1px solid #000 !important; border-right: 1px solid #000 !important;
+                padding: 20px 0 10px 0 !important; 
+                border-bottom: none !important; border-left: none !important; border-right: none !important;
                 page-break-inside: avoid !important; background: white !important;
             }
             body.printing-detail .signature-box { width: 40% !important; text-align: center !important; }
-            body.printing-detail .signature-line { border-bottom: 1px dashed #000 !important; height: 20px !important; margin-bottom: 5px !important; }
+            body.printing-detail .signature-line { border-bottom: 1px dashed #000 !important; height: 15px !important; margin-bottom: 5px !important; }
             
             body.printing-detail .modal-content button { display: none !important; }
         }
@@ -1065,76 +1083,78 @@
 
             // เปลี่ยนโครงสร้าง HTML เป็นแบบ Grid/Table สำหรับการพิมพ์ที่สวยงาม
             content.innerHTML = `
-                <div class="print-header" style="display: none;">
-                    <h2>RAW MATERIAL RECEIVING & VENDOR CHECKLIST (QA)</h2>
-                    <p>แบบฟอร์มตรวจสอบคุณภาพวัตถุดิบรับเข้า</p>
-                </div>
-
-                <div class="print-wrapper">
-                    <div class="detail-section-header">1. ข้อมูลการรับเข้า (Receiving Information)</div>
-                    <div class="detail-row"><div class="detail-label">รหัสวัตถุดิบ (Material Code):</div><div class="detail-value" style="font-weight:700;">${v(item.rmCode)}</div></div>
-                    <div class="detail-row"><div class="detail-label">ชื่อวัตถุดิบ (Material Name):</div><div class="detail-value">${v(item.rmName)}</div></div>
-                    <div class="detail-row"><div class="detail-label">ผู้จัดจำหน่าย (Supplier):</div><div class="detail-value">${v(item.supplier)}</div></div>
-                    <div class="detail-row"><div class="detail-label">เลขล็อต (Lot No.):</div><div class="detail-value">${v(item.lotNo)}</div></div>
-                    <div class="detail-row"><div class="detail-label">วันที่ผลิต (Mfg. Date):</div><div class="detail-value">${v(item.mfgDate)}</div></div>
-                    <div class="detail-row"><div class="detail-label">วันหมดอายุ (Exp. Date):</div><div class="detail-value">${v(item.expDate)}</div></div>
-                    <div class="detail-row"><div class="detail-label">ล็อตภายใน (Internal Lot):</div><div class="detail-value">${v(item.internalLotNo)}</div></div>
-                    <div class="detail-row"><div class="detail-label">วันที่รับของ (Date Received):</div><div class="detail-value">${v(item.receivedDate)}</div></div>
-
-                    <div class="detail-section-header" style="margin-top: 20px;">2. การตรวจสอบเอกสาร (Document Verification)</div>
-                    
-                    <div class="detail-row checklist-row">
-                        <div class="chk-title">📋 เช็คลิสต์ตรวจสอบเอกสาร:</div>
-                        <div class="chk-item"><span style="font-size: 1.2rem; margin-right:5px;">☑</span> มีเอกสารใบรับรอง COA ครบถ้วน (COA Available)</div>
-                        <div class="chk-item"><span style="font-size: 1.2rem; margin-right:5px;">☑</span> เลข Lot. ในเอกสาร ตรงกับสินค้าจริง (Lot number matches COA)</div>
-                        <div class="chk-item"><span style="font-size: 1.2rem; margin-right:5px;">☑</span> วันที่ผลิตและวันหมดอายุถูกต้อง (Mfg & Exp verified)</div>
+                <div class="print-container">
+                    <div class="print-header" style="display: none;">
+                        <h2>RAW MATERIAL RECEIVING & VENDOR CHECKLIST (QA)</h2>
+                        <p>แบบฟอร์มตรวจสอบคุณภาพวัตถุดิบรับเข้า</p>
                     </div>
 
-                    <div class="detail-row"><div class="detail-label">สีตาม COA (Specification Color):</div><div class="detail-value">${v(item.coaColor)}</div></div>
-                    <div class="detail-row"><div class="detail-label">กลิ่นตาม COA (Specification Odor):</div><div class="detail-value">${v(item.coaOdor)}</div></div>
-                    <div class="detail-row"><div class="detail-label">pH ตาม COA (Specification pH):</div><div class="detail-value">${v(item.coaPh)}</div></div>
-                    <div class="detail-row"><div class="detail-label">อุณหภูมิตาม COA (Specification Temp):</div><div class="detail-value">${v(item.coaTemp)}</div></div>
-                    <div class="detail-row print-hide"><div class="detail-label">ไฟล์ COA:</div><div class="detail-value">
-                        ${item.coaFile?.isLink ? `<a href="${item.coaFile.data}" target="_blank" class="btn btn-secondary btn-sm" style="background:#e2e8f0; color:#334155;">📄 เปิดไฟล์ COA</a>` : '<span style="color:#94a3b8;">ไม่มีไฟล์แนบ</span>'}
-                    </div></div>
+                    <div class="print-wrapper">
+                        <div class="detail-section-header">1. ข้อมูลการรับเข้า (Receiving Information)</div>
+                        <div class="detail-row"><div class="detail-label">รหัสวัตถุดิบ (Material Code):</div><div class="detail-value" style="font-weight:700;">${v(item.rmCode)}</div></div>
+                        <div class="detail-row"><div class="detail-label">ชื่อวัตถุดิบ (Material Name):</div><div class="detail-value">${v(item.rmName)}</div></div>
+                        <div class="detail-row"><div class="detail-label">ผู้จัดจำหน่าย (Supplier):</div><div class="detail-value">${v(item.supplier)}</div></div>
+                        <div class="detail-row"><div class="detail-label">เลขล็อต (Lot No.):</div><div class="detail-value">${v(item.lotNo)}</div></div>
+                        <div class="detail-row"><div class="detail-label">วันที่ผลิต (Mfg. Date):</div><div class="detail-value">${v(item.mfgDate)}</div></div>
+                        <div class="detail-row"><div class="detail-label">วันหมดอายุ (Exp. Date):</div><div class="detail-value">${v(item.expDate)}</div></div>
+                        <div class="detail-row"><div class="detail-label">ล็อตภายใน (Internal Lot):</div><div class="detail-value">${v(item.internalLotNo)}</div></div>
+                        <div class="detail-row"><div class="detail-label">วันที่รับของ (Date Received):</div><div class="detail-value">${v(item.receivedDate)}</div></div>
 
-                    <div class="detail-section-header" style="margin-top: 20px;">3. การตรวจสอบสภาพหน้างาน (Physical Inspection)</div>
-
-                    <div class="detail-row checklist-row">
-                        <div class="chk-title">📦 เช็คลิสต์ตรวจสอบบรรจุภัณฑ์:</div>
-                        <div class="chk-item"><span style="font-size: 1.2rem; margin-right:5px;">☑</span> สภาพบรรจุภัณฑ์สมบูรณ์ ไม่ชำรุดเสียหาย (Packaging intact)</div>
-                        <div class="chk-item"><span style="font-size: 1.2rem; margin-right:5px;">☑</span> ซีลปิดสนิท และไม่มีการรั่วซึม (Seal intact & No leakage)</div>
-                        <div class="chk-item"><span style="font-size: 1.2rem; margin-right:5px;">☑</span> ฉลากอ่านออกชัดเจน (Label readable)</div>
-                    </div>
-
-                    <div class="detail-row"><div class="detail-label">ลักษณะปรากฏ (Appearance):</div><div class="detail-value">${appearanceDisplay}</div></div>
-                    <div class="detail-row"><div class="detail-label">สีที่ตรวจพบจริง (Result Color):</div><div class="detail-value">${v(item.qcColor)}</div></div>
-                    <div class="detail-row"><div class="detail-label">กลิ่นที่ตรวจพบจริง (Result Odor):</div><div class="detail-value">${v(item.qcOdor)}</div></div>
-                    <div class="detail-row"><div class="detail-label">ค่า pH ที่วัดได้ (Result pH):</div><div class="detail-value">${v(item.qcPh)}</div></div>
-                    <div class="detail-row"><div class="detail-label">อุณหภูมิที่วัดได้ (Result Temp):</div><div class="detail-value">${v(item.qcTemp)}</div></div>
-                    <div class="detail-row print-hide"><div class="detail-label">รูปหน้างาน:</div><div class="detail-value">
-                         ${item.qcFile?.isLink ? `<a href="${item.qcFile.data}" target="_blank" class="btn btn-success btn-sm" style="background:#dcfce7; color:#166534;">📸 ดูรูป QC</a>` : '<span style="color:#94a3b8;">ไม่มีรูปถ่าย</span>'}
-                    </div></div>
-
-                    <div class="detail-section-header" style="margin-top: 20px;">4. สรุปผลการตรวจสอบ (QA Decision)</div>
-                    <div class="detail-row"><div class="detail-label">ผลการตัดสิน (Decision):</div><div class="detail-value"><strong style="font-size:1.1em;">${item.passFail}</strong></div></div>
-                    
-                    <div class="detail-row print-hide"><div class="detail-label">ผู้ตรวจสอบ:</div><div class="detail-value">${v(item.approvedBy)}</div></div>
-                    <div class="detail-row print-hide"><div class="detail-label">วันที่ตรวจ:</div><div class="detail-value">${v(item.approvedDate)}</div></div>
-
-                    <!-- แสดงเฉพาะตอนพริ้นท์เอกสาร -->
-                    <div class="signature-area" style="display: none;">
-                        <div class="signature-box">
-                            <div class="signature-line"></div>
-                            <div style="font-weight: bold;">( ${v(item.approvedBy)} )</div>
-                            <div style="font-size: 0.9em; margin-top: 5px;">ผู้ตรวจสอบ (Inspector Name)</div>
-                            <div style="font-size: 0.9em;">วันที่ (Date): ${v(item.approvedDate)}</div>
+                        <div class="detail-section-header">2. การตรวจสอบเอกสาร (Document Verification)</div>
+                        
+                        <div class="detail-checklist-box">
+                            <div class="chk-title">📋 เช็คลิสต์ตรวจสอบเอกสาร:</div>
+                            <div class="chk-item"><span class="chk-icon">☑</span> <span>มีเอกสารใบรับรอง COA ครบถ้วน (COA Available)</span></div>
+                            <div class="chk-item"><span class="chk-icon">☑</span> <span>เลข Lot. ในเอกสาร ตรงกับสินค้าจริง (Lot number matches COA)</span></div>
+                            <div class="chk-item"><span class="chk-icon">☑</span> <span>วันที่ผลิตและวันหมดอายุถูกต้อง (Mfg & Exp verified)</span></div>
                         </div>
-                        <div class="signature-box">
-                            <div class="signature-line"></div>
-                            <div style="font-weight: bold;">( .................................................... )</div>
-                            <div style="font-size: 0.9em; margin-top: 5px;">ผู้อนุมัติ (QA Manager / Approver)</div>
-                            <div style="font-size: 0.9em;">วันที่ (Date): _______/_______/_______</div>
+
+                        <div class="detail-row"><div class="detail-label">สีตาม COA (Specification Color):</div><div class="detail-value">${v(item.coaColor)}</div></div>
+                        <div class="detail-row"><div class="detail-label">กลิ่นตาม COA (Specification Odor):</div><div class="detail-value">${v(item.coaOdor)}</div></div>
+                        <div class="detail-row"><div class="detail-label">pH ตาม COA (Specification pH):</div><div class="detail-value">${v(item.coaPh)}</div></div>
+                        <div class="detail-row"><div class="detail-label">อุณหภูมิตาม COA (Specification Temp):</div><div class="detail-value">${v(item.coaTemp)}</div></div>
+                        <div class="detail-row print-hide"><div class="detail-label">ไฟล์ COA:</div><div class="detail-value">
+                            ${item.coaFile?.isLink ? `<a href="${item.coaFile.data}" target="_blank" class="btn btn-secondary btn-sm" style="background:#e2e8f0; color:#334155;">📄 เปิดไฟล์ COA</a>` : '<span style="color:#94a3b8;">ไม่มีไฟล์แนบ</span>'}
+                        </div></div>
+
+                        <div class="detail-section-header">3. การตรวจสอบสภาพหน้างาน (Physical Inspection)</div>
+
+                        <div class="detail-checklist-box">
+                            <div class="chk-title">📦 เช็คลิสต์ตรวจสอบบรรจุภัณฑ์:</div>
+                            <div class="chk-item"><span class="chk-icon">☑</span> <span>สภาพบรรจุภัณฑ์สมบูรณ์ ไม่ชำรุดเสียหาย (Packaging intact)</span></div>
+                            <div class="chk-item"><span class="chk-icon">☑</span> <span>ซีลปิดสนิท และไม่มีการรั่วซึม (Seal intact & No leakage)</span></div>
+                            <div class="chk-item"><span class="chk-icon">☑</span> <span>ฉลากอ่านออกชัดเจน (Label readable)</span></div>
+                        </div>
+
+                        <div class="detail-row"><div class="detail-label">ลักษณะปรากฏ (Appearance):</div><div class="detail-value">${appearanceDisplay}</div></div>
+                        <div class="detail-row"><div class="detail-label">สีที่ตรวจพบจริง (Result Color):</div><div class="detail-value">${v(item.qcColor)}</div></div>
+                        <div class="detail-row"><div class="detail-label">กลิ่นที่ตรวจพบจริง (Result Odor):</div><div class="detail-value">${v(item.qcOdor)}</div></div>
+                        <div class="detail-row"><div class="detail-label">ค่า pH ที่วัดได้ (Result pH):</div><div class="detail-value">${v(item.qcPh)}</div></div>
+                        <div class="detail-row"><div class="detail-label">อุณหภูมิที่วัดได้ (Result Temp):</div><div class="detail-value">${v(item.qcTemp)}</div></div>
+                        <div class="detail-row print-hide"><div class="detail-label">รูปหน้างาน:</div><div class="detail-value">
+                             ${item.qcFile?.isLink ? `<a href="${item.qcFile.data}" target="_blank" class="btn btn-success btn-sm" style="background:#dcfce7; color:#166534;">📸 ดูรูป QC</a>` : '<span style="color:#94a3b8;">ไม่มีรูปถ่าย</span>'}
+                        </div></div>
+
+                        <div class="detail-section-header">4. สรุปผลการตรวจสอบ (QA Decision)</div>
+                        <div class="detail-row"><div class="detail-label">ผลการตัดสิน (Decision):</div><div class="detail-value"><strong style="font-size:1.1em;">${item.passFail}</strong></div></div>
+                        
+                        <div class="detail-row print-hide"><div class="detail-label">ผู้ตรวจสอบ:</div><div class="detail-value">${v(item.approvedBy)}</div></div>
+                        <div class="detail-row print-hide"><div class="detail-label">วันที่ตรวจ:</div><div class="detail-value">${v(item.approvedDate)}</div></div>
+
+                        <!-- แสดงเฉพาะตอนพริ้นท์เอกสาร -->
+                        <div class="signature-area" style="display: none;">
+                            <div class="signature-box">
+                                <div class="signature-line"></div>
+                                <div style="font-weight: bold;">( ${v(item.approvedBy)} )</div>
+                                <div style="font-size: 0.9em; margin-top: 5px;">ผู้ตรวจสอบ (Inspector Name)</div>
+                                <div style="font-size: 0.9em;">วันที่ (Date): ${v(item.approvedDate)}</div>
+                            </div>
+                            <div class="signature-box">
+                                <div class="signature-line"></div>
+                                <div style="font-weight: bold;">( .................................................... )</div>
+                                <div style="font-size: 0.9em; margin-top: 5px;">ผู้อนุมัติ (QA Manager / Approver)</div>
+                                <div style="font-size: 0.9em;">วันที่ (Date): _______/_______/_______</div>
+                            </div>
                         </div>
                     </div>
                 </div>
