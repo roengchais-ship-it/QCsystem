@@ -174,16 +174,16 @@
         .detail-section-header { background: #f0fdfa; color: var(--primary); padding: 10px 16px; border-radius: 8px; font-weight: 700; margin: 25px 0 15px 0; font-size: 1.1rem; border-left: 4px solid var(--active-green); }
 
         /* =========================================
-           🖨️ PRINT STYLES (ปรับขนาดตัวอักษรและระยะขอบให้เล็กลง)
+           🖨️ PRINT STYLES (ปรับขนาดตัวอักษรให้เล็กลงอีก และระยะขอบให้กระชับที่สุด)
            ========================================= */
         @media print {
-            @page { size: A4 portrait; margin: 10mm 15mm; } /* ขอบเล็กลงนิดนึง เพื่อให้มีพื้นที่แนวตั้งเยอะขึ้น */
+            @page { size: A4 portrait; margin: 10mm; } /* ขอบเล็กลงอีก */
             
-            /* รีเซ็ตค่าพื้นฐานให้ตัวหนังสือเล็กลง */
+            /* รีเซ็ตค่าพื้นฐานให้ตัวหนังสือเล็กมากๆ (ประมาณ 8.5pt) */
             html, body { 
                 background: white !important; 
                 color: black !important; 
-                font-size: 10pt !important; /* ปรับจาก 12pt เป็น 10pt */
+                font-size: 8.5pt !important; 
                 height: auto !important; 
                 overflow: visible !important; 
                 font-family: 'Prompt', sans-serif !important;
@@ -211,23 +211,23 @@
             
             /* ส่วนหัวกระดาษเวลาพริ้นท์ (Title) */
             body.printing-detail .print-header { 
-                display: block !important; margin-bottom: 15px !important; 
-                border-bottom: 2px solid #000 !important; padding-bottom: 10px !important; 
+                display: block !important; margin-bottom: 10px !important; 
+                border-bottom: 2px solid #000 !important; padding-bottom: 8px !important; 
                 text-align: center !important;
             }
-            body.printing-detail .print-header h2 { font-size: 14pt !important; margin: 0 0 5px 0 !important; font-weight: bold !important; }
-            body.printing-detail .print-header p { font-size: 10pt !important; margin: 0 !important; }
+            body.printing-detail .print-header h2 { font-size: 12pt !important; margin: 0 0 3px 0 !important; font-weight: bold !important; }
+            body.printing-detail .print-header p { font-size: 8.5pt !important; margin: 0 !important; }
             
             /* กรอบตารางข้อมูล */
-            body.printing-detail .print-wrapper { border: 1.5px solid #000 !important; border-bottom: none !important; }
+            body.printing-detail .print-wrapper { border: 1px solid #000 !important; border-bottom: none !important; }
             
             /* หัวข้อ Section ย่อย (1, 2, 3, 4) */
             body.printing-detail .detail-section-header { 
                 background-color: #e5e7eb !important; color: #000 !important; 
                 border-bottom: 1px solid #000 !important; border-top: 1px solid #000 !important;
-                padding: 4px 8px !important; /* ลด Padding ให้แคบลง */
+                padding: 4px 6px !important; /* ลด Padding ให้แคบมาก */
                 -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; 
-                margin: 0 !important; font-size: 11pt !important; /* ลดจาก 13pt เป็น 11pt */
+                margin: 0 !important; font-size: 9.5pt !important; /* เล็กลงอีก */
                 border-left: none !important; border-radius: 0 !important;
             }
             body.printing-detail .print-wrapper > .detail-section-header:first-child { border-top: none !important; }
@@ -243,34 +243,35 @@
             body.printing-detail .detail-label {
                 border-right: 1px solid #000 !important; color: #000 !important; background-color: #f9fafb !important;
                 -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; 
-                width: 40% !important;
-                padding: 4px 8px !important; /* ลด Padding */
+                width: 35% !important; /* ปรับลดพื้นที่ฝั่งชื่อฟิลด์เล็กน้อย */
+                padding: 3px 6px !important; /* ลด Padding ลงอีก */
                 display: flex; align-items: center; font-weight: bold !important;
             }
             
             /* คอลัมน์ขวา (ค่าข้อมูล) */
             body.printing-detail .detail-value {
-                color: #000 !important; width: 60% !important;
-                padding: 4px 8px !important; /* ลด Padding */
+                color: #000 !important; width: 65% !important;
+                padding: 3px 6px !important; /* ลด Padding ลงอีก */
                 display: flex; align-items: center;
             }
             
             /* ส่วน Checklist */
-            body.printing-detail .checklist-row { padding: 8px 12px !important; display: block !important; border-bottom: 1px solid #000 !important; }
+            body.printing-detail .checklist-row { padding: 6px 10px !important; display: block !important; border-bottom: 1px solid #000 !important; }
             body.printing-detail .chk-title { color: #000 !important; font-weight: bold !important; margin-bottom: 4px !important; text-decoration: underline !important; }
-            body.printing-detail .chk-item span { color: #000 !important; font-size: 10pt !important; }
-            body.printing-detail .status-badge { border: 1px solid #000 !important; color: #000 !important; background: transparent !important; padding: 2px 6px !important; font-size: 10pt !important; }
+            body.printing-detail .chk-item { margin-bottom: 2px !important; }
+            body.printing-detail .chk-item span { color: #000 !important; font-size: 8.5pt !important; }
+            body.printing-detail .status-badge { border: 1px solid #000 !important; color: #000 !important; background: transparent !important; padding: 1px 4px !important; font-size: 8.5pt !important; }
 
             /* กล่องเซ็นชื่อด้านล่างสุด (Signature) */
             body.printing-detail .signature-area {
                 display: flex !important; justify-content: space-around !important;
                 margin-top: 0 !important;
-                padding: 30px 0 15px 0 !important; /* ลดช่องว่างแนวตั้ง */
-                border-bottom: 1.5px solid #000 !important; border-left: 1.5px solid #000 !important; border-right: 1.5px solid #000 !important;
+                padding: 25px 0 10px 0 !important; /* ลดช่องว่างแนวตั้งให้กระชับมาก */
+                border-bottom: 1px solid #000 !important; border-left: 1px solid #000 !important; border-right: 1px solid #000 !important;
                 page-break-inside: avoid !important; background: white !important;
             }
             body.printing-detail .signature-box { width: 40% !important; text-align: center !important; }
-            body.printing-detail .signature-line { border-bottom: 1px dashed #000 !important; height: 25px !important; margin-bottom: 5px !important; }
+            body.printing-detail .signature-line { border-bottom: 1px dashed #000 !important; height: 20px !important; margin-bottom: 5px !important; }
             
             body.printing-detail .modal-content button { display: none !important; }
         }
