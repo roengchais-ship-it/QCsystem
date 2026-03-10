@@ -256,6 +256,16 @@
                         </div>
                         <div class="form-row">
                             <div class="form-group">
+                                <label>วันที่ผลิต <span class="en-label">(Manufacturing Date)</span></label>
+                                <input type="date" name="mfgDate">
+                            </div>
+                            <div class="form-group">
+                                <label>วันหมดอายุ <span class="en-label">(Expiry Date)</span></label>
+                                <input type="date" name="expDate">
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
                                 <label>ล็อตภายในบริษัท <span class="en-label">(Internal Lot)</span></label>
                                 <input type="text" name="internalLotNo" placeholder="ระบุเลขลอตภายใน (ถ้ามี)...">
                             </div>
@@ -279,6 +289,10 @@
                             <div class="checklist-item">
                                 <input type="checkbox" id="chk_doc_lot" required>
                                 <label for="chk_doc_lot">เลข Lot. ในเอกสาร ตรงกับสินค้าจริง (Lot number matches COA)</label>
+                            </div>
+                            <div class="checklist-item">
+                                <input type="checkbox" id="chk_doc_mfg" required>
+                                <label for="chk_doc_mfg">วันที่ผลิตและวันหมดอายุถูกต้อง (Manufacturing & Expiry date verified)</label>
                             </div>
                         </div>
 
@@ -543,6 +557,10 @@
                     <div class="form-row" style="margin-bottom:15px;">
                         <div class="form-group"><label>ผู้จัดจำหน่าย (Supplier)</label><input type="text" id="edit_supplier" required></div>
                         <div class="form-group"><label>เลขล็อต (Lot No.)</label><input type="text" id="edit_lotNo" required></div>
+                    </div>
+                    <div class="form-row" style="margin-bottom:15px;">
+                        <div class="form-group"><label>วันที่ผลิต (Mfg. Date)</label><input type="date" id="edit_mfgDate"></div>
+                        <div class="form-group"><label>วันหมดอายุ (Exp. Date)</label><input type="date" id="edit_expDate"></div>
                     </div>
                     <div class="form-row" style="margin-bottom:0;">
                         <div class="form-group"><label>ล็อตภายใน (Int. Lot)</label><input type="text" id="edit_internalLotNo"></div>
@@ -817,6 +835,7 @@
                 action: 'insert',
                 timestamp: new Date().toLocaleString('th-TH'),
                 rmCode: fd.get('rmCode'), rmName: fd.get('rmName'), supplier: fd.get('supplier'), lotNo: fd.get('lotNo'), internalLotNo: fd.get('internalLotNo'),
+                mfgDate: fd.get('mfgDate'), expDate: fd.get('expDate'),
                 receivedDate: fd.get('receivedDate'), coaColor: fd.get('coaColor'), coaOdor: fd.get('coaOdor'), coaPh: fd.get('coaPh'), coaTemp: fd.get('coaTemp'),
                 qcAppearance: fd.get('qcAppearance'), qcColor: fd.get('qcColor'), qcOdor: fd.get('qcOdor'), qcPh: fd.get('qcPh'), qcTemp: fd.get('qcTemp'),
                 passFail: fd.get('passFail'), approvedBy: fd.get('approvedBy'), approvedDate: fd.get('approvedDate'),
@@ -942,6 +961,8 @@
                 <div class="detail-row"><div class="detail-label">ชื่อวัตถุดิบ:</div><div class="detail-value">${v(item.rmName)}</div></div>
                 <div class="detail-row"><div class="detail-label">ผู้จัดจำหน่าย:</div><div class="detail-value">${v(item.supplier)}</div></div>
                 <div class="detail-row"><div class="detail-label">เลขล็อต:</div><div class="detail-value">${v(item.lotNo)}</div></div>
+                <div class="detail-row"><div class="detail-label">วันที่ผลิต:</div><div class="detail-value">${v(item.mfgDate)}</div></div>
+                <div class="detail-row"><div class="detail-label">วันหมดอายุ:</div><div class="detail-value">${v(item.expDate)}</div></div>
                 <div class="detail-row"><div class="detail-label">ล็อตภายใน:</div><div class="detail-value">${v(item.internalLotNo)}</div></div>
                 <div class="detail-row"><div class="detail-label">วันที่รับของ:</div><div class="detail-value">${v(item.receivedDate)}</div></div>
 
@@ -1068,7 +1089,7 @@
         window.openEditRecord = function(idx) {
             const i = inspections[idx];
             document.getElementById('editOriginalTimestamp').value = i.timestamp;
-            const fields = ['rmCode','rmName','supplier','lotNo','internalLotNo','receivedDate','coaColor','coaOdor','coaPh','coaTemp','qcAppearance','qcColor','qcOdor','qcPh','qcTemp','passFail','approvedBy','approvedDate'];
+            const fields = ['rmCode','rmName','supplier','lotNo','internalLotNo','mfgDate','expDate','receivedDate','coaColor','coaOdor','coaPh','coaTemp','qcAppearance','qcColor','qcOdor','qcPh','qcTemp','passFail','approvedBy','approvedDate'];
             fields.forEach(f => { if(document.getElementById('edit_'+f)) document.getElementById('edit_'+f).value = i[f] || ''; });
             
             isEditCoaRemoved = false; editCoaFileData = null;
@@ -1097,7 +1118,9 @@
                 action: 'edit', originalTimestamp: document.getElementById('editOriginalTimestamp').value,
                 rmCode: document.getElementById('edit_rmCode').value, rmName: document.getElementById('edit_rmName').value,
                 supplier: document.getElementById('edit_supplier').value, lotNo: document.getElementById('edit_lotNo').value,
-                internalLotNo: document.getElementById('edit_internalLotNo').value, receivedDate: document.getElementById('edit_receivedDate').value,
+                internalLotNo: document.getElementById('edit_internalLotNo').value, 
+                mfgDate: document.getElementById('edit_mfgDate').value, expDate: document.getElementById('edit_expDate').value,
+                receivedDate: document.getElementById('edit_receivedDate').value,
                 coaColor: document.getElementById('edit_coaColor').value, coaOdor: document.getElementById('edit_coaOdor').value,
                 coaPh: document.getElementById('edit_coaPh').value, coaTemp: document.getElementById('edit_coaTemp').value,
                 qcAppearance: document.getElementById('edit_qcAppearance').value, qcColor: document.getElementById('edit_qcColor').value,
