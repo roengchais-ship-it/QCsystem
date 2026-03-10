@@ -180,12 +180,11 @@
         .detail-section-header { background: #f0fdfa; color: var(--primary); padding: 10px 16px; border-radius: 8px; font-weight: 700; margin: 25px 0 15px 0; font-size: 1.1rem; border-left: 4px solid var(--active-green); }
 
         /* =========================================
-           🖨️ PRINT STYLES (แก้กระดาษเปล่า / จัดพอดีหน้า)
+           🖨️ PRINT STYLES
            ========================================= */
         @media print {
             @page { size: A4 portrait; margin: 8mm; } 
             
-            /* ล้างค่าความสูงทั้งหมดที่ทำให้เกิดหน้ากระดาษทะลุไปแผ่นที่ 2 */
             html, body { 
                 background: white !important; 
                 color: black !important; 
@@ -198,10 +197,8 @@
                 font-family: 'Prompt', sans-serif !important;
             }
             
-            /* ซ่อนทุกอย่างที่ไม่เกี่ยวกับการพริ้นท์ให้หมดจด */
             #main-app, #login-overlay, #loading-overlay, .print-hide { display: none !important; } 
 
-            /* ปลดล็อก Modal ให้กลายเป็น Block ปกติ ไม่ให้ลอยหรือบังคับเต็มจอ */
             body.printing-detail .modal { 
                 position: static !important; 
                 display: block !important; 
@@ -220,7 +217,6 @@
                 max-height: none !important; overflow: visible !important;
             }
 
-            /* 🌟 กรอบเอกสารล้อมรอบทั้งหมด 🌟 */
             body.printing-detail .print-container {
                 border: 2px solid #000 !important;
                 width: 100% !important;
@@ -229,7 +225,6 @@
                 page-break-inside: avoid !important;
             }
             
-            /* ส่วนหัวกระดาษเวลาพริ้นท์ (Title) */
             body.printing-detail .print-header { 
                 display: block !important; margin-bottom: 0 !important; 
                 border-bottom: 2px solid #000 !important; padding: 10px !important; 
@@ -238,10 +233,8 @@
             body.printing-detail .print-header h2 { font-size: 11pt !important; margin: 0 0 3px 0 !important; font-weight: bold !important; }
             body.printing-detail .print-header p { font-size: 8pt !important; margin: 0 !important; }
             
-            /* กรอบตารางข้อมูล */
             body.printing-detail .print-wrapper { border: none !important; }
             
-            /* หัวข้อ Section ย่อย (1, 2, 3, 4) */
             body.printing-detail .detail-section-header { 
                 background-color: #e5e7eb !important; color: #000 !important; 
                 border-bottom: 1px solid #000 !important; border-top: none !important;
@@ -250,18 +243,15 @@
                 margin: 0 !important; font-size: 8.5pt !important; font-weight: bold !important;
                 border-left: none !important; border-radius: 0 !important;
             }
-            /* ป้องกันเส้นซ้อนทับกัน */
             body.printing-detail .detail-row:last-of-type { border-bottom: 1px solid #000 !important; }
             body.printing-detail .detail-section-header + .detail-row { border-top: none !important; }
             
-            /* แถวข้อมูล (Row) */
             body.printing-detail .detail-row { 
                 border-bottom: 1px solid #000 !important; page-break-inside: avoid !important; 
                 margin: 0 !important; padding: 0 !important; border-radius: 0 !important; 
                 background: #fff !important; align-items: stretch !important; display: flex !important;
             }
             
-            /* คอลัมน์ซ้าย (ชื่อฟิลด์) */
             body.printing-detail .detail-label {
                 border-right: 1px solid #000 !important; color: #000 !important; background-color: #f9fafb !important;
                 -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; 
@@ -269,13 +259,11 @@
                 display: flex; align-items: center; font-weight: bold !important;
             }
             
-            /* คอลัมน์ขวา (ค่าข้อมูล) */
             body.printing-detail .detail-value {
                 color: #000 !important; width: 65% !important;
                 padding: 3px 6px !important; display: flex; align-items: center;
             }
             
-            /* ส่วน Checklist */
             body.printing-detail .detail-checklist-box { 
                 padding: 6px 10px !important; display: block !important; 
                 border-bottom: 1px solid #000 !important; border-radius: 0 !important; 
@@ -288,7 +276,6 @@
             body.printing-detail .chk-icon { font-size: 10pt !important; margin-right: 2px !important; }
             body.printing-detail .status-badge { border: 1px solid #000 !important; color: #000 !important; background: transparent !important; padding: 1px 4px !important; font-size: 8pt !important; }
 
-            /* กล่องเซ็นชื่อด้านล่างสุด (Signature) */
             body.printing-detail .signature-area {
                 display: flex !important; justify-content: space-around !important;
                 margin-top: 0 !important;
@@ -363,46 +350,46 @@
                 <form id="qcForm">
                     <!-- Section 1: General Info -->
                     <div class="form-section">
-                        <div class="section-title"><div class="section-icon">1</div> ข้อมูลการรับเข้า <span class="en-text">(Receiving Information)</span></div>
+                        <div class="section-title"><div class="section-icon">1</div> Receiving Information <span class="en-text">(ข้อมูลการรับเข้า)</span></div>
                         <div class="form-row">
                             <div class="form-group">
-                                <label>รหัสวัตถุดิบ <span class="en-label">(Material Code)</span> <span class="required">*</span></label>
+                                <label>Material Code <span class="en-label">(รหัสวัตถุดิบ)</span> <span class="required">*</span></label>
                                 <input type="text" name="rmCode" id="rmCode" placeholder="พิมพ์รหัสวัตถุดิบ..." onkeyup="window.handleAutocomplete(event, 'rmCode')" required autocomplete="off">
                                 <div class="autocomplete-list" id="rmCode-autocomplete-list"></div>
                             </div>
                             <div class="form-group">
-                                <label>ชื่อวัตถุดิบ <span class="en-label">(Material Name)</span> <span class="required">*</span></label>
+                                <label>Material Name <span class="en-label">(ชื่อวัตถุดิบ)</span> <span class="required">*</span></label>
                                 <input type="text" name="rmName" id="rmName" placeholder="พิมพ์ชื่อวัตถุดิบ..." onkeyup="window.handleAutocomplete(event, 'rmName')" required autocomplete="off">
                                 <div class="autocomplete-list" id="rmName-autocomplete-list"></div>
                             </div>
                         </div>
                         <div class="form-row">
                             <div class="form-group">
-                                <label>ผู้จัดจำหน่าย <span class="en-label">(Supplier Name)</span> <span class="required">*</span></label>
+                                <label>Supplier Name <span class="en-label">(ผู้จัดจำหน่าย)</span> <span class="required">*</span></label>
                                 <input type="text" name="supplier" placeholder="พิมพ์ชื่อ Supplier..." required>
                             </div>
                             <div class="form-group">
-                                <label>เลขล็อต <span class="en-label">(Batch/Lot Number)</span> <span class="required">*</span></label>
+                                <label>Batch/Lot Number <span class="en-label">(เลขล็อต)</span> <span class="required">*</span></label>
                                 <input type="text" name="lotNo" placeholder="ระบุเลขลอตจากผู้ผลิต..." required>
                             </div>
                         </div>
                         <div class="form-row">
                             <div class="form-group">
-                                <label>วันที่ผลิต <span class="en-label">(Manufacturing Date)</span></label>
+                                <label>Manufacturing Date <span class="en-label">(วันที่ผลิต)</span></label>
                                 <input type="date" name="mfgDate">
                             </div>
                             <div class="form-group">
-                                <label>วันหมดอายุ <span class="en-label">(Expiry Date)</span></label>
+                                <label>Expiry Date <span class="en-label">(วันหมดอายุ)</span></label>
                                 <input type="date" name="expDate">
                             </div>
                         </div>
                         <div class="form-row">
                             <div class="form-group">
-                                <label>ล็อตภายในบริษัท <span class="en-label">(Internal Lot)</span></label>
+                                <label>Internal Lot <span class="en-label">(ล็อตภายในบริษัท)</span></label>
                                 <input type="text" name="internalLotNo" placeholder="ระบุเลขลอตภายใน (ถ้ามี)...">
                             </div>
                             <div class="form-group">
-                                <label>วันที่รับของ <span class="en-label">(Date Received)</span> <span class="required">*</span></label>
+                                <label>Date Received <span class="en-label">(วันที่รับของ)</span> <span class="required">*</span></label>
                                 <input type="date" name="receivedDate" required>
                             </div>
                         </div>
@@ -410,26 +397,26 @@
 
                     <!-- Section 2: Document Verification -->
                     <div class="form-section">
-                        <div class="section-title"><div class="section-icon" style="background: #3b82f6;">2</div> การตรวจสอบเอกสาร <span class="en-text">(Document Verification)</span></div>
+                        <div class="section-title"><div class="section-icon" style="background: #3b82f6;">2</div> Document Verification <span class="en-text">(การตรวจสอบเอกสาร)</span></div>
                         
                         <div class="checklist-container">
                             <div style="font-weight: 600; color:#3b82f6; margin-bottom: 10px;">📋 เช็คลิสต์ตรวจสอบเอกสาร (เพื่อเตือนความจำ):</div>
                             <div class="checklist-item">
                                 <input type="checkbox" id="chk_doc_coa" required>
-                                <label for="chk_doc_coa">มีเอกสารใบรับรอง COA ครบถ้วน (Certificate of Analysis Available)</label>
+                                <label for="chk_doc_coa">Certificate of Analysis Available (มีเอกสารใบรับรอง COA ครบถ้วน)</label>
                             </div>
                             <div class="checklist-item">
                                 <input type="checkbox" id="chk_doc_lot" required>
-                                <label for="chk_doc_lot">เลข Lot. ในเอกสาร ตรงกับสินค้าจริง (Lot number matches COA)</label>
+                                <label for="chk_doc_lot">Lot number matches COA (เลข Lot. ในเอกสาร ตรงกับสินค้าจริง)</label>
                             </div>
                             <div class="checklist-item">
                                 <input type="checkbox" id="chk_doc_mfg" required>
-                                <label for="chk_doc_mfg">วันที่ผลิตและวันหมดอายุถูกต้อง (Manufacturing & Expiry date verified)</label>
+                                <label for="chk_doc_mfg">Manufacturing & Expiry date verified (วันที่ผลิตและวันหมดอายุถูกต้อง)</label>
                             </div>
                         </div>
 
                         <div class="form-group" style="margin-bottom:20px;">
-                            <label>📄 แนบไฟล์เอกสาร COA <span class="en-label">(Upload COA PDF/Image)</span></label>
+                            <label>📄 Upload COA PDF/Image <span class="en-label">(แนบไฟล์เอกสาร COA)</span></label>
                             <div class="file-upload" style="border-color:#bfdbfe; background:#eff6ff;" onclick="document.getElementById('coaFile').click()">
                                 <input type="file" id="coaFile" accept=".pdf,.jpg,.jpeg,.png" style="display:none">
                                 <span class="upload-icon">📄</span>
@@ -439,40 +426,40 @@
                         </div>
 
                         <div style="padding: 15px; background: #f8fafc; border-left: 4px solid #3b82f6; border-radius: 8px;">
-                            <div style="margin-bottom: 15px; font-weight: 600; color: #475569;">👉 กรอกค่าสเปคที่ระบุในใบ COA:</div>
+                            <div style="margin-bottom: 15px; font-weight: 600; color: #475569;">👉 Enter COA specifications (กรอกค่าสเปคที่ระบุในใบ COA):</div>
                             <div class="form-row">
-                                <div class="form-group"><label>สีตาม COA <span class="en-label">(Specification Color)</span></label><input type="text" name="coaColor" placeholder="เช่น สีใส, สีเหลืองอ่อน..."></div>
-                                <div class="form-group"><label>กลิ่นตาม COA <span class="en-label">(Specification Odor)</span></label><input type="text" name="coaOdor" placeholder="เช่น ไม่มีกลิ่น, กลิ่นหอมอ่อนๆ..."></div>
+                                <div class="form-group"><label>Specification Color <span class="en-label">(สีตาม COA)</span></label><input type="text" name="coaColor" placeholder="เช่น สีใส, สีเหลืองอ่อน..."></div>
+                                <div class="form-group"><label>Specification Odor <span class="en-label">(กลิ่นตาม COA)</span></label><input type="text" name="coaOdor" placeholder="เช่น ไม่มีกลิ่น, กลิ่นหอมอ่อนๆ..."></div>
                             </div>
                             <div class="form-row" style="margin-bottom:0;">
-                                <div class="form-group"><label>ค่า pH ตาม COA <span class="en-label">(Specification pH)</span></label><input type="text" name="coaPh" placeholder="เช่น 5.5 - 6.5..."></div>
-                                <div class="form-group"><label>อุณหภูมิตาม COA <span class="en-label">(Specification Temp)</span></label><input type="text" name="coaTemp" placeholder="เช่น 25°C..."></div>
+                                <div class="form-group"><label>Specification pH <span class="en-label">(ค่า pH ตาม COA)</span></label><input type="text" name="coaPh" placeholder="เช่น 5.5 - 6.5..."></div>
+                                <div class="form-group"><label>Specification Temp <span class="en-label">(อุณหภูมิตาม COA)</span></label><input type="text" name="coaTemp" placeholder="เช่น 25°C..."></div>
                             </div>
                         </div>
                     </div>
 
                     <!-- Section 3: Physical & Packaging Inspection -->
                     <div class="form-section">
-                        <div class="section-title"><div class="section-icon" style="background: #f59e0b;">3</div> การตรวจสอบสภาพหน้างานจริง <span class="en-text">(Physical & Packaging Inspection)</span></div>
+                        <div class="section-title"><div class="section-icon" style="background: #f59e0b;">3</div> Physical & Packaging Inspection <span class="en-text">(การตรวจสอบสภาพหน้างานจริง)</span></div>
                         
                         <div class="checklist-container">
                             <div style="font-weight: 600; color:#d97706; margin-bottom: 10px;">📦 เช็คลิสต์ตรวจสอบบรรจุภัณฑ์ (เพื่อเตือนความจำ):</div>
                             <div class="checklist-item">
                                 <input type="checkbox" id="chk_pkg_intact" required>
-                                <label for="chk_pkg_intact">สภาพบรรจุภัณฑ์สมบูรณ์ ไม่ชำรุดเสียหาย (Packaging intact)</label>
+                                <label for="chk_pkg_intact">Packaging intact (สภาพบรรจุภัณฑ์สมบูรณ์ ไม่ชำรุดเสียหาย)</label>
                             </div>
                             <div class="checklist-item">
                                 <input type="checkbox" id="chk_pkg_clean" required>
-                                <label for="chk_pkg_clean">ซีลปิดสนิท และไม่มีการรั่วซึม (Seal intact & No leakage)</label>
+                                <label for="chk_pkg_clean">Seal intact & No leakage (ซีลปิดสนิท และไม่มีการรั่วซึม)</label>
                             </div>
                             <div class="checklist-item">
                                 <input type="checkbox" id="chk_pkg_label" required>
-                                <label for="chk_pkg_label">ฉลากอ่านออกชัดเจน (Label readable)</label>
+                                <label for="chk_pkg_label">Label readable (ฉลากอ่านออกชัดเจน)</label>
                             </div>
                         </div>
 
                         <div class="form-group" style="margin-bottom:25px;">
-                            <label>📸 แนบรูปถ่ายหน้างาน <span class="en-label">(QC Photo)</span></label>
+                            <label>📸 QC Photo <span class="en-label">(แนบรูปถ่ายหน้างาน)</span></label>
                             <div class="file-upload" style="border-color:#fde68a; background:#fffbeb;" onclick="document.getElementById('qcFile').click()">
                                 <input type="file" id="qcFile" accept=".jpg,.jpeg,.png" style="display:none">
                                 <span class="upload-icon">📸</span>
@@ -482,27 +469,27 @@
                         </div>
 
                         <div style="padding: 15px; background: #f8fafc; border-left: 4px solid #f59e0b; border-radius: 8px;">
-                            <div style="margin-bottom: 15px; font-weight: 600; color: #475569;">👉 กรอกผลการตรวจหน้างานจริง (Physical Result):</div>
+                            <div style="margin-bottom: 15px; font-weight: 600; color: #475569;">👉 Enter physical inspection results (กรอกผลการตรวจหน้างานจริง):</div>
                             
                             <div class="form-row">
                                 <div class="form-group">
-                                    <label>ลักษณะปรากฏเทียบ Master <span class="en-label">(Appearance)</span> <span class="required">*</span></label>
+                                    <label>Appearance <span class="en-label">(ลักษณะปรากฏเทียบ Master)</span> <span class="required">*</span></label>
                                     <select name="qcAppearance" required style="border-color:#f59e0b;">
-                                        <option value="">-- เลือกผลการตรวจ --</option>
-                                        <option value="Pass">✅ ผ่าน (Pass)</option>
-                                        <option value="Fail">❌ ไม่ผ่าน (Fail)</option>
+                                        <option value="">-- เลือกผลการตรวจ (Select Result) --</option>
+                                        <option value="Pass">✅ Passed (ผ่าน)</option>
+                                        <option value="Fail">❌ Failed (ไม่ผ่าน)</option>
                                     </select>
                                 </div>
-                                <div class="form-group"><label>สีที่ตรวจพบจริง <span class="en-label">(Result Color)</span> <span class="required">*</span></label><input type="text" name="qcColor" placeholder="ระบุสีที่มองเห็น..." required></div>
+                                <div class="form-group"><label>Result Color <span class="en-label">(สีที่ตรวจพบจริง)</span> <span class="required">*</span></label><input type="text" name="qcColor" placeholder="ระบุสีที่มองเห็น..." required></div>
                             </div>
                             
                             <div class="form-row">
-                                <div class="form-group"><label>กลิ่นที่ตรวจพบจริง <span class="en-label">(Result Odor)</span> <span class="required">*</span></label><input type="text" name="qcOdor" placeholder="ระบุกลิ่นที่ดมได้..." required></div>
-                                <div class="form-group"><label>ค่า pH ที่วัดได้ <span class="en-label">(Result pH)</span> <span class="required">*</span></label><input type="text" name="qcPh" placeholder="ระบุค่า pH..." required></div>
+                                <div class="form-group"><label>Result Odor <span class="en-label">(กลิ่นที่ตรวจพบจริง)</span> <span class="required">*</span></label><input type="text" name="qcOdor" placeholder="ระบุกลิ่นที่ดมได้..." required></div>
+                                <div class="form-group"><label>Result pH <span class="en-label">(ค่า pH ที่วัดได้)</span> <span class="required">*</span></label><input type="text" name="qcPh" placeholder="ระบุค่า pH..." required></div>
                             </div>
                             
                             <div class="form-row" style="margin-bottom:0;">
-                                <div class="form-group"><label>อุณหภูมิที่วัดได้ <span class="en-label">(Result Temp)</span> <span class="required">*</span></label><input type="text" name="qcTemp" placeholder="ระบุอุณหภูมิ..." required></div>
+                                <div class="form-group"><label>Result Temp <span class="en-label">(อุณหภูมิที่วัดได้)</span> <span class="required">*</span></label><input type="text" name="qcTemp" placeholder="ระบุอุณหภูมิ..." required></div>
                                 <div class="form-group"></div> <!-- Empty spacer for grid alignment -->
                             </div>
                         </div>
@@ -510,27 +497,27 @@
 
                     <!-- Section 4: QA Decision -->
                     <div class="form-section" style="background: #f0fdf4; border: 2px solid #86efac;">
-                        <div class="section-title" style="color: #166534; border-bottom-color: #bbf7d0;"><div class="section-icon" style="background: #16a34a;">4</div> สรุปผลการพิจารณา <span class="en-text" style="color:#166534;">(QA Decision)</span></div>
+                        <div class="section-title" style="color: #166534; border-bottom-color: #bbf7d0;"><div class="section-icon" style="background: #16a34a;">4</div> QA Decision <span class="en-text" style="color:#166534;">(สรุปผลการพิจารณา)</span></div>
                         
                         <div class="form-row" style="margin-bottom: 20px;">
                             <div class="form-group" style="grid-column: span 2;">
-                                <label style="color:#166534; font-weight:700; font-size:1.1rem;">ผลการตัดสิน <span class="en-label" style="color:#15803d;">(Decision Result)</span> <span class="required">*</span></label>
+                                <label style="color:#166534; font-weight:700; font-size:1.1rem;">Decision Result <span class="en-label" style="color:#15803d;">(ผลการตัดสิน)</span> <span class="required">*</span></label>
                                 <select name="passFail" required style="border-color:#16a34a; border-width:2px; height: 60px; font-size:1.1rem; color:#166534; background:white;">
-                                    <option value="">-- กรุณาเลือกผลการตัดสิน --</option>
-                                    <option value="Pass">✅ ผ่าน (Accepted)</option>
-                                    <option value="Fail">❌ ไม่ผ่าน (Rejected)</option>
-                                    <option value="Pending">⏳ รอผลตรวจเพิ่ม (Pending)</option>
-                                    <option value="Hold">🔒 กักกัน / อายัดสินค้า (Quarantine)</option>
+                                    <option value="">-- Please select decision (กรุณาเลือกผลการตัดสิน) --</option>
+                                    <option value="Pass">✅ Accepted (ผ่าน)</option>
+                                    <option value="Fail">❌ Rejected (ไม่ผ่าน)</option>
+                                    <option value="Pending">⏳ Pending (รอผลตรวจเพิ่ม)</option>
+                                    <option value="Hold">🔒 Quarantine (กักกัน / อายัดสินค้า)</option>
                                 </select>
                             </div>
                         </div>
                         <div class="form-row" style="margin-bottom: 0;">
                             <div class="form-group">
-                                <label>ลงชื่อผู้ตรวจสอบ <span class="en-label">(Inspector Name)</span> <span class="required">*</span></label>
+                                <label>Inspector Name <span class="en-label">(ลงชื่อผู้ตรวจสอบ)</span> <span class="required">*</span></label>
                                 <input type="text" name="approvedBy" placeholder="พิมพ์ชื่อพนักงานผู้ตรวจ..." style="height: 50px;" required>
                             </div>
                             <div class="form-group">
-                                <label>วันที่ตรวจสอบ <span class="en-label">(Inspection Date)</span> <span class="required">*</span></label>
+                                <label>Inspection Date <span class="en-label">(วันที่ตรวจสอบ)</span> <span class="required">*</span></label>
                                 <input type="date" name="approvedDate" style="height: 50px;" required>
                             </div>
                         </div>
@@ -684,38 +671,38 @@
                 
                 <!-- Section 1 -->
                 <div style="margin-bottom:20px; border:1px solid #e2e8f0; padding:20px; border-radius:16px;">
-                    <div style="font-weight:700; color:var(--primary); margin-bottom:15px;">1. ข้อมูลการรับเข้า (Receiving Info)</div>
+                    <div style="font-weight:700; color:var(--primary); margin-bottom:15px;">1. Receiving Info (ข้อมูลการรับเข้า)</div>
                     <div class="form-row" style="margin-bottom:15px;">
-                        <div class="form-group"><label>รหัสวัตถุดิบ (RM Code)</label><input type="text" id="edit_rmCode" required></div>
-                        <div class="form-group"><label>ชื่อวัตถุดิบ (RM Name)</label><input type="text" id="edit_rmName" required></div>
+                        <div class="form-group"><label>Material Code (รหัสวัตถุดิบ)</label><input type="text" id="edit_rmCode" required></div>
+                        <div class="form-group"><label>Material Name (ชื่อวัตถุดิบ)</label><input type="text" id="edit_rmName" required></div>
                     </div>
                     <div class="form-row" style="margin-bottom:15px;">
-                        <div class="form-group"><label>ผู้จัดจำหน่าย (Supplier)</label><input type="text" id="edit_supplier" required></div>
-                        <div class="form-group"><label>เลขล็อต (Lot No.)</label><input type="text" id="edit_lotNo" required></div>
+                        <div class="form-group"><label>Supplier Name (ผู้จัดจำหน่าย)</label><input type="text" id="edit_supplier" required></div>
+                        <div class="form-group"><label>Lot No. (เลขล็อต)</label><input type="text" id="edit_lotNo" required></div>
                     </div>
                     <div class="form-row" style="margin-bottom:15px;">
-                        <div class="form-group"><label>วันที่ผลิต (Mfg. Date)</label><input type="date" id="edit_mfgDate"></div>
-                        <div class="form-group"><label>วันหมดอายุ (Exp. Date)</label><input type="date" id="edit_expDate"></div>
+                        <div class="form-group"><label>Mfg. Date (วันที่ผลิต)</label><input type="date" id="edit_mfgDate"></div>
+                        <div class="form-group"><label>Exp. Date (วันหมดอายุ)</label><input type="date" id="edit_expDate"></div>
                     </div>
                     <div class="form-row" style="margin-bottom:0;">
-                        <div class="form-group"><label>ล็อตภายใน (Int. Lot)</label><input type="text" id="edit_internalLotNo"></div>
-                        <div class="form-group"><label>วันที่รับของ (Rec. Date)</label><input type="date" id="edit_receivedDate" required></div>
+                        <div class="form-group"><label>Internal Lot (ล็อตภายใน)</label><input type="text" id="edit_internalLotNo"></div>
+                        <div class="form-group"><label>Date Received (วันที่รับของ)</label><input type="date" id="edit_receivedDate" required></div>
                     </div>
                 </div>
 
                 <!-- Section 2 -->
                 <div style="margin-bottom:20px; border:1px solid #e2e8f0; padding:20px; border-radius:16px; background:#f8fafc;">
-                    <div style="font-weight:700; color:#2563eb; margin-bottom:15px;">2. ข้อมูลตาม COA (Document)</div>
+                    <div style="font-weight:700; color:#2563eb; margin-bottom:15px;">2. Document Verification (การตรวจสอบเอกสาร)</div>
                     <div class="form-row" style="margin-bottom:15px;">
-                        <div class="form-group"><label>สีตาม COA (COA Color)</label><input type="text" id="edit_coaColor"></div>
-                        <div class="form-group"><label>กลิ่นตาม COA (COA Odor)</label><input type="text" id="edit_coaOdor"></div>
+                        <div class="form-group"><label>Specification Color (สีตาม COA)</label><input type="text" id="edit_coaColor"></div>
+                        <div class="form-group"><label>Specification Odor (กลิ่นตาม COA)</label><input type="text" id="edit_coaOdor"></div>
                     </div>
                     <div class="form-row" style="margin-bottom:15px;">
-                        <div class="form-group"><label>pH ตาม COA (COA pH)</label><input type="text" id="edit_coaPh"></div>
-                        <div class="form-group"><label>อุณหภูมิตาม COA (COA Temp)</label><input type="text" id="edit_coaTemp"></div>
+                        <div class="form-group"><label>Specification pH (pH ตาม COA)</label><input type="text" id="edit_coaPh"></div>
+                        <div class="form-group"><label>Specification Temp (อุณหภูมิตาม COA)</label><input type="text" id="edit_coaTemp"></div>
                     </div>
                     <div style="background:white; padding:15px; border-radius:12px; border:1px solid #e2e8f0;">
-                        <label style="font-weight:600; font-size:0.9rem; color:#4a5568;">ไฟล์เอกสาร COA:</label>
+                        <label style="font-weight:600; font-size:0.9rem; color:#4a5568;">COA File (ไฟล์เอกสาร COA):</label>
                         <div id="edit_coaFileStatus" style="font-size:0.9rem; margin:8px 0; color:#64748b;"></div>
                         <input type="file" id="edit_coaFileInput" style="font-size:0.9rem; padding:8px 0;">
                         <button type="button" id="edit_btnRemoveCoa" class="btn btn-danger btn-sm" onclick="window.markFileRemoved('coa')" style="display:none; margin-top:5px;">🗑️ ลบไฟล์เดิมทิ้ง</button>
@@ -724,28 +711,28 @@
 
                 <!-- Section 3 & 4 -->
                 <div style="margin-bottom:25px; border:1px solid #e2e8f0; padding:20px; border-radius:16px;">
-                    <div style="font-weight:700; color:#d97706; margin-bottom:15px;">3. ผลตรวจสอบหน้างาน (Physical)</div>
+                    <div style="font-weight:700; color:#d97706; margin-bottom:15px;">3. Physical Inspection (การตรวจสอบสภาพหน้างาน)</div>
                     <div class="form-row" style="margin-bottom:15px;">
                         <div class="form-group">
-                            <label>ลักษณะปรากฏ (Appearance)</label>
+                            <label>Appearance (ลักษณะปรากฏ)</label>
                             <select id="edit_qcAppearance" required>
                                 <option value="">-- เลือกผล --</option>
-                                <option value="Pass">✅ ผ่าน (Pass)</option>
-                                <option value="Fail">❌ ไม่ผ่าน (Fail)</option>
+                                <option value="Pass">✅ Pass (ผ่าน)</option>
+                                <option value="Fail">❌ Fail (ไม่ผ่าน)</option>
                             </select>
                         </div>
-                        <div class="form-group"><label>สีที่ตรวจพบ (QC Color)</label><input type="text" id="edit_qcColor"></div>
+                        <div class="form-group"><label>Result Color (สีที่ตรวจพบ)</label><input type="text" id="edit_qcColor"></div>
                     </div>
                     <div class="form-row" style="margin-bottom:15px;">
-                        <div class="form-group"><label>กลิ่นที่ตรวจพบ (QC Odor)</label><input type="text" id="edit_qcOdor"></div>
-                        <div class="form-group"><label>ค่า pH ที่วัดได้ (QC pH)</label><input type="text" id="edit_qcPh"></div>
+                        <div class="form-group"><label>Result Odor (กลิ่นที่ตรวจพบ)</label><input type="text" id="edit_qcOdor"></div>
+                        <div class="form-group"><label>Result pH (ค่า pH ที่วัดได้)</label><input type="text" id="edit_qcPh"></div>
                     </div>
                     <div class="form-row" style="margin-bottom:15px;">
-                        <div class="form-group"><label>อุณหภูมิที่วัดได้ (QC Temp)</label><input type="text" id="edit_qcTemp"></div>
+                        <div class="form-group"><label>Result Temp (อุณหภูมิที่วัดได้)</label><input type="text" id="edit_qcTemp"></div>
                         <div class="form-group"></div>
                     </div>
                     <div style="background:#fffbeb; padding:15px; border-radius:12px; border:1px solid #fde68a; margin-bottom:20px;">
-                        <label style="font-weight:600; font-size:0.9rem; color:#b45309;">รูปถ่ายหน้างาน:</label>
+                        <label style="font-weight:600; font-size:0.9rem; color:#b45309;">QC Photo (รูปถ่ายหน้างาน):</label>
                         <div id="edit_qcFileStatus" style="font-size:0.9rem; margin:8px 0; color:#d97706;"></div>
                         <input type="file" id="edit_qcFileInput" style="font-size:0.9rem; padding:8px 0;">
                         <button type="button" id="edit_btnRemoveQc" class="btn btn-danger btn-sm" onclick="window.markFileRemoved('qc')" style="display:none; margin-top:5px;">🗑️ ลบรูปเดิมทิ้ง</button>
@@ -753,17 +740,17 @@
                     
                     <div class="form-row" style="background:#f0fdf4; padding:15px; border-radius:12px; border:1px solid #bbf7d0; margin-bottom:0;">
                         <div class="form-group">
-                            <label style="font-weight: 700; color:#166534;">4. ผลการตัดสิน (Decision)</label>
+                            <label style="font-weight: 700; color:#166534;">4. QA Decision (สรุปผลการพิจารณา)</label>
                             <select id="edit_passFail" required style="border-color:#16a34a; border-width:2px; font-weight:600; color:#166534;">
-                                <option value="Pass">✅ ผ่าน (Accepted)</option>
-                                <option value="Fail">❌ ไม่ผ่าน (Rejected)</option>
-                                <option value="Pending">⏳ รอผล (Pending)</option>
-                                <option value="Hold">🔒 อายัด (Quarantine)</option>
+                                <option value="Pass">✅ Accepted (ผ่าน)</option>
+                                <option value="Fail">❌ Rejected (ไม่ผ่าน)</option>
+                                <option value="Pending">⏳ Pending (รอผล)</option>
+                                <option value="Hold">🔒 Quarantine (อายัด)</option>
                             </select>
                         </div>
                         <div class="form-group">
-                            <label>ผู้ตรวจสอบ</label><input type="text" id="edit_approvedBy">
-                            <label style="margin-top:10px;">วันที่ตรวจสอบ</label><input type="date" id="edit_approvedDate">
+                            <label>Inspector Name (ผู้ตรวจสอบ)</label><input type="text" id="edit_approvedBy">
+                            <label style="margin-top:10px;">Inspection Date (วันที่ตรวจสอบ)</label><input type="date" id="edit_approvedDate">
                         </div>
                     </div>
                 </div>
@@ -977,17 +964,17 @@
                 await fetch(WEB_APP_URL, { method: 'POST', body: JSON.stringify(data) });
                 alert("บันทึกข้อมูลสำเร็จ!"); this.reset(); currentCoaFileData = null; currentQcFileData = null;
                 document.getElementById('fileName').innerHTML = "รองรับไฟล์ PDF, JPG, PNG";
-                document.getElementById('fileName').previousElementSibling.textContent = "คลิกเพื่ออัปโหลดไฟล์ COA";
+                document.getElementById('fileName').previousElementSibling.textContent = "Upload COA PDF/Image (แนบไฟล์เอกสาร COA)";
                 document.getElementById('qcFileName').innerHTML = "รองรับไฟล์ JPG, PNG";
-                document.getElementById('qcFileName').previousElementSibling.textContent = "คลิกเพื่ออัปโหลดรูปถ่าย QC";
+                document.getElementById('qcFileName').previousElementSibling.textContent = "QC Photo (แนบรูปถ่ายหน้างาน)";
                 fetchData();
             } catch (err) { 
                 alert("ส่งข้อมูลเข้าระบบเรียบร้อยแล้ว"); 
                 this.reset(); currentCoaFileData = null; currentQcFileData = null;
                 document.getElementById('fileName').innerHTML = "รองรับไฟล์ PDF, JPG, PNG";
-                document.getElementById('fileName').previousElementSibling.textContent = "คลิกเพื่ออัปโหลดไฟล์ COA";
+                document.getElementById('fileName').previousElementSibling.textContent = "Upload COA PDF/Image (แนบไฟล์เอกสาร COA)";
                 document.getElementById('qcFileName').innerHTML = "รองรับไฟล์ JPG, PNG";
-                document.getElementById('qcFileName').previousElementSibling.textContent = "คลิกเพื่ออัปโหลดรูปถ่าย QC";
+                document.getElementById('qcFileName').previousElementSibling.textContent = "QC Photo (แนบรูปถ่ายหน้างาน)";
                 fetchData(); 
             }
             showLoading(false);
@@ -1086,8 +1073,14 @@
             const v = (val) => val ? val : '<span style="color:#cbd5e1;">-</span>';
             
             let appearanceDisplay = v(item.qcAppearance);
-            if (item.qcAppearance === 'Pass') appearanceDisplay = '✅ ผ่าน (Pass)';
-            if (item.qcAppearance === 'Fail') appearanceDisplay = '❌ ไม่ผ่าน (Fail)';
+            if (item.qcAppearance === 'Pass') appearanceDisplay = '✅ Pass (ผ่าน)';
+            if (item.qcAppearance === 'Fail') appearanceDisplay = '❌ Fail (ไม่ผ่าน)';
+            
+            let passFailDisplay = v(item.passFail);
+            if (item.passFail === 'Pass') passFailDisplay = '✅ Accepted (ผ่าน)';
+            if (item.passFail === 'Fail') passFailDisplay = '❌ Rejected (ไม่ผ่าน)';
+            if (item.passFail === 'Pending') passFailDisplay = '⏳ Pending (รอผลตรวจเพิ่ม)';
+            if (item.passFail === 'Hold') passFailDisplay = '🔒 Quarantine (กักกัน / อายัดสินค้า)';
 
             // เปลี่ยนโครงสร้าง HTML เป็นแบบ Grid/Table สำหรับการพิมพ์ที่สวยงาม
             content.innerHTML = `
@@ -1098,70 +1091,70 @@
                     </div>
 
                     <div class="print-wrapper">
-                        <div class="detail-section-header">1. ข้อมูลการรับเข้า (Receiving Information)</div>
-                        <div class="detail-row"><div class="detail-label">รหัสวัตถุดิบ (Material Code):</div><div class="detail-value" style="font-weight:700;">${v(item.rmCode)}</div></div>
-                        <div class="detail-row"><div class="detail-label">ชื่อวัตถุดิบ (Material Name):</div><div class="detail-value">${v(item.rmName)}</div></div>
-                        <div class="detail-row"><div class="detail-label">ผู้จัดจำหน่าย (Supplier):</div><div class="detail-value">${v(item.supplier)}</div></div>
-                        <div class="detail-row"><div class="detail-label">เลขล็อต (Lot No.):</div><div class="detail-value">${v(item.lotNo)}</div></div>
-                        <div class="detail-row"><div class="detail-label">วันที่ผลิต (Mfg. Date):</div><div class="detail-value">${v(item.mfgDate)}</div></div>
-                        <div class="detail-row"><div class="detail-label">วันหมดอายุ (Exp. Date):</div><div class="detail-value">${v(item.expDate)}</div></div>
-                        <div class="detail-row"><div class="detail-label">ล็อตภายใน (Internal Lot):</div><div class="detail-value">${v(item.internalLotNo)}</div></div>
-                        <div class="detail-row"><div class="detail-label">วันที่รับของ (Date Received):</div><div class="detail-value">${v(item.receivedDate)}</div></div>
+                        <div class="detail-section-header">1. Receiving Information (ข้อมูลการรับเข้า)</div>
+                        <div class="detail-row"><div class="detail-label">Material Code (รหัสวัตถุดิบ):</div><div class="detail-value" style="font-weight:700;">${v(item.rmCode)}</div></div>
+                        <div class="detail-row"><div class="detail-label">Material Name (ชื่อวัตถุดิบ):</div><div class="detail-value">${v(item.rmName)}</div></div>
+                        <div class="detail-row"><div class="detail-label">Supplier Name (ผู้จัดจำหน่าย):</div><div class="detail-value">${v(item.supplier)}</div></div>
+                        <div class="detail-row"><div class="detail-label">Batch/Lot Number (เลขล็อต):</div><div class="detail-value">${v(item.lotNo)}</div></div>
+                        <div class="detail-row"><div class="detail-label">Manufacturing Date (วันที่ผลิต):</div><div class="detail-value">${v(item.mfgDate)}</div></div>
+                        <div class="detail-row"><div class="detail-label">Expiry Date (วันหมดอายุ):</div><div class="detail-value">${v(item.expDate)}</div></div>
+                        <div class="detail-row"><div class="detail-label">Internal Lot (ล็อตภายในบริษัท):</div><div class="detail-value">${v(item.internalLotNo)}</div></div>
+                        <div class="detail-row"><div class="detail-label">Date Received (วันที่รับของ):</div><div class="detail-value">${v(item.receivedDate)}</div></div>
 
-                        <div class="detail-section-header">2. การตรวจสอบเอกสาร (Document Verification)</div>
+                        <div class="detail-section-header" style="margin-top: 20px;">2. Document Verification (การตรวจสอบเอกสาร)</div>
                         
                         <div class="detail-checklist-box">
-                            <div class="chk-title">📋 เช็คลิสต์ตรวจสอบเอกสาร:</div>
-                            <div class="chk-item"><span class="chk-icon">☑</span> <span>มีเอกสารใบรับรอง COA ครบถ้วน (COA Available)</span></div>
-                            <div class="chk-item"><span class="chk-icon">☑</span> <span>เลข Lot. ในเอกสาร ตรงกับสินค้าจริง (Lot number matches COA)</span></div>
-                            <div class="chk-item"><span class="chk-icon">☑</span> <span>วันที่ผลิตและวันหมดอายุถูกต้อง (Mfg & Exp verified)</span></div>
+                            <div class="chk-title">📋 Document Checklist (เช็คลิสต์ตรวจสอบเอกสาร):</div>
+                            <div class="chk-item"><span class="chk-icon">☑</span> <span>Certificate of Analysis Available (มีเอกสารใบรับรอง COA ครบถ้วน)</span></div>
+                            <div class="chk-item"><span class="chk-icon">☑</span> <span>Lot number matches COA (เลข Lot. ในเอกสาร ตรงกับสินค้าจริง)</span></div>
+                            <div class="chk-item"><span class="chk-icon">☑</span> <span>Manufacturing & Expiry date verified (วันที่ผลิตและวันหมดอายุถูกต้อง)</span></div>
                         </div>
 
-                        <div class="detail-row"><div class="detail-label">สีตาม COA (Specification Color):</div><div class="detail-value">${v(item.coaColor)}</div></div>
-                        <div class="detail-row"><div class="detail-label">กลิ่นตาม COA (Specification Odor):</div><div class="detail-value">${v(item.coaOdor)}</div></div>
-                        <div class="detail-row"><div class="detail-label">pH ตาม COA (Specification pH):</div><div class="detail-value">${v(item.coaPh)}</div></div>
-                        <div class="detail-row"><div class="detail-label">อุณหภูมิตาม COA (Specification Temp):</div><div class="detail-value">${v(item.coaTemp)}</div></div>
-                        <div class="detail-row print-hide"><div class="detail-label">ไฟล์ COA:</div><div class="detail-value">
+                        <div class="detail-row"><div class="detail-label">Specification Color (สีตาม COA):</div><div class="detail-value">${v(item.coaColor)}</div></div>
+                        <div class="detail-row"><div class="detail-label">Specification Odor (กลิ่นตาม COA):</div><div class="detail-value">${v(item.coaOdor)}</div></div>
+                        <div class="detail-row"><div class="detail-label">Specification pH (ค่า pH ตาม COA):</div><div class="detail-value">${v(item.coaPh)}</div></div>
+                        <div class="detail-row"><div class="detail-label">Specification Temp (อุณหภูมิตาม COA):</div><div class="detail-value">${v(item.coaTemp)}</div></div>
+                        <div class="detail-row print-hide"><div class="detail-label">COA File (ไฟล์ COA):</div><div class="detail-value">
                             ${item.coaFile?.isLink ? `<a href="${item.coaFile.data}" target="_blank" class="btn btn-secondary btn-sm" style="background:#e2e8f0; color:#334155;">📄 เปิดไฟล์ COA</a>` : '<span style="color:#94a3b8;">ไม่มีไฟล์แนบ</span>'}
                         </div></div>
 
-                        <div class="detail-section-header">3. การตรวจสอบสภาพหน้างาน (Physical Inspection)</div>
+                        <div class="detail-section-header" style="margin-top: 20px;">3. Physical & Packaging Inspection (การตรวจสอบสภาพหน้างานจริง)</div>
 
                         <div class="detail-checklist-box">
-                            <div class="chk-title">📦 เช็คลิสต์ตรวจสอบบรรจุภัณฑ์:</div>
-                            <div class="chk-item"><span class="chk-icon">☑</span> <span>สภาพบรรจุภัณฑ์สมบูรณ์ ไม่ชำรุดเสียหาย (Packaging intact)</span></div>
-                            <div class="chk-item"><span class="chk-icon">☑</span> <span>ซีลปิดสนิท และไม่มีการรั่วซึม (Seal intact & No leakage)</span></div>
-                            <div class="chk-item"><span class="chk-icon">☑</span> <span>ฉลากอ่านออกชัดเจน (Label readable)</span></div>
+                            <div class="chk-title">📦 Packaging Checklist (เช็คลิสต์ตรวจสอบบรรจุภัณฑ์):</div>
+                            <div class="chk-item"><span class="chk-icon">☑</span> <span>Packaging intact (สภาพบรรจุภัณฑ์สมบูรณ์ ไม่ชำรุดเสียหาย)</span></div>
+                            <div class="chk-item"><span class="chk-icon">☑</span> <span>Seal intact & No leakage (ซีลปิดสนิท และไม่มีการรั่วซึม)</span></div>
+                            <div class="chk-item"><span class="chk-icon">☑</span> <span>Label readable (ฉลากอ่านออกชัดเจน)</span></div>
                         </div>
 
-                        <div class="detail-row"><div class="detail-label">ลักษณะปรากฏ (Appearance):</div><div class="detail-value">${appearanceDisplay}</div></div>
-                        <div class="detail-row"><div class="detail-label">สีที่ตรวจพบจริง (Result Color):</div><div class="detail-value">${v(item.qcColor)}</div></div>
-                        <div class="detail-row"><div class="detail-label">กลิ่นที่ตรวจพบจริง (Result Odor):</div><div class="detail-value">${v(item.qcOdor)}</div></div>
-                        <div class="detail-row"><div class="detail-label">ค่า pH ที่วัดได้ (Result pH):</div><div class="detail-value">${v(item.qcPh)}</div></div>
-                        <div class="detail-row"><div class="detail-label">อุณหภูมิที่วัดได้ (Result Temp):</div><div class="detail-value">${v(item.qcTemp)}</div></div>
-                        <div class="detail-row print-hide"><div class="detail-label">รูปหน้างาน:</div><div class="detail-value">
+                        <div class="detail-row"><div class="detail-label">Appearance (ลักษณะปรากฏเทียบ Master):</div><div class="detail-value">${appearanceDisplay}</div></div>
+                        <div class="detail-row"><div class="detail-label">Result Color (สีที่ตรวจพบจริง):</div><div class="detail-value">${v(item.qcColor)}</div></div>
+                        <div class="detail-row"><div class="detail-label">Result Odor (กลิ่นที่ตรวจพบจริง):</div><div class="detail-value">${v(item.qcOdor)}</div></div>
+                        <div class="detail-row"><div class="detail-label">Result pH (ค่า pH ที่วัดได้):</div><div class="detail-value">${v(item.qcPh)}</div></div>
+                        <div class="detail-row"><div class="detail-label">Result Temp (อุณหภูมิที่วัดได้):</div><div class="detail-value">${v(item.qcTemp)}</div></div>
+                        <div class="detail-row print-hide"><div class="detail-label">QC Photo (รูปหน้างาน):</div><div class="detail-value">
                              ${item.qcFile?.isLink ? `<a href="${item.qcFile.data}" target="_blank" class="btn btn-success btn-sm" style="background:#dcfce7; color:#166534;">📸 ดูรูป QC</a>` : '<span style="color:#94a3b8;">ไม่มีรูปถ่าย</span>'}
                         </div></div>
 
-                        <div class="detail-section-header">4. สรุปผลการตรวจสอบ (QA Decision)</div>
-                        <div class="detail-row"><div class="detail-label">ผลการตัดสิน (Decision):</div><div class="detail-value"><strong style="font-size:1.1em;">${item.passFail}</strong></div></div>
+                        <div class="detail-section-header" style="margin-top: 20px;">4. QA Decision (สรุปผลการพิจารณา)</div>
+                        <div class="detail-row"><div class="detail-label">Decision Result (ผลการตัดสิน):</div><div class="detail-value"><strong style="font-size:1.1em;">${passFailDisplay}</strong></div></div>
                         
-                        <div class="detail-row print-hide"><div class="detail-label">ผู้ตรวจสอบ:</div><div class="detail-value">${v(item.approvedBy)}</div></div>
-                        <div class="detail-row print-hide"><div class="detail-label">วันที่ตรวจ:</div><div class="detail-value">${v(item.approvedDate)}</div></div>
+                        <div class="detail-row print-hide"><div class="detail-label">Inspector Name (ผู้ตรวจสอบ):</div><div class="detail-value">${v(item.approvedBy)}</div></div>
+                        <div class="detail-row print-hide"><div class="detail-label">Inspection Date (วันที่ตรวจ):</div><div class="detail-value">${v(item.approvedDate)}</div></div>
 
                         <!-- แสดงเฉพาะตอนพริ้นท์เอกสาร -->
                         <div class="signature-area" style="display: none;">
                             <div class="signature-box">
                                 <div class="signature-line"></div>
                                 <div style="font-weight: bold;">( ${v(item.approvedBy)} )</div>
-                                <div style="font-size: 0.9em; margin-top: 5px;">ผู้ตรวจสอบ (Inspector Name)</div>
-                                <div style="font-size: 0.9em;">วันที่ (Date): ${v(item.approvedDate)}</div>
+                                <div style="font-size: 0.9em; margin-top: 5px;">Inspector Name (ผู้ตรวจสอบ)</div>
+                                <div style="font-size: 0.9em;">Date (วันที่): ${v(item.approvedDate)}</div>
                             </div>
                             <div class="signature-box">
                                 <div class="signature-line"></div>
                                 <div style="font-weight: bold;">( .................................................... )</div>
-                                <div style="font-size: 0.9em; margin-top: 5px;">ผู้อนุมัติ (QA Manager / Approver)</div>
-                                <div style="font-size: 0.9em;">วันที่ (Date): _______/_______/_______</div>
+                                <div style="font-size: 0.9em; margin-top: 5px;">QA Manager / Approver (ผู้อนุมัติ)</div>
+                                <div style="font-size: 0.9em;">Date (วันที่): _______/_______/_______</div>
                             </div>
                         </div>
                     </div>
