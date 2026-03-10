@@ -96,7 +96,7 @@
         .form-group input:hover, .form-group select:hover { border-color: #cbd5e1; }
         .form-group input:focus, .form-group select:focus { outline: none; background-color: white; border-color: var(--active-green); box-shadow: 0 0 0 4px rgba(39, 174, 96, 0.15); }
 
-        select[name="passFail"] { font-weight: 600; cursor: pointer; }
+        select[name="passFail"], select[name="qcAppearance"] { font-weight: 600; cursor: pointer; }
 
         /* Custom Checklist UI */
         .checklist-container { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 20px; margin-bottom: 20px; }
@@ -337,13 +337,27 @@
 
                         <div style="padding: 15px; background: #f8fafc; border-left: 4px solid #f59e0b; border-radius: 8px;">
                             <div style="margin-bottom: 15px; font-weight: 600; color: #475569;">👉 กรอกผลการตรวจหน้างานจริง (Physical Result):</div>
+                            
                             <div class="form-row">
+                                <div class="form-group">
+                                    <label>ลักษณะปรากฏเทียบ Master <span class="en-label">(Appearance)</span> <span class="required">*</span></label>
+                                    <select name="qcAppearance" required style="border-color:#f59e0b;">
+                                        <option value="">-- เลือกผลการตรวจ --</option>
+                                        <option value="Pass">✅ ผ่าน (Pass)</option>
+                                        <option value="Fail">❌ ไม่ผ่าน (Fail)</option>
+                                    </select>
+                                </div>
                                 <div class="form-group"><label>สีที่ตรวจพบจริง <span class="en-label">(Result Color)</span> <span class="required">*</span></label><input type="text" name="qcColor" placeholder="ระบุสีที่มองเห็น..." required></div>
-                                <div class="form-group"><label>กลิ่นที่ตรวจพบจริง <span class="en-label">(Result Odor)</span> <span class="required">*</span></label><input type="text" name="qcOdor" placeholder="ระบุกลิ่นที่ดมได้..." required></div>
                             </div>
-                            <div class="form-row" style="margin-bottom:0;">
+                            
+                            <div class="form-row">
+                                <div class="form-group"><label>กลิ่นที่ตรวจพบจริง <span class="en-label">(Result Odor)</span> <span class="required">*</span></label><input type="text" name="qcOdor" placeholder="ระบุกลิ่นที่ดมได้..." required></div>
                                 <div class="form-group"><label>ค่า pH ที่วัดได้ <span class="en-label">(Result pH)</span> <span class="required">*</span></label><input type="text" name="qcPh" placeholder="ระบุค่า pH..." required></div>
+                            </div>
+                            
+                            <div class="form-row" style="margin-bottom:0;">
                                 <div class="form-group"><label>อุณหภูมิที่วัดได้ <span class="en-label">(Result Temp)</span> <span class="required">*</span></label><input type="text" name="qcTemp" placeholder="ระบุอุณหภูมิ..." required></div>
+                                <div class="form-group"></div> <!-- Empty spacer for grid alignment -->
                             </div>
                         </div>
                     </div>
@@ -559,12 +573,23 @@
                 <div style="margin-bottom:25px; border:1px solid #e2e8f0; padding:20px; border-radius:16px;">
                     <div style="font-weight:700; color:#d97706; margin-bottom:15px;">3. ผลตรวจสอบหน้างาน (Physical)</div>
                     <div class="form-row" style="margin-bottom:15px;">
+                        <div class="form-group">
+                            <label>ลักษณะปรากฏ (Appearance)</label>
+                            <select id="edit_qcAppearance" required>
+                                <option value="">-- เลือกผล --</option>
+                                <option value="Pass">✅ ผ่าน (Pass)</option>
+                                <option value="Fail">❌ ไม่ผ่าน (Fail)</option>
+                            </select>
+                        </div>
                         <div class="form-group"><label>สีที่ตรวจพบ (QC Color)</label><input type="text" id="edit_qcColor"></div>
-                        <div class="form-group"><label>กลิ่นที่ตรวจพบ (QC Odor)</label><input type="text" id="edit_qcOdor"></div>
                     </div>
                     <div class="form-row" style="margin-bottom:15px;">
+                        <div class="form-group"><label>กลิ่นที่ตรวจพบ (QC Odor)</label><input type="text" id="edit_qcOdor"></div>
                         <div class="form-group"><label>ค่า pH ที่วัดได้ (QC pH)</label><input type="text" id="edit_qcPh"></div>
+                    </div>
+                    <div class="form-row" style="margin-bottom:15px;">
                         <div class="form-group"><label>อุณหภูมิที่วัดได้ (QC Temp)</label><input type="text" id="edit_qcTemp"></div>
+                        <div class="form-group"></div>
                     </div>
                     <div style="background:#fffbeb; padding:15px; border-radius:12px; border:1px solid #fde68a; margin-bottom:20px;">
                         <label style="font-weight:600; font-size:0.9rem; color:#b45309;">รูปถ่ายหน้างาน:</label>
@@ -793,7 +818,7 @@
                 timestamp: new Date().toLocaleString('th-TH'),
                 rmCode: fd.get('rmCode'), rmName: fd.get('rmName'), supplier: fd.get('supplier'), lotNo: fd.get('lotNo'), internalLotNo: fd.get('internalLotNo'),
                 receivedDate: fd.get('receivedDate'), coaColor: fd.get('coaColor'), coaOdor: fd.get('coaOdor'), coaPh: fd.get('coaPh'), coaTemp: fd.get('coaTemp'),
-                qcColor: fd.get('qcColor'), qcOdor: fd.get('qcOdor'), qcPh: fd.get('qcPh'), qcTemp: fd.get('qcTemp'),
+                qcAppearance: fd.get('qcAppearance'), qcColor: fd.get('qcColor'), qcOdor: fd.get('qcOdor'), qcPh: fd.get('qcPh'), qcTemp: fd.get('qcTemp'),
                 passFail: fd.get('passFail'), approvedBy: fd.get('approvedBy'), approvedDate: fd.get('approvedDate'),
                 coaFile: currentCoaFileData, qcFile: currentQcFileData
             };
@@ -905,6 +930,11 @@
             const item = inspections[idx];
             const content = document.getElementById('detailContent');
             const v = (val) => val ? val : '<span style="color:#cbd5e1;">-</span>';
+            
+            // จัดการข้อมูลแสดงผลสำหรับ Appearance dropdown
+            let appearanceDisplay = v(item.qcAppearance);
+            if (item.qcAppearance === 'Pass') appearanceDisplay = '✅ ผ่าน (Pass)';
+            if (item.qcAppearance === 'Fail') appearanceDisplay = '❌ ไม่ผ่าน (Fail)';
 
             content.innerHTML = `
                 <div class="detail-section-header">1. ข้อมูลการรับเข้า (Receiving Info)</div>
@@ -924,6 +954,7 @@
                 </div></div>
 
                 <div class="detail-section-header">3. การตรวจสอบสภาพหน้างาน (Physical)</div>
+                <div class="detail-row"><div class="detail-label">ลักษณะปรากฏเทียบ Master:</div><div class="detail-value">${appearanceDisplay}</div></div>
                 <div class="detail-row"><div class="detail-label">สีที่ตรวจพบจริง:</div><div class="detail-value">${v(item.qcColor)}</div></div>
                 <div class="detail-row"><div class="detail-label">กลิ่นที่ตรวจพบจริง:</div><div class="detail-value">${v(item.qcOdor)}</div></div>
                 <div class="detail-row"><div class="detail-label">ค่า pH ที่วัดได้:</div><div class="detail-value">${v(item.qcPh)}</div></div>
@@ -1037,7 +1068,7 @@
         window.openEditRecord = function(idx) {
             const i = inspections[idx];
             document.getElementById('editOriginalTimestamp').value = i.timestamp;
-            const fields = ['rmCode','rmName','supplier','lotNo','internalLotNo','receivedDate','coaColor','coaOdor','coaPh','coaTemp','qcColor','qcOdor','qcPh','qcTemp','passFail','approvedBy','approvedDate'];
+            const fields = ['rmCode','rmName','supplier','lotNo','internalLotNo','receivedDate','coaColor','coaOdor','coaPh','coaTemp','qcAppearance','qcColor','qcOdor','qcPh','qcTemp','passFail','approvedBy','approvedDate'];
             fields.forEach(f => { if(document.getElementById('edit_'+f)) document.getElementById('edit_'+f).value = i[f] || ''; });
             
             isEditCoaRemoved = false; editCoaFileData = null;
@@ -1069,8 +1100,9 @@
                 internalLotNo: document.getElementById('edit_internalLotNo').value, receivedDate: document.getElementById('edit_receivedDate').value,
                 coaColor: document.getElementById('edit_coaColor').value, coaOdor: document.getElementById('edit_coaOdor').value,
                 coaPh: document.getElementById('edit_coaPh').value, coaTemp: document.getElementById('edit_coaTemp').value,
-                qcColor: document.getElementById('edit_qcColor').value, qcOdor: document.getElementById('edit_qcOdor').value,
-                qcPh: document.getElementById('edit_qcPh').value, qcTemp: document.getElementById('edit_qcTemp').value,
+                qcAppearance: document.getElementById('edit_qcAppearance').value, qcColor: document.getElementById('edit_qcColor').value,
+                qcOdor: document.getElementById('edit_qcOdor').value, qcPh: document.getElementById('edit_qcPh').value,
+                qcTemp: document.getElementById('edit_qcTemp').value,
                 passFail: document.getElementById('edit_passFail').value, approvedBy: document.getElementById('edit_approvedBy').value,
                 approvedDate: document.getElementById('edit_approvedDate').value, coaFile: editCoaFileData, qcFile: editQcFileData,
                 isFileRemoved: isEditCoaRemoved, isQcFileRemoved: isEditQcRemoved
