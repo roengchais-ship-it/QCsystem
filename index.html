@@ -180,36 +180,43 @@
         .detail-section-header { background: #f0fdfa; color: var(--primary); padding: 10px 16px; border-radius: 8px; font-weight: 700; margin: 25px 0 15px 0; font-size: 1.1rem; border-left: 4px solid var(--active-green); }
 
         /* =========================================
-           🖨️ PRINT STYLES (ปรับบีบอัดขั้นสุดและเพิ่มกรอบเอกสาร)
+           🖨️ PRINT STYLES (แก้กระดาษเปล่า / จัดพอดีหน้า)
            ========================================= */
         @media print {
             @page { size: A4 portrait; margin: 8mm; } 
             
-            /* รีเซ็ตค่าพื้นฐานให้ตัวหนังสือเล็กมากๆ (ประมาณ 8pt) และบีบความสูงบรรทัด */
+            /* ล้างค่าความสูงทั้งหมดที่ทำให้เกิดหน้ากระดาษทะลุไปแผ่นที่ 2 */
             html, body { 
                 background: white !important; 
                 color: black !important; 
                 font-size: 8pt !important; 
                 line-height: 1.2 !important;
                 height: auto !important; 
+                margin: 0 !important; 
+                padding: 0 !important;
                 overflow: visible !important; 
                 font-family: 'Prompt', sans-serif !important;
             }
             
-            /* ซ่อนสิ่งที่ไม่เกี่ยวกับการพริ้นท์ */
-            #main-app, .print-hide { display: none !important; } 
+            /* ซ่อนทุกอย่างที่ไม่เกี่ยวกับการพริ้นท์ให้หมดจด */
+            #main-app, #login-overlay, #loading-overlay, .print-hide { display: none !important; } 
 
-            /* ปรับ Modal ให้กางเต็มจอ ไร้ Scrollbar */
+            /* ปลดล็อก Modal ให้กลายเป็น Block ปกติ ไม่ให้ลอยหรือบังคับเต็มจอ */
             body.printing-detail .modal { 
-                position: absolute !important; left: 0 !important; top: 0 !important; 
-                display: block !important; background: transparent !important; 
-                backdrop-filter: none !important; width: 100% !important; 
-                height: auto !important; min-height: 100% !important; 
-                overflow: visible !important; align-items: flex-start !important;
+                position: static !important; 
+                display: block !important; 
+                background: transparent !important; 
+                backdrop-filter: none !important; 
+                width: 100% !important; 
+                height: auto !important; 
+                min-height: 0 !important; 
+                margin: 0 !important; 
+                padding: 0 !important;
+                overflow: visible !important; 
             }
             body.printing-detail .modal-content { 
                 box-shadow: none !important; width: 100% !important; max-width: 100% !important; 
-                padding: 0 !important; border-radius: 0 !important; height: auto !important; 
+                padding: 0 !important; margin: 0 !important; border-radius: 0 !important; height: auto !important; 
                 max-height: none !important; overflow: visible !important;
             }
 
@@ -219,6 +226,7 @@
                 width: 100% !important;
                 box-sizing: border-box !important;
                 margin: 0 !important;
+                page-break-inside: avoid !important;
             }
             
             /* ส่วนหัวกระดาษเวลาพริ้นท์ (Title) */
@@ -230,7 +238,7 @@
             body.printing-detail .print-header h2 { font-size: 11pt !important; margin: 0 0 3px 0 !important; font-weight: bold !important; }
             body.printing-detail .print-header p { font-size: 8pt !important; margin: 0 !important; }
             
-            /* กรอบตารางข้อมูล (เอาขอบนอกออก เพราะใส่ที่ print-container แล้ว) */
+            /* กรอบตารางข้อมูล */
             body.printing-detail .print-wrapper { border: none !important; }
             
             /* หัวข้อ Section ย่อย (1, 2, 3, 4) */
