@@ -123,6 +123,8 @@
         .btn-warning { background: #f39c12; color: white; }
         .btn-danger { background: #e74c3c; color: white; }
         .btn-secondary { background: #64748b; color: white; }
+        .btn-info { background: #3b82f6; color: white; }
+        .btn-info:hover { background: #2563eb; }
         .btn-sm { padding: 8px 12px; font-size: 0.85rem; border-radius: 8px; }
 
         .btn-submit-form { width: 100%; padding: 20px; font-size: 1.25rem; background: linear-gradient(135deg, var(--primary) 0%, var(--active-green) 100%); color: white; border-radius: 16px; box-shadow: 0 10px 25px rgba(39, 174, 96, 0.3); letter-spacing: 0.5px; margin-top: 10px; }
@@ -169,6 +171,29 @@
         .detail-label { width: 40%; font-weight: 600; color: #64748b; font-size: 0.95rem; }
         .detail-value { width: 60%; color: var(--text-main); font-size: 1rem; font-weight: 500; }
         .detail-section-header { background: #f0fdfa; color: var(--primary); padding: 10px 16px; border-radius: 8px; font-weight: 700; margin: 25px 0 15px 0; font-size: 1rem; border-left: 4px solid var(--active-green); }
+
+        /* Print Styles */
+        @media print {
+            body { background: white; color: black; font-size: 12pt; }
+            .container, #main-app { padding: 0; margin: 0; width: 100%; max-width: 100%; }
+            
+            /* Hide UI elements not meant for printing */
+            .header, .tabs, .modal:not(#detailModal), .btn, #login-overlay, #loading-overlay, 
+            .tab-content:not(#master) /* We'll use JS to control visibility during print */
+            { display: none !important; }
+
+            /* Specific styling for the detail modal content when printing */
+            body.printing-detail #main-app { display: none !important; } /* Hide everything else */
+            body.printing-detail .modal { position: static; display: block !important; background: transparent; backdrop-filter: none; }
+            body.printing-detail .modal-content { box-shadow: none; width: 100%; max-width: 100%; padding: 0; border-radius: 0; }
+            body.printing-detail .detail-section-header { background: #eee !important; color: black !important; border-left: none; padding: 5px; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+            body.printing-detail .detail-row { border-bottom: 1px solid #ddd; page-break-inside: avoid; }
+            body.printing-detail h3 { text-align: center; margin-bottom: 20px; font-size: 18pt; }
+            
+            /* Hide the close button and print button in modal during print */
+            body.printing-detail .modal-content button,
+            body.printing-detail .print-hide { display: none !important; }
+        }
 
         @media (max-width: 768px) { 
             .form-row { grid-template-columns: 1fr; gap: 15px; } 
@@ -521,16 +546,19 @@
     <!-- 📄 Detail Modal (Read Only) -->
     <div id="detailModal" class="modal">
         <div class="modal-content">
-            <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:2px solid #f1f5f9; padding-bottom:15px; margin-bottom:20px;">
+            <div class="print-hide" style="display:flex; justify-content:space-between; align-items:center; border-bottom:2px solid #f1f5f9; padding-bottom:15px; margin-bottom:20px;">
                 <h3 style="color:var(--primary); margin:0; font-size:1.3rem;">📄 รายละเอียดผลการตรวจสอบ (Detail)</h3>
-                <button onclick="window.closeModal('detailModal')" style="background:var(--input-bg); border:none; border-radius:50%; width:36px; height:36px; font-size:1.2rem; cursor:pointer; color:#64748b; display:flex; justify-content:center; align-items:center; transition:0.2s;">&times;</button>
+                <div style="display:flex; gap: 10px;">
+                    <button class="btn btn-info btn-sm" onclick="window.printDetail()">🖨️ พิมพ์เอกสาร</button>
+                    <button onclick="window.closeModal('detailModal')" style="background:var(--input-bg); border:none; border-radius:50%; width:36px; height:36px; font-size:1.2rem; cursor:pointer; color:#64748b; display:flex; justify-content:center; align-items:center; transition:0.2s;">&times;</button>
+                </div>
             </div>
             
             <div id="detailContent">
                 <!-- Content will be injected here -->
             </div>
 
-            <div style="margin-top:25px; text-align:right; border-top: 2px solid #f1f5f9; padding-top: 20px;">
+            <div class="print-hide" style="margin-top:25px; text-align:right; border-top: 2px solid #f1f5f9; padding-top: 20px;">
                 <button class="btn btn-secondary" onclick="window.closeModal('detailModal')">ปิดหน้าต่าง</button>
             </div>
         </div>
@@ -871,7 +899,10 @@
                     <td><span class="status-badge ${item.passFail.toLowerCase()}">${item.passFail}</span></td>
                     <td>${item.coaFile?.isLink ? `<a href="${item.coaFile.data}" target="_blank" class="btn btn-secondary btn-sm" style="background:#f1f5f9; color:#475569;">COA File</a>` : '-'}</td>
                     <td>${item.qcFile?.isLink ? `<a href="${item.qcFile.data}" target="_blank" class="btn btn-success btn-sm" style="background:#dcfce7; color:#166534;">QC Photo</a>` : '-'}</td>
-                    <td><button class="btn btn-warning btn-sm" onclick="window.openEditRecord(${idx})" style="background:#fef3c7; color:#b45309; border:1px solid #fde68a;">✏️ Edit</button></td>
+                    <td>
+                        <button class="btn btn-info btn-sm" onclick="window.openDetailModal(${idx})" style="margin-right: 5px;">📄 View</button>
+                        <button class="btn btn-warning btn-sm" onclick="window.openEditRecord(${idx})" style="background:#fef3c7; color:#b45309; border:1px solid #fde68a;">✏️ Edit</button>
+                    </td>
                 </tr>
             `).join('');
         }
@@ -956,6 +987,10 @@
             if (item.qcAppearance === 'Fail') appearanceDisplay = '❌ ไม่ผ่าน (Fail)';
 
             content.innerHTML = `
+                <div style="text-align: center; display: none;" class="print-header">
+                    <h2 style="margin-bottom: 5px;">RAW MATERIAL RECEIVING & VENDOR CHECKLIST (QA)</h2>
+                </div>
+
                 <div class="detail-section-header">1. ข้อมูลการรับเข้า (Receiving Info)</div>
                 <div class="detail-row"><div class="detail-label">รหัสวัตถุดิบ:</div><div class="detail-value" style="color:var(--primary); font-weight:700;">${v(item.rmCode)}</div></div>
                 <div class="detail-row"><div class="detail-label">ชื่อวัตถุดิบ:</div><div class="detail-value">${v(item.rmName)}</div></div>
@@ -970,7 +1005,7 @@
                 <div class="detail-row"><div class="detail-label">สีตาม COA:</div><div class="detail-value">${v(item.coaColor)}</div></div>
                 <div class="detail-row"><div class="detail-label">กลิ่นตาม COA:</div><div class="detail-value">${v(item.coaOdor)}</div></div>
                 <div class="detail-row"><div class="detail-label">pH ตาม COA:</div><div class="detail-value">${v(item.coaPh)}</div></div>
-                <div class="detail-row"><div class="detail-label">ไฟล์ COA:</div><div class="detail-value">
+                <div class="detail-row print-hide"><div class="detail-label">ไฟล์ COA:</div><div class="detail-value">
                     ${item.coaFile?.isLink ? `<a href="${item.coaFile.data}" target="_blank" class="btn btn-secondary btn-sm" style="background:#e2e8f0; color:#334155;">📄 เปิดไฟล์ COA</a>` : '<span style="color:#94a3b8;">ไม่มีไฟล์แนบ</span>'}
                 </div></div>
 
@@ -980,7 +1015,7 @@
                 <div class="detail-row"><div class="detail-label">กลิ่นที่ตรวจพบจริง:</div><div class="detail-value">${v(item.qcOdor)}</div></div>
                 <div class="detail-row"><div class="detail-label">ค่า pH ที่วัดได้:</div><div class="detail-value">${v(item.qcPh)}</div></div>
                 <div class="detail-row"><div class="detail-label">อุณหภูมิที่วัดได้:</div><div class="detail-value">${v(item.qcTemp)}</div></div>
-                <div class="detail-row"><div class="detail-label">รูปหน้างาน:</div><div class="detail-value">
+                <div class="detail-row print-hide"><div class="detail-label">รูปหน้างาน:</div><div class="detail-value">
                      ${item.qcFile?.isLink ? `<a href="${item.qcFile.data}" target="_blank" class="btn btn-success btn-sm" style="background:#dcfce7; color:#166534;">📸 ดูรูป QC</a>` : '<span style="color:#94a3b8;">ไม่มีรูปถ่าย</span>'}
                 </div></div>
 
@@ -990,6 +1025,21 @@
                 <div class="detail-row"><div class="detail-label">วันที่ตรวจ:</div><div class="detail-value">${v(item.approvedDate)}</div></div>
             `;
             window.openModal('detailModal');
+        }
+
+        window.printDetail = function() {
+            // เพิ่ม class ให้ body เพื่อใช้กับ CSS @media print
+            document.body.classList.add('printing-detail');
+            
+            // แสดงหัวกระดาษเวลาพริ้นท์
+            const printHeader = document.querySelector('.print-header');
+            if(printHeader) printHeader.style.display = 'block';
+            
+            window.print();
+            
+            // ซ่อนหัวกระดาษหลังพริ้นท์เสร็จ
+            if(printHeader) printHeader.style.display = 'none';
+            document.body.classList.remove('printing-detail');
         }
 
         window.showTab = function(id) {
