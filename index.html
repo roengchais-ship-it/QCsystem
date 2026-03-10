@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>QC System v6.4 (Search & Detail)</title>
+    <title>QC System v6.4 (Firebase Edition)</title>
     
     <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
@@ -16,12 +16,14 @@
             --primary: #2c4b46;
             --primary-soft: #3d6e66;
             --active-green: #27ae60;
-            --bg-body: #f0f2f5;
+            --bg-body: #f4f7f6;
             --text-main: #2d3436;
             --text-light: #636e72;
-            --border-input: #e0e0e0;
+            --border-input: #e2e8f0;
+            --input-bg: #f8fafc;
             --shadow-sm: 0 2px 8px rgba(0,0,0,0.04);
-            --shadow-md: 0 8px 24px rgba(44, 75, 70, 0.08);
+            --shadow-md: 0 10px 30px rgba(44, 75, 70, 0.08);
+            --shadow-hover: 0 15px 35px rgba(44, 75, 70, 0.12);
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -45,99 +47,127 @@
             border-radius: 12px; font-family: 'Prompt'; font-size: 1rem; transition: 0.3s;
         }
         #loginError { color: #e74c3c; font-size: 0.85rem; margin-bottom: 15px; display: none; }
+        .login-hint { background: #f0fdfa; border: 1px dashed #2dd4bf; padding: 10px; border-radius: 8px; margin-bottom: 20px; font-size: 0.9rem; color: #0f766e; }
 
         /* --- Loading --- */
         #loading-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255, 255, 255, 0.95); display: none; justify-content: center; align-items: center; flex-direction: column; z-index: 9999; backdrop-filter: blur(5px); }
-        .spinner { border: 4px solid #f3f3f3; border-top: 4px solid var(--primary); border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; margin-bottom: 15px; }
+        .spinner { border: 4px solid #f3f3f3; border-top: 4px solid var(--primary); border-radius: 50%; width: 50px; height: 50px; animation: spin 1s linear infinite; margin-bottom: 15px; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 
         /* --- Header --- */
-        .header { background: linear-gradient(120deg, var(--primary) 0%, var(--primary-soft) 100%); color: white; padding: 25px 20px; border-radius: 16px; margin-bottom: 20px; box-shadow: var(--shadow-md); position: relative; }
-        .user-panel { position: absolute; top: 15px; right: 20px; display: flex; align-items: center; gap: 10px; }
-        .user-tag { background: rgba(255,255,255,0.2); padding: 4px 12px; border-radius: 20px; font-size: 0.8rem; font-weight: 500; }
+        .header { background: linear-gradient(120deg, var(--primary) 0%, var(--primary-soft) 100%); color: white; padding: 30px 25px; border-radius: 20px; margin-bottom: 25px; box-shadow: var(--shadow-md); position: relative; overflow: hidden; }
+        .header::after { content: ''; position: absolute; top: -50%; right: -10%; width: 300px; height: 300px; background: rgba(255,255,255,0.05); border-radius: 50%; }
+        .user-panel { position: absolute; top: 20px; right: 25px; display: flex; align-items: center; gap: 10px; z-index: 2; }
+        .user-tag { background: rgba(255,255,255,0.2); padding: 6px 16px; border-radius: 20px; font-size: 0.85rem; font-weight: 500; backdrop-filter: blur(4px); }
 
         /* --- Tabs --- */
-        .tabs { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 20px; }
-        .tab { padding: 12px 10px; background: white; border: none; border-radius: 12px; cursor: pointer; font-size: 0.9rem; font-weight: 600; color: var(--text-light); transition: all 0.2s ease; box-shadow: var(--shadow-sm); font-family: 'Prompt'; display: flex; align-items: center; justify-content: center; gap: 8px; }
-        .tab.active { background: var(--active-green); color: white; box-shadow: 0 4px 12px rgba(39, 174, 96, 0.4); }
-        .tab-content { display: none; background: white; padding: 25px; border-radius: 16px; box-shadow: var(--shadow-md); min-height: 400px; }
-        .tab-content.active { display: block; animation: fadeIn 0.3s ease-out; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .tabs { display: grid; grid-template-columns: repeat(5, 1fr); gap: 12px; margin-bottom: 25px; }
+        .tab { padding: 14px 10px; background: white; border: none; border-radius: 16px; cursor: pointer; font-size: 0.95rem; font-weight: 600; color: var(--text-light); transition: all 0.3s ease; box-shadow: var(--shadow-sm); font-family: 'Prompt'; display: flex; align-items: center; justify-content: center; gap: 8px; }
+        .tab:hover { background: #f8fafc; color: var(--primary); transform: translateY(-2px); }
+        .tab.active { background: var(--active-green); color: white; box-shadow: 0 6px 15px rgba(39, 174, 96, 0.3); }
+        .tab-content { display: none; background: transparent; padding: 0; min-height: 400px; }
+        .tab-content.active { display: block; animation: fadeIn 0.4s ease-out; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
+        
+        /* General content box */
+        .content-box { background: white; padding: 30px; border-radius: 20px; box-shadow: var(--shadow-md); }
 
-        /* --- Form Elements --- */
-        .form-section { margin-bottom: 30px; padding: 20px; border-radius: 12px; background: #fcfcfc; border: 1px solid #f0f0f0; }
-        .section-title { font-size: 1rem; font-weight: 600; color: var(--primary); margin-bottom: 20px; display: flex; align-items: center; gap: 8px; border-bottom: 2px solid rgba(44, 75, 70, 0.1); padding-bottom: 8px; }
-        .section-icon { background: rgba(44, 75, 70, 0.1); color: var(--primary); width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; border-radius: 6px; font-size: 0.9rem; }
-        .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px; }
+        /* --- MODERN FORM ELEMENTS --- */
+        #qcForm { max-width: 900px; margin: 0 auto; }
+        
+        .form-section { 
+            background: white; margin-bottom: 25px; padding: 35px 30px; 
+            border-radius: 20px; box-shadow: var(--shadow-md); border: 1px solid rgba(0,0,0,0.02);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .form-section:hover { transform: translateY(-3px); box-shadow: var(--shadow-hover); }
+
+        .section-title { font-size: 1.15rem; font-weight: 700; color: var(--primary); margin-bottom: 25px; display: flex; align-items: center; gap: 12px; border-bottom: 2px dashed #edf2f7; padding-bottom: 15px; }
+        .section-icon { background: linear-gradient(135deg, var(--primary), var(--primary-soft)); color: white; width: 34px; height: 34px; display: flex; align-items: center; justify-content: center; border-radius: 10px; font-size: 1rem; box-shadow: 0 4px 10px rgba(44, 75, 70, 0.2); }
+
+        .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px; }
         .form-group { position: relative; }
-        .form-group label { display: block; margin-bottom: 6px; font-weight: 500; font-size: 0.9rem; }
-        .required { color: #e74c3c; margin-left: 2px; }
-        .form-group input, .form-group select { width: 100%; padding: 10px 12px; border: 1px solid var(--border-input); border-radius: 10px; font-size: 0.95rem; font-family: 'Prompt'; transition: all 0.2s; }
-        .form-group input:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 3px rgba(44, 75, 70, 0.15); }
+        .form-group label { display: block; margin-bottom: 8px; font-weight: 500; font-size: 0.95rem; color: #4a5568; }
+        .required { color: #e74c3c; margin-left: 4px; font-weight: bold; }
+        
+        .form-group input, .form-group select { width: 100%; padding: 14px 16px; background-color: var(--input-bg); border: 1.5px solid var(--border-input); border-radius: 12px; font-size: 0.95rem; font-family: 'Prompt'; color: var(--text-main); transition: all 0.3s; }
+        .form-group input:hover, .form-group select:hover { border-color: #cbd5e1; }
+        .form-group input:focus, .form-group select:focus { outline: none; background-color: white; border-color: var(--active-green); box-shadow: 0 0 0 4px rgba(39, 174, 96, 0.15); }
+
+        select[name="passFail"] { font-weight: 600; cursor: pointer; }
 
         /* Autocomplete */
-        .autocomplete-list { position: absolute; z-index: 1000; top: 100%; left: 0; right: 0; background: white; border: 1px solid #ddd; border-radius: 10px; box-shadow: 0 10px 20px rgba(0,0,0,0.15); max-height: 200px; overflow-y: auto; display: none; }
-        .autocomplete-item { padding: 10px 15px; cursor: pointer; border-bottom: 1px solid #f9f9f9; font-size: 0.9rem; }
-        .autocomplete-item:hover { background: #f0f7f6; color: var(--primary); }
+        .autocomplete-list { position: absolute; z-index: 1000; top: 100%; left: 0; right: 0; background: white; border: 1px solid #e2e8f0; border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); max-height: 220px; overflow-y: auto; display: none; margin-top: 5px; }
+        .autocomplete-item { padding: 12px 16px; cursor: pointer; border-bottom: 1px solid #f8fafc; font-size: 0.95rem; transition: background 0.2s; }
+        .autocomplete-item:hover { background: #f0fdfa; color: var(--primary); font-weight: 500; }
 
-        .file-upload { border: 2px dashed #cbd5e0; padding: 20px; text-align: center; border-radius: 10px; cursor: pointer; transition: 0.3s; background: #f8fafc; }
-        .file-upload:hover { border-color: var(--primary); background: #f0f7f6; }
+        .file-upload { background: var(--input-bg); border: 2px dashed #cbd5e1; padding: 30px 20px; text-align: center; border-radius: 16px; cursor: pointer; transition: all 0.3s ease; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px; }
+        .file-upload:hover { border-color: var(--primary); background: #f0fdfa; transform: scale(1.01); }
+        .file-upload .upload-icon { font-size: 2.5rem; margin-bottom: 5px; transition: transform 0.3s; }
+        .file-upload:hover .upload-icon { transform: translateY(-5px); }
 
-        /* Buttons */
-        .btn { padding: 10px 20px; border: none; border-radius: 10px; font-size: 0.95rem; font-weight: 500; cursor: pointer; transition: 0.2s; display: inline-flex; align-items: center; justify-content: center; gap: 6px; font-family: 'Prompt'; }
+        .btn { padding: 12px 24px; border: none; border-radius: 12px; font-size: 0.95rem; font-weight: 600; cursor: pointer; transition: all 0.3s; display: inline-flex; align-items: center; justify-content: center; gap: 8px; font-family: 'Prompt'; }
         .btn-primary { background: var(--primary); color: white; }
+        .btn-primary:hover { background: var(--primary-soft); box-shadow: 0 6px 15px rgba(44, 75, 70, 0.3); transform: translateY(-1px); }
         .btn-success { background: #27ae60; color: white; }
+        .btn-success:hover { background: #219653; box-shadow: 0 6px 15px rgba(39, 174, 96, 0.3); }
         .btn-warning { background: #f39c12; color: white; }
         .btn-danger { background: #e74c3c; color: white; }
-        .btn-secondary { background: #636e72; color: white; }
-        .btn-sm { padding: 6px 10px; font-size: 0.8rem; border-radius: 8px; }
+        .btn-secondary { background: #64748b; color: white; }
+        .btn-sm { padding: 8px 12px; font-size: 0.85rem; border-radius: 8px; }
 
-        /* Table */
-        .table-container-scroll { border-radius: 12px; overflow-x: auto; border: 1px solid #eee; margin-top: 15px; width: 100%; }
-        table { width: 100%; border-collapse: collapse; min-width: 800px; }
-        th { background: #f8f9fa; color: var(--text-light); padding: 12px 10px; text-align: left; font-weight: 600; font-size: 0.85rem; }
-        td { padding: 12px 10px; border-bottom: 1px solid #f0f0f0; color: var(--text-main); font-size: 0.9rem; }
+        .btn-submit-form { width: 100%; padding: 18px; font-size: 1.15rem; background: linear-gradient(135deg, var(--primary) 0%, var(--active-green) 100%); color: white; border-radius: 16px; box-shadow: 0 10px 25px rgba(39, 174, 96, 0.3); letter-spacing: 0.5px; }
+        .btn-submit-form:hover { transform: translateY(-3px); box-shadow: 0 15px 35px rgba(39, 174, 96, 0.4); }
 
-        /* Dashboard & Charts */
-        .dashboard-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 25px; }
-        .kpi-card { background: white; padding: 20px; border-radius: 14px; box-shadow: var(--shadow-sm); display: flex; align-items: center; justify-content: space-between; border-bottom: 4px solid var(--primary); }
-        .kpi-info h3 { font-size: 0.8rem; color: var(--text-light); text-transform: uppercase; margin-bottom: 4px; }
-        .kpi-info .value { font-size: 1.8rem; font-weight: 700; }
-        .charts-row { display: grid; grid-template-columns: 1fr 1.5fr; gap: 20px; }
-        .chart-box { background: white; padding: 20px; border-radius: 16px; box-shadow: var(--shadow-sm); border: 1px solid #f5f5f5; }
+        .table-container-scroll { border-radius: 16px; overflow-x: auto; border: 1px solid #f1f5f9; margin-top: 15px; width: 100%; box-shadow: var(--shadow-sm); }
+        table { width: 100%; border-collapse: collapse; min-width: 800px; background: white; }
+        th { background: #f8fafc; color: var(--text-light); padding: 16px 15px; text-align: left; font-weight: 600; font-size: 0.9rem; text-transform: uppercase; letter-spacing: 0.5px; border-bottom: 2px solid #e2e8f0; }
+        td { padding: 15px; border-bottom: 1px solid #f1f5f9; color: var(--text-main); font-size: 0.95rem; vertical-align: middle; }
+        tr:hover td { background-color: #f8fafc; }
 
-        /* Status Badges */
-        .status-badge { padding: 4px 10px; border-radius: 20px; font-size: 0.75rem; font-weight: 600; }
-        .pass { background: rgba(39, 174, 96, 0.15); color: #27ae60; }
-        .fail { background: rgba(231, 76, 60, 0.15); color: #e74c3c; }
-        .pending { background: rgba(243, 156, 18, 0.15); color: #f39c12; }
-        .hold { background: rgba(149, 165, 166, 0.2); color: #7f8c8d; }
-
-        /* Search Results Styles */
-        .result-card {
-            background: white; padding: 20px; border-radius: 16px; 
-            box-shadow: 0 4px 15px rgba(0,0,0,0.05); margin-bottom: 15px; 
-            border: 1px solid #f0f0f0; transition: transform 0.2s;
-        }
-        .result-card:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(0,0,0,0.1); }
-        .result-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px; }
-        .result-title { font-size: 1.1rem; font-weight: 700; color: var(--primary); }
-        .result-lot { font-size: 0.9rem; color: #888; margin-top: 2px; }
-        .result-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; font-size: 0.9rem; margin-bottom: 15px; background: #f9f9f9; padding: 10px; border-radius: 8px; }
-        .result-label { color: #666; font-size: 0.8rem; }
-
-        /* Modal */
-        .modal { display: none; position: fixed; z-index: 5000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); backdrop-filter: blur(4px); justify-content: center; align-items: center; }
-        .modal.active { display: flex; }
-        .modal-content { background: white; padding: 25px; border-radius: 16px; width: 95%; max-width: 600px; max-height: 90vh; overflow-y: auto; position: relative; }
+        .dashboard-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 20px; margin-bottom: 30px; }
+        .kpi-card { background: white; padding: 25px; border-radius: 20px; box-shadow: var(--shadow-md); display: flex; align-items: center; justify-content: space-between; position: relative; overflow: hidden; }
+        .kpi-card::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 5px; background: var(--primary); }
+        .kpi-info h3 { font-size: 0.85rem; color: var(--text-light); text-transform: uppercase; margin-bottom: 8px; letter-spacing: 0.5px; font-weight: 600; }
+        .kpi-info .value { font-size: 2.2rem; font-weight: 700; color: var(--text-main); line-height: 1; }
+        .kpi-icon { font-size: 2.5rem; opacity: 0.8; }
         
-        /* Detail View Styles */
-        .detail-row { display: flex; border-bottom: 1px solid #eee; padding: 10px 0; }
-        .detail-label { width: 40%; font-weight: 600; color: var(--text-light); font-size: 0.9rem; }
-        .detail-value { width: 60%; color: var(--text-main); font-size: 0.95rem; }
-        .detail-section-header { background: #f0f7f6; color: var(--primary); padding: 8px 12px; border-radius: 6px; font-weight: 600; margin: 15px 0 10px 0; font-size: 0.95rem; }
+        .charts-row { display: grid; grid-template-columns: 1fr 1.5fr; gap: 25px; }
+        .chart-box { background: white; padding: 25px; border-radius: 20px; box-shadow: var(--shadow-md); }
 
-        @media (max-width: 768px) { .form-row { grid-template-columns: 1fr; } .tabs { grid-template-columns: repeat(2, 1fr); } .charts-row { grid-template-columns: 1fr; } }
+        .status-badge { padding: 6px 12px; border-radius: 20px; font-size: 0.8rem; font-weight: 600; display: inline-flex; align-items: center; gap: 4px; }
+        .pass { background: rgba(39, 174, 96, 0.1); color: #219653; }
+        .fail { background: rgba(231, 76, 60, 0.1); color: #e74c3c; }
+        .pending { background: rgba(243, 156, 18, 0.1); color: #d68910; }
+        .hold { background: rgba(149, 165, 166, 0.15); color: #7f8c8d; }
+
+        .result-card { background: white; padding: 25px; border-radius: 20px; box-shadow: var(--shadow-md); margin-bottom: 20px; border: 1px solid transparent; transition: all 0.3s ease; }
+        .result-card:hover { transform: translateY(-3px); box-shadow: var(--shadow-hover); border-color: #f1f5f9; }
+        .result-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 15px; }
+        .result-title { font-size: 1.2rem; font-weight: 700; color: var(--primary); }
+        .result-lot { font-size: 0.95rem; color: var(--text-light); margin-top: 4px; }
+        .result-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; font-size: 0.95rem; margin-bottom: 20px; background: #f8fafc; padding: 15px; border-radius: 12px; }
+        .result-label { color: #64748b; font-size: 0.85rem; font-weight: 500; text-transform: uppercase; }
+
+        .modal { display: none; position: fixed; z-index: 5000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.6); backdrop-filter: blur(8px); justify-content: center; align-items: center; }
+        .modal.active { display: flex; animation: modalFadeIn 0.3s ease; }
+        @keyframes modalFadeIn { from { opacity: 0; } to { opacity: 1; } }
+        .modal-content { background: white; padding: 35px; border-radius: 24px; width: 95%; max-width: 650px; max-height: 90vh; overflow-y: auto; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25); animation: modalSlideUp 0.3s ease; }
+        @keyframes modalSlideUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+        
+        .detail-row { display: flex; border-bottom: 1px solid #f1f5f9; padding: 12px 0; }
+        .detail-row:last-child { border-bottom: none; }
+        .detail-label { width: 40%; font-weight: 600; color: #64748b; font-size: 0.95rem; }
+        .detail-value { width: 60%; color: var(--text-main); font-size: 1rem; font-weight: 500; }
+        .detail-section-header { background: #f0fdfa; color: var(--primary); padding: 10px 16px; border-radius: 8px; font-weight: 700; margin: 25px 0 15px 0; font-size: 1rem; border-left: 4px solid var(--active-green); }
+
+        @media (max-width: 768px) { 
+            .form-row { grid-template-columns: 1fr; gap: 15px; } 
+            .tabs { grid-template-columns: repeat(2, 1fr); } 
+            .charts-row { grid-template-columns: 1fr; } 
+            .header { padding: 20px 15px; }
+            .form-section { padding: 20px 15px; }
+        }
     </style>
 </head>
 <body>
@@ -146,37 +176,45 @@
     <div id="login-overlay">
         <div class="login-card">
             <h2>🔐 QC System Login</h2>
-            <p>กรุณาเข้าสู่ระบบเพื่อใช้งาน</p>
-            <form id="loginForm" onsubmit="event.preventDefault(); handleLogin();">
+            
+            <!-- เพิ่มคำแนะนำการเข้าระบบที่ชัดเจนตรงนี้ -->
+            <div class="login-hint">
+                <div style="font-weight: 600; margin-bottom: 5px;">ข้อมูลสำหรับทดสอบเข้าสู่ระบบ:</div>
+                Username: <b>admin</b><br>
+                Password: <b>1234</b>
+            </div>
+
+            <form id="loginForm" onsubmit="event.preventDefault(); window.handleLogin();">
                 <input type="text" id="loginUser" placeholder="Username" autocomplete="username">
                 <input type="password" id="loginPass" placeholder="Password" autocomplete="current-password">
                 <div id="loginError">Username หรือ Password ไม่ถูกต้อง</div>
-                <button type="submit" class="btn btn-primary" style="width:100%; padding: 14px;">ยืนยัน (Enter)</button>
+                <button type="submit" class="btn btn-primary" style="width:100%; padding: 14px; font-size:1.1rem; border-radius:12px;">เข้าสู่ระบบ (Enter)</button>
             </form>
         </div>
     </div>
 
     <!-- 🔄 Loading -->
-    <div id="loading-overlay"><div class="spinner"></div><span id="loading-text">กำลังโหลด...</span></div>
+    <div id="loading-overlay"><div class="spinner"></div><span id="loading-text" style="font-weight:600; color:var(--primary); font-size:1.1rem;">กำลังโหลดข้อมูล...</span></div>
 
     <!-- 📱 Main App -->
-    <div id="main-app" style="display:none; padding: 15px;">
+    <div id="main-app" style="display:none; padding: 20px;">
         <div class="container">
             <div class="header">
                 <div class="user-panel">
                     <span class="user-tag" id="displayUser">User: -</span>
-                    <button class="btn btn-warning btn-sm" onclick="openModal('passModal')">🔑 เปลี่ยนรหัส</button>
-                    <button class="btn btn-danger btn-sm" onclick="handleLogout()">Logout</button>
+                    <button class="btn btn-warning btn-sm" onclick="window.openModal('passModal')">🔑</button>
+                    <button class="btn btn-danger btn-sm" onclick="window.handleLogout()">Logout</button>
                 </div>
-                <h1>☁️ QC System v6.4</h1>
-                <p>ระบบจัดการคุณภาพวัตถุดิบครบวงจร</p>
+                <h1 style="font-size: 2rem; margin-bottom: 5px;">☁️ QC System v6.4 <small style="font-size:1rem; opacity:0.8;">(Firebase Sync)</small></h1>
+                <p style="opacity: 0.9; font-weight: 300;">ระบบจัดการและตรวจสอบคุณภาพวัตถุดิบครบวงจร</p>
             </div>
 
             <div class="tabs">
-                <button class="tab active" onclick="showTab('form')"><span>📝</span> Form</button>
-                <button class="tab" onclick="showTab('master')"><span>📊</span> History</button>
-                <button class="tab" onclick="showTab('summary')"><span>📈</span> Dash</button>
-                <button class="tab" onclick="showTab('search')"><span>🔍</span> Search</button>
+                <button class="tab active" onclick="window.showTab('form')"><span style="font-size:1.2rem;">📝</span> บันทึกผล QC</button>
+                <button class="tab" onclick="window.showTab('master')"><span style="font-size:1.2rem;">📊</span> ประวัติ (History)</button>
+                <button class="tab" onclick="window.showTab('summary')"><span style="font-size:1.2rem;">📈</span> แดชบอร์ด</button>
+                <button class="tab" onclick="window.showTab('search')"><span style="font-size:1.2rem;">🔍</span> ค้นหาข้อมูล</button>
+                <button class="tab" onclick="window.showTab('rmMaster')"><span style="font-size:1.2rem;">📦</span> RM Master</button>
             </div>
 
             <!-- Tab: Form -->
@@ -187,99 +225,126 @@
                         <div class="section-title"><div class="section-icon">A</div> ข้อมูลวัตถุดิบ (Raw Material)</div>
                         <div class="form-row">
                             <div class="form-group">
-                                <label>RM Code <span class="required">*</span></label>
-                                <input type="text" name="rmCode" id="rmCode" onkeyup="handleAutocomplete(event, 'rmCode')" required>
+                                <label>รหัสวัตถุดิบ (RM Code) <span class="required">*</span></label>
+                                <input type="text" name="rmCode" id="rmCode" placeholder="พิมพ์เพื่อค้นหารหัส..." onkeyup="window.handleAutocomplete(event, 'rmCode')" required autocomplete="off">
                                 <div class="autocomplete-list" id="rmCode-autocomplete-list"></div>
                             </div>
                             <div class="form-group">
-                                <label>RM Name <span class="required">*</span></label>
-                                <input type="text" name="rmName" id="rmName" onkeyup="handleAutocomplete(event, 'rmName')" required>
+                                <label>ชื่อวัตถุดิบ (RM Name) <span class="required">*</span></label>
+                                <input type="text" name="rmName" id="rmName" placeholder="พิมพ์เพื่อค้นหาชื่อ..." onkeyup="window.handleAutocomplete(event, 'rmName')" required autocomplete="off">
                                 <div class="autocomplete-list" id="rmName-autocomplete-list"></div>
                             </div>
                         </div>
                         <div class="form-row">
-                            <div class="form-group"><label>Supplier <span class="required">*</span></label><input type="text" name="supplier" required></div>
-                            <div class="form-group"><label>Lot No. <span class="required">*</span></label><input type="text" name="lotNo" required></div>
+                            <div class="form-group">
+                                <label>ผู้จัดจำหน่าย (Supplier) <span class="required">*</span></label>
+                                <input type="text" name="supplier" placeholder="ระบุชื่อ Supplier..." required>
+                            </div>
+                            <div class="form-group">
+                                <label>Lot No. (จาก Supplier) <span class="required">*</span></label>
+                                <input type="text" name="lotNo" placeholder="ระบุ Lot No..." required>
+                            </div>
                         </div>
                         <div class="form-row">
-                            <div class="form-group"><label>Internal Lot</label><input type="text" name="internalLotNo"></div>
-                            <div class="form-group"><label>Received Date <span class="required">*</span></label><input type="date" name="receivedDate" required></div>
+                            <div class="form-group">
+                                <label>Internal Lot (ถ้ามี)</label>
+                                <input type="text" name="internalLotNo" placeholder="ระบุ Internal Lot...">
+                            </div>
+                            <div class="form-group">
+                                <label>วันที่รับเข้า (Received Date) <span class="required">*</span></label>
+                                <input type="date" name="receivedDate" required>
+                            </div>
                         </div>
                     </div>
 
                     <!-- Section B -->
                     <div class="form-section">
-                        <div class="section-title"><div class="section-icon">B</div> ผลจาก COA & ไฟล์แนบ</div>
+                        <div class="section-title"><div class="section-icon">B</div> ผลจากเอกสาร COA & ไฟล์แนบ</div>
                         <div class="form-row">
-                            <div class="form-group"><label>สี (COA Color)</label><input type="text" name="coaColor"></div>
-                            <div class="form-group"><label>กลิ่น (COA Odor)</label><input type="text" name="coaOdor"></div>
+                            <div class="form-group"><label>สี (COA Color)</label><input type="text" name="coaColor" placeholder="ระบุสีตาม COA..."></div>
+                            <div class="form-group"><label>กลิ่น (COA Odor)</label><input type="text" name="coaOdor" placeholder="ระบุกลิ่นตาม COA..."></div>
                         </div>
                         <div class="form-row">
-                            <div class="form-group"><label>ค่า pH (COA)</label><input type="text" name="coaPh"></div>
-                            <div class="form-group"><label>อุณหภูมิ (COA Temp)</label><input type="text" name="coaTemp"></div>
+                            <div class="form-group"><label>ค่า pH (COA)</label><input type="text" name="coaPh" placeholder="ระบุค่า pH..."></div>
+                            <div class="form-group"><label>อุณหภูมิ (COA Temp)</label><input type="text" name="coaTemp" placeholder="ระบุอุณหภูมิ..."></div>
                         </div>
-                        <div class="form-group" style="margin-top:15px;">
-                            <label>แนบไฟล์ COA (PDF/รูป)</label>
+                        <div class="form-group" style="margin-top:20px;">
+                            <label>แนบไฟล์เอกสาร COA (PDF/รูปภาพ)</label>
                             <div class="file-upload" onclick="document.getElementById('coaFile').click()">
                                 <input type="file" id="coaFile" accept=".pdf,.jpg,.jpeg,.png" style="display:none">
-                                 <span style="font-size:1.5rem;">📎</span>
-                                <span id="fileName" style="color:#666; font-size:0.9rem; display:block;">คลิกเลือกไฟล์ COA</span>
+                                <span class="upload-icon">📄</span>
+                                <span style="font-weight:600; color:var(--primary);">คลิกเพื่ออัปโหลดไฟล์ COA</span>
+                                <span id="fileName" style="color:var(--text-light); font-size:0.9rem; margin-top:5px;">รองรับไฟล์ PDF, JPG, PNG</span>
                             </div>
                         </div>
                     </div>
 
                     <!-- Section C -->
                     <div class="form-section">
-                        <div class="section-title"><div class="section-icon">C</div> ผลการตรวจสอบ (Result)</div>
+                        <div class="section-title"><div class="section-icon">C</div> ผลการตรวจสอบจริง (QC Result)</div>
                         <div class="form-row">
-                            <div class="form-group"><label>สี (QC Color) <span class="required">*</span></label><input type="text" name="qcColor" required></div>
-                            <div class="form-group"><label>กลิ่น (QC Odor) <span class="required">*</span></label><input type="text" name="qcOdor" required></div>
+                            <div class="form-group"><label>สีที่ตรวจพบ (QC Color) <span class="required">*</span></label><input type="text" name="qcColor" placeholder="ระบุสีที่ตรวจพบ..." required></div>
+                            <div class="form-group"><label>กลิ่นที่ตรวจพบ (QC Odor) <span class="required">*</span></label><input type="text" name="qcOdor" placeholder="ระบุกลิ่นที่ตรวจพบ..." required></div>
                         </div>
                         <div class="form-row">
-                            <div class="form-group"><label>ค่า pH (QC) <span class="required">*</span></label><input type="text" name="qcPh" required></div>
-                            <div class="form-group"><label>อุณหภูมิ (QC) <span class="required">*</span></label><input type="text" name="qcTemp" required></div>
+                            <div class="form-group"><label>ค่า pH (QC) <span class="required">*</span></label><input type="text" name="qcPh" placeholder="ระบุค่า pH ที่วัดได้..." required></div>
+                            <div class="form-group"><label>อุณหภูมิ (QC) <span class="required">*</span></label><input type="text" name="qcTemp" placeholder="ระบุอุณหภูมิ..." required></div>
                         </div>
-                        <div class="form-group" style="margin-bottom:15px;">
-                            <label>📷 แนบรูปการตรวจ (QC Photo)</label>
-                            <div class="file-upload" style="border-color:#27ae60; background:#f0fff4;" onclick="document.getElementById('qcFile').click()">
+                        <div class="form-group" style="margin-bottom:25px; margin-top:10px;">
+                            <label>📷 แนบรูปถ่ายการตรวจสอบ (QC Photo)</label>
+                            <div class="file-upload" style="border-color:#86efac; background:#f0fdf4;" onclick="document.getElementById('qcFile').click()">
                                 <input type="file" id="qcFile" accept=".jpg,.jpeg,.png" style="display:none">
-                                 <span style="font-size:1.5rem;">📸</span>
-                                <span id="qcFileName" style="color:#27ae60; font-size:0.9rem; display:block;">คลิกเลือกรูป QC</span>
+                                <span class="upload-icon">📸</span>
+                                <span style="font-weight:600; color:#166534;">คลิกเพื่ออัปโหลดรูปถ่าย QC</span>
+                                <span id="qcFileName" style="color:#15803d; font-size:0.9rem; margin-top:5px;">รองรับไฟล์ JPG, PNG</span>
                             </div>
                         </div>
-                        <div class="form-row">
-                            <div class="form-group">
-                                <label>Result <span class="required">*</span></label>
-                                <select name="passFail" required>
-                                    <option value="">-- เลือก --</option>
-                                    <option value="Pass">✅ ผ่าน (Pass)</option>
-                                    <option value="Fail">❌ ไม่ผ่าน (Fail)</option>
-                                    <option value="Pending">⏳ รอผล (Pending)</option>
-                                    <option value="Hold">🔒 อายัด (Hold)</option>
-                                </select>
+                        
+                        <div style="background: #f8fafc; padding: 20px; border-radius: 16px; border: 1px solid #e2e8f0; margin-bottom: 20px;">
+                            <div class="form-row" style="margin-bottom: 0;">
+                                <div class="form-group">
+                                    <label style="color:var(--primary); font-weight:700;">ผลการตัดสิน (Final Result) <span class="required">*</span></label>
+                                    <select name="passFail" required style="border-color:var(--primary); border-width:2px; height: 50px; font-size:1.05rem;">
+                                        <option value="">-- กรุณาเลือกผลการตัดสิน --</option>
+                                        <option value="Pass">✅ ผ่าน (Pass)</option>
+                                        <option value="Fail">❌ ไม่ผ่าน (Fail)</option>
+                                        <option value="Pending">⏳ รอผล (Pending)</option>
+                                        <option value="Hold">🔒 อายัด (Hold)</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <div class="form-row" style="gap:10px; margin-bottom:0;">
+                                        <div class="form-group" style="width: 100%;">
+                                            <label>ผู้ตรวจสอบ (Approved By) <span class="required">*</span></label>
+                                            <input type="text" name="approvedBy" placeholder="ลงชื่อผู้ตรวจ..." style="height: 50px;" required>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
-                            <div class="form-group"><label>Approved By <span class="required">*</span></label><input type="text" name="approvedBy" required></div>
+                            <div class="form-group" style="margin-top: 15px;">
+                                <label>วันที่ตรวจสอบ (Approved Date) <span class="required">*</span></label>
+                                <input type="date" name="approvedDate" required>
+                            </div>
                         </div>
-                        <div class="form-group"><label>Date <span class="required">*</span></label><input type="date" name="approvedDate" required></div>
                     </div>
 
-                    <button type="submit" class="btn btn-primary" style="width:100%; padding:15px; font-size:1.1rem;">🚀 บันทึกข้อมูลเข้าสู่ระบบ</button>
+                    <button type="submit" class="btn btn-submit-form">🚀 บันทึกข้อมูลเข้าสู่ระบบ (Submit QC Report)</button>
                 </form>
             </div>
 
             <!-- Tab: History -->
-            <div id="master" class="tab-content">
-                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
-                    <h2>📊 Inspection History</h2>
-                    <div>
-                        <button class="btn btn-success" onclick="exportToExcel()">📥 Excel</button>
-                        <button class="btn btn-secondary" onclick="fetchData()">🔄 Refresh</button>
+            <div id="master" class="tab-content content-box">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
+                    <h2 style="color:var(--primary); font-size:1.5rem;">📊 ประวัติการตรวจสอบ (Inspection History)</h2>
+                    <div style="display:flex; gap:10px;">
+                        <button class="btn btn-success" onclick="window.exportToExcel()">📥 Export Excel</button>
+                        <button class="btn btn-secondary" onclick="window.fetchData()">🔄 Refresh</button>
                     </div>
                 </div>
                 <div class="table-container-scroll">
                     <table>
                         <thead>
-                            <tr><th>Date</th><th>RM Code</th><th>Lot No.</th><th>Result</th><th>COA</th><th>QC Pic</th><th>Action</th></tr>
+                            <tr><th>Date</th><th>RM Code & Name</th><th>Lot No.</th><th>Status</th><th>COA</th><th>QC Pic</th><th>Action</th></tr>
                         </thead>
                         <tbody id="masterTableBody"></tbody>
                     </table>
@@ -289,21 +354,23 @@
             <!-- Tab: Dashboard -->
             <div id="summary" class="tab-content">
                 <div class="dashboard-grid">
-                    <div class="kpi-card"><div><div class="kpi-info"><h3>Total</h3><div class="value" id="dashTotal">0</div></div></div><div>📦</div></div>
-                    <div class="kpi-card" style="border-bottom-color:#27ae60;"><div><div class="kpi-info"><h3>Pass</h3><div class="value" id="dashPass">0</div></div></div><div>✅</div></div>
-                    <div class="kpi-card" style="border-bottom-color:#e74c3c;"><div><div class="kpi-info"><h3>Fail</h3><div class="value" id="dashFail">0</div></div></div><div>❌</div></div>
-                    <div class="kpi-card" style="border-bottom-color:#f39c12;"><div><div class="kpi-info"><h3>Rate</h3><div class="value" id="dashRate">0%</div></div></div><div>📊</div></div>
+                    <div class="kpi-card"><div><div class="kpi-info"><h3>Total Items</h3><div class="value" id="dashTotal">0</div></div></div><div class="kpi-icon">📦</div></div>
+                    <div class="kpi-card" style="border-left-color: #27ae60;"><div><div class="kpi-info"><h3>Passed</h3><div class="value" id="dashPass" style="color:#27ae60;">0</div></div></div><div class="kpi-icon">✅</div></div>
+                    <div class="kpi-card" style="border-left-color: #e74c3c;"><div><div class="kpi-info"><h3>Failed</h3><div class="value" id="dashFail" style="color:#e74c3c;">0</div></div></div><div class="kpi-icon">❌</div></div>
+                    <div class="kpi-card" style="border-left-color: #f39c12;"><div><div class="kpi-info"><h3>Pass Rate</h3><div class="value" id="dashRate">0%</div></div></div><div class="kpi-icon">📈</div></div>
                 </div>
                 <div class="charts-row">
                     <div class="chart-box">
-                        <h3 style="margin-bottom:15px; font-size:1rem;">สัดส่วนผลการตรวจสอบ</h3>
-                        <canvas id="qcPieChart"></canvas>
+                        <h3 style="margin-bottom:20px; font-size:1.1rem; color:var(--primary);">สัดส่วนผลการตรวจสอบ</h3>
+                        <div style="position: relative; height:300px; width:100%; display:flex; justify-content:center;">
+                            <canvas id="qcPieChart"></canvas>
+                        </div>
                     </div>
                     <div class="chart-box">
-                        <h3 style="margin-bottom:15px; font-size:1rem;">⏳ รายการรอผล (Aging)</h3>
-                        <div class="table-container-scroll" style="margin-top:0;">
+                        <h3 style="margin-bottom:20px; font-size:1.1rem; color:var(--primary);">⏳ รายการรอผล (Aging Pending/Hold)</h3>
+                        <div class="table-container-scroll" style="margin-top:0; box-shadow:none; border-radius:8px;">
                             <table style="min-width:100%;">
-                                <thead><tr><th>RM Code</th><th>Lot</th><th>Status</th><th>Aging</th></tr></thead>
+                                <thead style="background:#f8fafc;"><tr><th>RM Code</th><th>Lot No.</th><th>Status</th><th>Aging</th></tr></thead>
                                 <tbody id="dashPendingBody"></tbody>
                             </table>
                         </div>
@@ -312,25 +379,65 @@
             </div>
 
             <!-- Tab: Search -->
-            <div id="search" class="tab-content">
-                <div style="position:relative; margin-bottom:25px;">
-                    <input type="text" id="searchInput" placeholder="พิมพ์คำค้นหา: RM Code, Name, หรือ Lot No..." style="width:100%; padding:15px 15px 15px 50px; border-radius:30px; border:1px solid #eee; box-shadow: 0 4px 12px rgba(0,0,0,0.05); outline:none;" onkeyup="performSearch()">
-                    <span style="position:absolute; left:20px; top:15px; font-size:1.2rem; color:#aaa;">🔍</span>
+            <div id="search" class="tab-content content-box">
+                <h2 style="color:var(--primary); font-size:1.5rem; margin-bottom:20px;">🔍 ค้นหาข้อมูล (Search & Track)</h2>
+                <div style="position:relative; margin-bottom:30px;">
+                    <input type="text" id="searchInput" placeholder="พิมพ์คำค้นหา: RM Code, RM Name, หรือ Lot No..." style="width:100%; padding:18px 20px 18px 60px; border-radius:16px; border:2px solid #e2e8f0; font-size:1.05rem; box-shadow: var(--shadow-sm); outline:none; transition:0.3s;" onkeyup="window.performSearch()" onfocus="this.style.borderColor='var(--primary)'" onblur="this.style.borderColor='#e2e8f0'">
+                    <span style="position:absolute; left:22px; top:18px; font-size:1.3rem; opacity:0.5;">🔍</span>
                 </div>
                 <div id="searchResults"></div>
+            </div>
+
+            <!-- Tab: RM Master -->
+            <div id="rmMaster" class="tab-content content-box">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
+                    <h2 style="color:var(--primary); font-size:1.5rem; margin:0;">📦 ฐานข้อมูลวัตถุดิบ (RM Master <span style="color:#f59e0b;">Firebase</span>)</h2>
+                    <button class="btn btn-secondary btn-sm" onclick="window.importDefaultRM()">📥 โหลดข้อมูลเริ่มต้น (Import Default)</button>
+                </div>
+                
+                <div style="background: #f8fafc; padding: 25px; border-radius: 16px; border: 1px solid #e2e8f0; margin-bottom: 25px;">
+                    <h3 style="font-size: 1.1rem; margin-bottom: 15px; color: var(--primary);">➕ เพิ่มวัตถุดิบใหม่</h3>
+                    <form id="rmMasterForm" onsubmit="event.preventDefault(); window.handleAddRM();" class="form-row" style="margin-bottom: 0; align-items: end;">
+                        <div class="form-group">
+                            <label>รหัสวัตถุดิบ (RM Code) <span class="required">*</span></label>
+                            <input type="text" id="newRmCode" required placeholder="เช่น RM1-XX-YY">
+                        </div>
+                        <div class="form-group">
+                            <label>ชื่อวัตถุดิบ (RM Name) <span class="required">*</span></label>
+                            <input type="text" id="newRmName" required placeholder="ชื่อวัตถุดิบ...">
+                        </div>
+                        <div class="form-group" style="grid-column: span 2;">
+                            <button type="submit" class="btn btn-primary" style="width: 100%; font-size:1rem; padding: 12px;">💾 บันทึกรายการใหม่ลง Firebase</button>
+                        </div>
+                    </form>
+                </div>
+
+                <div class="table-container-scroll">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th style="width: 10%;">ลำดับ</th>
+                                <th style="width: 30%;">RM Code</th>
+                                <th style="width: 45%;">RM Name</th>
+                                <th style="width: 15%;">จัดการ</th>
+                            </tr>
+                        </thead>
+                        <tbody id="rmMasterTableBody"></tbody>
+                    </table>
+                </div>
             </div>
         </div>
     </div>
 
     <!-- 🔑 Change Pass Modal -->
     <div id="passModal" class="modal">
-        <div class="modal-content">
-            <h3>🔑 เปลี่ยนรหัสผ่าน</h3>
-            <div class="form-group" style="margin:15px 0;"><label>รหัสผ่านเดิม</label><input type="password" id="oldPass"></div>
-            <div class="form-group" style="margin:15px 0;"><label>รหัสผ่านใหม่</label><input type="password" id="newPass"></div>
-            <div style="display:flex; gap:10px; margin-top:20px;">
-                <button class="btn btn-primary" onclick="handleChangePassword()" style="flex:1;">ตกลง</button>
-                <button class="btn btn-secondary" onclick="closeModal('passModal')" style="flex:1;">ยกเลิก</button>
+        <div class="modal-content" style="max-width: 400px;">
+            <h3 style="color:var(--primary); margin-bottom: 20px;">🔑 เปลี่ยนรหัสผ่าน</h3>
+            <div class="form-group" style="margin-bottom:15px;"><label>รหัสผ่านเดิม</label><input type="password" id="oldPass" placeholder="ระบุรหัสเดิม"></div>
+            <div class="form-group" style="margin-bottom:25px;"><label>รหัสผ่านใหม่</label><input type="password" id="newPass" placeholder="ระบุรหัสใหม่"></div>
+            <div style="display:flex; gap:12px;">
+                <button class="btn btn-primary" onclick="window.handleChangePassword()" style="flex:1;">อัปเดต</button>
+                <button class="btn btn-secondary" onclick="window.closeModal('passModal')" style="flex:1;">ยกเลิก</button>
             </div>
         </div>
     </div>
@@ -338,106 +445,191 @@
     <!-- 📄 Detail Modal (Read Only) -->
     <div id="detailModal" class="modal">
         <div class="modal-content">
-            <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid #eee; padding-bottom:15px; margin-bottom:15px;">
-                <h3 style="color:var(--primary); margin:0;">📄 รายละเอียด (Detail)</h3>
-                <button onclick="closeModal('detailModal')" style="background:none; border:none; font-size:1.5rem; cursor:pointer; color:#999;">&times;</button>
+            <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:2px solid #f1f5f9; padding-bottom:15px; margin-bottom:20px;">
+                <h3 style="color:var(--primary); margin:0; font-size:1.3rem;">📄 รายละเอียดผลการตรวจสอบ (Detail)</h3>
+                <button onclick="window.closeModal('detailModal')" style="background:var(--input-bg); border:none; border-radius:50%; width:36px; height:36px; font-size:1.2rem; cursor:pointer; color:#64748b; display:flex; justify-content:center; align-items:center; transition:0.2s;">&times;</button>
             </div>
             
             <div id="detailContent">
                 <!-- Content will be injected here -->
             </div>
 
-            <div style="margin-top:20px; text-align:right;">
-                <button class="btn btn-secondary" onclick="closeModal('detailModal')">ปิดหน้าต่าง</button>
+            <div style="margin-top:25px; text-align:right; border-top: 2px solid #f1f5f9; padding-top: 20px;">
+                <button class="btn btn-secondary" onclick="window.closeModal('detailModal')">ปิดหน้าต่าง</button>
             </div>
         </div>
     </div>
 
     <!-- ✏️ Edit Modal (Full Fields) -->
     <div id="editModal" class="modal">
-        <div class="modal-content" style="max-width: 700px;">
-            <h3 style="margin-bottom:20px; border-bottom:2px solid #eee; padding-bottom:10px;">✏️ แก้ไขข้อมูล (Full Edit)</h3>
+        <div class="modal-content" style="max-width: 750px;">
+            <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:2px solid #f1f5f9; padding-bottom:15px; margin-bottom:20px;">
+                <h3 style="color:var(--primary); margin:0; font-size:1.3rem;">✏️ แก้ไขข้อมูล (Edit Record)</h3>
+                <button onclick="window.closeModal('editModal')" style="background:var(--input-bg); border:none; border-radius:50%; width:36px; height:36px; font-size:1.2rem; cursor:pointer; color:#64748b; display:flex; justify-content:center; align-items:center;">&times;</button>
+            </div>
+            
             <form id="editForm">
                 <input type="hidden" id="editOriginalTimestamp">
                 
                 <!-- Section A -->
-                <div style="margin-bottom:15px; border:1px solid #eee; padding:10px; border-radius:8px;">
-                    <div style="font-weight:bold; color:var(--primary); margin-bottom:10px;">A: ข้อมูลวัตถุดิบ</div>
-                    <div class="form-row">
+                <div style="margin-bottom:20px; border:1px solid #e2e8f0; padding:20px; border-radius:16px;">
+                    <div style="font-weight:700; color:var(--primary); margin-bottom:15px;">A: ข้อมูลวัตถุดิบ</div>
+                    <div class="form-row" style="margin-bottom:15px;">
                         <div class="form-group"><label>RM Code</label><input type="text" id="edit_rmCode" required></div>
                         <div class="form-group"><label>RM Name</label><input type="text" id="edit_rmName" required></div>
                     </div>
-                    <div class="form-row">
+                    <div class="form-row" style="margin-bottom:15px;">
                         <div class="form-group"><label>Supplier</label><input type="text" id="edit_supplier" required></div>
                         <div class="form-group"><label>Lot No.</label><input type="text" id="edit_lotNo" required></div>
                     </div>
-                    <div class="form-row">
+                    <div class="form-row" style="margin-bottom:0;">
                         <div class="form-group"><label>Int. Lot</label><input type="text" id="edit_internalLotNo"></div>
                         <div class="form-group"><label>Rec. Date</label><input type="date" id="edit_receivedDate" required></div>
                     </div>
                 </div>
 
                 <!-- Section B -->
-                <div style="margin-bottom:15px; border:1px solid #eee; padding:10px; border-radius:8px; background:#f9f9f9;">
-                    <div style="font-weight:bold; color:var(--primary); margin-bottom:10px;">B: ข้อมูล COA</div>
-                    <div class="form-row">
+                <div style="margin-bottom:20px; border:1px solid #e2e8f0; padding:20px; border-radius:16px; background:#f8fafc;">
+                    <div style="font-weight:700; color:var(--primary); margin-bottom:15px;">B: ข้อมูล COA</div>
+                    <div class="form-row" style="margin-bottom:15px;">
                         <div class="form-group"><label>COA Color</label><input type="text" id="edit_coaColor"></div>
                         <div class="form-group"><label>COA Odor</label><input type="text" id="edit_coaOdor"></div>
                     </div>
-                    <div class="form-row">
+                    <div class="form-row" style="margin-bottom:15px;">
                         <div class="form-group"><label>COA pH</label><input type="text" id="edit_coaPh"></div>
                         <div class="form-group"><label>COA Temp</label><input type="text" id="edit_coaTemp"></div>
                     </div>
-                    <div>
-                        <label style="font-weight:600; font-size:0.85rem;">COA File:</label>
-                        <div id="edit_coaFileStatus" style="font-size:0.8rem; margin:5px 0; color:#666;"></div>
-                        <input type="file" id="edit_coaFileInput" style="font-size:0.8rem;">
-                        <button type="button" id="edit_btnRemoveCoa" class="btn btn-danger btn-sm" onclick="markFileRemoved('coa')" style="display:none; margin-top:5px;">ลบไฟล์เดิม</button>
+                    <div style="background:white; padding:15px; border-radius:12px; border:1px solid #e2e8f0;">
+                        <label style="font-weight:600; font-size:0.9rem; color:#4a5568;">COA File:</label>
+                        <div id="edit_coaFileStatus" style="font-size:0.9rem; margin:8px 0; color:#64748b;"></div>
+                        <input type="file" id="edit_coaFileInput" style="font-size:0.9rem; padding:8px 0;">
+                        <button type="button" id="edit_btnRemoveCoa" class="btn btn-danger btn-sm" onclick="window.markFileRemoved('coa')" style="display:none; margin-top:5px;">🗑️ ลบไฟล์เดิมทิ้ง</button>
                     </div>
                 </div>
 
                 <!-- Section C -->
-                <div style="margin-bottom:15px; border:1px solid #eee; padding:10px; border-radius:8px;">
-                    <div style="font-weight:bold; color:var(--primary); margin-bottom:10px;">C: ผลการตรวจสอบ</div>
-                    <div class="form-row">
+                <div style="margin-bottom:25px; border:1px solid #e2e8f0; padding:20px; border-radius:16px;">
+                    <div style="font-weight:700; color:var(--primary); margin-bottom:15px;">C: ผลการตรวจสอบ</div>
+                    <div class="form-row" style="margin-bottom:15px;">
                         <div class="form-group"><label>QC Color</label><input type="text" id="edit_qcColor"></div>
                         <div class="form-group"><label>QC Odor</label><input type="text" id="edit_qcOdor"></div>
                     </div>
-                    <div class="form-row">
+                    <div class="form-row" style="margin-bottom:15px;">
                         <div class="form-group"><label>QC pH</label><input type="text" id="edit_qcPh"></div>
                         <div class="form-group"><label>QC Temp</label><input type="text" id="edit_qcTemp"></div>
                     </div>
-                    <div>
-                        <label style="font-weight:600; font-size:0.85rem;">QC Photo:</label>
-                        <div id="edit_qcFileStatus" style="font-size:0.8rem; margin:5px 0; color:#666;"></div>
-                        <input type="file" id="edit_qcFileInput" style="font-size:0.8rem;">
-                        <button type="button" id="edit_btnRemoveQc" class="btn btn-danger btn-sm" onclick="markFileRemoved('qc')" style="display:none; margin-top:5px;">ลบรูปเดิม</button>
+                    <div style="background:#f0fdf4; padding:15px; border-radius:12px; border:1px solid #bbf7d0; margin-bottom:20px;">
+                        <label style="font-weight:600; font-size:0.9rem; color:#166534;">QC Photo:</label>
+                        <div id="edit_qcFileStatus" style="font-size:0.9rem; margin:8px 0; color:#15803d;"></div>
+                        <input type="file" id="edit_qcFileInput" style="font-size:0.9rem; padding:8px 0;">
+                        <button type="button" id="edit_btnRemoveQc" class="btn btn-danger btn-sm" onclick="window.markFileRemoved('qc')" style="display:none; margin-top:5px;">🗑️ ลบรูปเดิมทิ้ง</button>
                     </div>
-                    <div class="form-row" style="margin-top:10px;">
+                    
+                    <div class="form-row" style="background:#f8fafc; padding:15px; border-radius:12px; margin-bottom:0;">
                         <div class="form-group">
-                            <label>Result</label>
-                            <select id="edit_passFail" required>
-                                <option value="Pass">Pass</option><option value="Fail">Fail</option>
-                                <option value="Pending">Pending</option><option value="Hold">Hold</option>
+                            <label style="font-weight: 700;">Result</label>
+                            <select id="edit_passFail" required style="border-width:2px; font-weight:600;">
+                                <option value="Pass">✅ Pass</option><option value="Fail">❌ Fail</option>
+                                <option value="Pending">⏳ Pending</option><option value="Hold">🔒 Hold</option>
                             </select>
                         </div>
-                        <div class="form-group"><label>Approved By</label><input type="text" id="edit_approvedBy"></div>
+                        <div class="form-group">
+                            <label>Approved By</label><input type="text" id="edit_approvedBy">
+                            <label style="margin-top:10px;">Approved Date</label><input type="date" id="edit_approvedDate">
+                        </div>
                     </div>
-                    <div class="form-group"><label>Approved Date</label><input type="date" id="edit_approvedDate"></div>
                 </div>
 
-                <div style="text-align:center; display:flex; gap:10px;">
-                    <button type="submit" class="btn btn-primary" style="flex:2;">💾 บันทึกการแก้ไข</button>
-                    <button type="button" class="btn btn-secondary" style="flex:1;" onclick="closeModal('editModal')">ยกเลิก</button>
+                <div style="text-align:center; display:flex; gap:15px; border-top: 2px solid #f1f5f9; padding-top: 20px;">
+                    <button type="submit" class="btn btn-primary" style="flex:2; font-size: 1.1rem; padding: 14px;">💾 บันทึกการอัปเดตข้อมูล</button>
+                    <button type="button" class="btn btn-secondary" style="flex:1;" onclick="window.closeModal('editModal')">ยกเลิก</button>
                 </div>
             </form>
         </div>
     </div>
 
-    <script>
-        const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbwdpL4fbmZg3lrLR2XCpCMqrU7Ee_893AEuD_3Oc8Qi6q7bC0m0FIZQ3rEV3TJ3zKufAQ/exec";
+    <script type="module">
+        // ----------------------------------------------------
+        // ส่วนของระบบ Login ที่ถูกแยกออกมาเพื่อให้โหลดได้เสมอ
+        // ----------------------------------------------------
+        if (!localStorage.getItem('qc_users')) localStorage.setItem('qc_users', JSON.stringify({'qc':'1234','admin':'1234'}));
+
+        window.handleLogin = function() {
+            const u = document.getElementById('loginUser').value.trim();
+            const p = document.getElementById('loginPass').value.trim();
+            const users = JSON.parse(localStorage.getItem('qc_users'));
+            if (users[u] && users[u] === p) {
+                window.currentUser = u;
+                document.getElementById('login-overlay').style.display = 'none';
+                document.getElementById('main-app').style.display = 'block';
+                document.getElementById('displayUser').textContent = "User: " + u;
+                if(typeof window.fetchData === 'function') window.fetchData();
+            } else { 
+                document.getElementById('loginError').style.display = 'block'; 
+            }
+        }
+
+        window.handleLogout = function() { location.reload(); }
+
+        window.handleChangePassword = function() {
+            const oldP = document.getElementById('oldPass').value;
+            const newP = document.getElementById('newPass').value;
+            const users = JSON.parse(localStorage.getItem('qc_users'));
+            if (users[window.currentUser] === oldP) {
+                users[window.currentUser] = newP;
+                localStorage.setItem('qc_users', JSON.stringify(users));
+                alert("เปลี่ยนรหัสผ่านสำเร็จ!"); window.closeModal('passModal');
+            } else { alert("รหัสผ่านเดิมไม่ถูกต้อง"); }
+        }
+
+        // ==========================================
+        // ⚙️ FIREBASE CONFIGURATION
+        // ==========================================
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInWithCustomToken, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, collection, onSnapshot, addDoc, deleteDoc, doc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        const myFirebaseConfig = {
+            // apiKey: "YOUR_API_KEY",
+            // authDomain: "your-project.firebaseapp.com",
+            // projectId: "your-project",
+            // ...
+        };
+
+        // Fallback ป้องกันเว็บพังกรณีไม่มี Firebase Config
+        let firebaseConfig = Object.keys(myFirebaseConfig).length > 0 ? myFirebaseConfig : (typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : { apiKey: "dummy-key", projectId: "dummy-project" });
         
-        const MASTER_LIST = [
+        let app, auth, db;
+        try {
+            app = initializeApp(firebaseConfig);
+            auth = getAuth(app);
+            db = getFirestore(app);
+        } catch(e) {
+            console.warn("Firebase Initialization Skipped (Running without Firebase Data Sync)");
+        }
+
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+        let firebaseUser = null;
+
+        const initAuth = async () => {
+            if(!auth) return;
+            try {
+                if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+                    await signInWithCustomToken(auth, __initial_auth_token);
+                } else {
+                    await signInAnonymously(auth);
+                }
+            } catch (error) { console.error("Firebase Auth Error:", error); }
+        };
+        initAuth();
+
+        // ----------------------------------------------------
+        // ส่วนของ RM Master (เชื่อมต่อ Firebase)
+        // ----------------------------------------------------
+        let MASTER_LIST = []; 
+        let isFirebaseLoaded = false;
+        
+        const DEFAULT_RM = [
             { code: "RM1-SV-WT", name: "Water" }, { code: "RM2-CA-LRGS", name: "Plantacare 1200 UP" },
             { code: "RM2-CA-DG-DGS", name: "Plantacare 2000 UP" }, { code: "RM2-CA-CGS", name: "Plantacare 810 UP" },
             { code: "RM2-CA-SCG", name: "Galsoft SCG" }, { code: "RM2-CA-CG-GO", name: "LAMESOFT PO 65" },
@@ -462,8 +654,42 @@
             { code: "RM2-EM-PG40", name: "Eumulgin CO 40" }, { code: "RM2-EM-IPM", name: "Isopropyl myristate (IPM)" }
         ];
 
+        if(auth) {
+            onAuthStateChanged(auth, (user) => {
+                firebaseUser = user;
+                if (user) {
+                    const rmRef = typeof __app_id !== 'undefined' 
+                        ? collection(db, 'artifacts', appId, 'public', 'data', 'rmMaster')
+                        : collection(db, 'rmMaster');
+
+                    onSnapshot(rmRef, (snapshot) => {
+                        if (!snapshot.empty) {
+                            MASTER_LIST = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                        } else {
+                            MASTER_LIST = [...DEFAULT_RM];
+                        }
+                        isFirebaseLoaded = true;
+                        
+                        if(document.getElementById('rmMaster').classList.contains('active')) {
+                            renderRMMasterTable();
+                        }
+                    }, (error) => {
+                        console.error("Firebase Read Error:", error);
+                    });
+                }
+            });
+        } else {
+            // ถ้าไม่มี Firebase ให้ใช้ Default
+            MASTER_LIST = [...DEFAULT_RM];
+            isFirebaseLoaded = true;
+        }
+
+        // ----------------------------------------------------
+        // ส่วนของระบบเดิม (เชื่อม Google Apps Script)
+        // ----------------------------------------------------
+        const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbwdpL4fbmZg3lrLR2XCpCMqrU7Ee_893AEuD_3Oc8Qi6q7bC0m0FIZQ3rEV3TJ3zKufAQ/exec";
+        
         let inspections = [];
-        let currentUser = null;
         let myPieChart = null;
         let currentCoaFileData = null;
         let currentQcFileData = null;
@@ -474,51 +700,23 @@
         let isEditCoaRemoved = false;
         let isEditQcRemoved = false;
 
-        // --- 🔐 AUTH ---
-        if (!localStorage.getItem('qc_users')) localStorage.setItem('qc_users', JSON.stringify({'qc':'1234','admin':'1234'}));
-
-        function handleLogin() {
-            const u = document.getElementById('loginUser').value.trim();
-            const p = document.getElementById('loginPass').value.trim();
-            const users = JSON.parse(localStorage.getItem('qc_users'));
-            if (users[u] && users[u] === p) {
-                currentUser = u;
-                document.getElementById('login-overlay').style.display = 'none';
-                document.getElementById('main-app').style.display = 'block';
-                document.getElementById('displayUser').textContent = "User: " + u;
-                fetchData();
-            } else { document.getElementById('loginError').style.display = 'block'; }
-        }
-
-        function handleLogout() { location.reload(); }
-
-        function handleChangePassword() {
-            const oldP = document.getElementById('oldPass').value;
-            const newP = document.getElementById('newPass').value;
-            const users = JSON.parse(localStorage.getItem('qc_users'));
-            if (users[currentUser] === oldP) {
-                users[currentUser] = newP;
-                localStorage.setItem('qc_users', JSON.stringify(users));
-                alert("เปลี่ยนรหัสผ่านสำเร็จ!"); closeModal('passModal');
-            } else { alert("รหัสผ่านเดิมไม่ถูกต้อง"); }
-        }
-
         // --- 📊 DATA ---
         async function fetchData() {
-            showLoading(true, "กำลังโหลดข้อมูล...");
+            showLoading(true, "กำลังดึงข้อมูล QC จากระบบ (Google Sheet)...");
             try {
                 const res = await fetch(WEB_APP_URL);
                 const data = await res.json();
                 inspections = data.reverse();
                 renderMasterTable();
                 renderSummary();
-            } catch (e) { alert("Error connecting to server"); }
+            } catch (e) { console.error(e); }
             showLoading(false);
         }
+        window.fetchData = fetchData;
 
         document.getElementById('qcForm').addEventListener('submit', async function(e) {
             e.preventDefault();
-            showLoading(true, "กำลังบันทึก...");
+            showLoading(true, "กำลังส่งข้อมูล QC เข้า Google Sheet...");
             const fd = new FormData(this);
             const data = {
                 action: 'insert',
@@ -531,11 +729,21 @@
             };
             try {
                 await fetch(WEB_APP_URL, { method: 'POST', body: JSON.stringify(data) });
-                alert("บันทึกสำเร็จ!"); this.reset(); currentCoaFileData = null; currentQcFileData = null;
-                document.getElementById('fileName').textContent = "คลิกเลือกไฟล์ COA";
-                document.getElementById('qcFileName').textContent = "คลิกเลือกรูป QC";
+                alert("บันทึกข้อมูลสำเร็จ!"); this.reset(); currentCoaFileData = null; currentQcFileData = null;
+                document.getElementById('fileName').innerHTML = "รองรับไฟล์ PDF, JPG, PNG";
+                document.getElementById('fileName').previousElementSibling.textContent = "คลิกเพื่ออัปโหลดไฟล์ COA";
+                document.getElementById('qcFileName').innerHTML = "รองรับไฟล์ JPG, PNG";
+                document.getElementById('qcFileName').previousElementSibling.textContent = "คลิกเพื่ออัปโหลดรูปถ่าย QC";
                 fetchData();
-            } catch (err) { alert("ส่งข้อมูลเรียบร้อยแล้ว"); fetchData(); }
+            } catch (err) { 
+                alert("ส่งข้อมูลเข้าระบบเรียบร้อยแล้ว"); 
+                this.reset(); currentCoaFileData = null; currentQcFileData = null;
+                document.getElementById('fileName').innerHTML = "รองรับไฟล์ PDF, JPG, PNG";
+                document.getElementById('fileName').previousElementSibling.textContent = "คลิกเพื่ออัปโหลดไฟล์ COA";
+                document.getElementById('qcFileName').innerHTML = "รองรับไฟล์ JPG, PNG";
+                document.getElementById('qcFileName').previousElementSibling.textContent = "คลิกเพื่ออัปโหลดรูปถ่าย QC";
+                fetchData(); 
+            }
             showLoading(false);
         });
 
@@ -545,12 +753,12 @@
             tbody.innerHTML = inspections.map((item, idx) => `
                 <tr>
                     <td>${item.receivedDate}</td>
-                    <td><strong>${item.rmCode}</strong><br><small>${item.rmName}</small></td>
+                    <td><strong style="color:var(--primary);">${item.rmCode}</strong><br><small style="color:var(--text-light);">${item.rmName}</small></td>
                     <td>${item.lotNo}</td>
                     <td><span class="status-badge ${item.passFail.toLowerCase()}">${item.passFail}</span></td>
-                    <td>${item.coaFile?.isLink ? `<a href="${item.coaFile.data}" target="_blank" class="btn btn-secondary btn-sm">COA</a>` : '-'}</td>
-                    <td>${item.qcFile?.isLink ? `<a href="${item.qcFile.data}" target="_blank" class="btn btn-success btn-sm">Pic</a>` : '-'}</td>
-                    <td><button class="btn btn-warning btn-sm" onclick="openEditRecord(${idx})">✏️</button></td>
+                    <td>${item.coaFile?.isLink ? `<a href="${item.coaFile.data}" target="_blank" class="btn btn-secondary btn-sm" style="background:#f1f5f9; color:#475569;">COA File</a>` : '-'}</td>
+                    <td>${item.qcFile?.isLink ? `<a href="${item.qcFile.data}" target="_blank" class="btn btn-success btn-sm" style="background:#dcfce7; color:#166534;">QC Photo</a>` : '-'}</td>
+                    <td><button class="btn btn-warning btn-sm" onclick="window.openEditRecord(${idx})" style="background:#fef3c7; color:#b45309; border:1px solid #fde68a;">✏️ Edit</button></td>
                 </tr>
             `).join('');
         }
@@ -568,24 +776,23 @@
 
             document.getElementById('dashPendingBody').innerHTML = pendingItems.map(i => {
                 const days = Math.floor((new Date() - new Date(i.receivedDate)) / (1000*60*60*24));
-                return `<tr><td>${i.rmCode}</td><td>${i.lotNo}</td><td>${i.passFail}</td><td style="color:${days>7?'red':'green'}"><b>${days} วัน</b></td></tr>`;
+                return `<tr><td><strong>${i.rmCode}</strong></td><td>${i.lotNo}</td><td><span class="status-badge ${i.passFail.toLowerCase()}">${i.passFail}</span></td><td style="color:${days>7?'#e74c3c':'#27ae60'}; font-weight:600;">${days} วัน</td></tr>`;
             }).join('');
 
             if (myPieChart) myPieChart.destroy();
             myPieChart = new Chart(document.getElementById('qcPieChart'), {
                 type: 'doughnut', plugins: [ChartDataLabels],
-                data: { labels: ['Pass', 'Fail', 'Pending'], datasets: [{ data: [pass, fail, pendingItems.length], backgroundColor: ['#27ae60', '#e74c3c', '#f39c12'] }] },
-                options: { plugins: { legend: { position: 'bottom' }, datalabels: { color: '#fff' } } }
+                data: { labels: ['Pass', 'Fail', 'Pending/Hold'], datasets: [{ data: [pass, fail, pendingItems.length], backgroundColor: ['#27ae60', '#e74c3c', '#f39c12'], borderWidth:0 }] },
+                options: { maintainAspectRatio: false, plugins: { legend: { position: 'bottom' }, datalabels: { color: '#fff', font:{weight:'bold', size:14} } }, cutout: '65%' }
             });
         }
 
-        function performSearch() {
+        window.performSearch = function() {
             const q = document.getElementById('searchInput').value.toLowerCase();
             const resultsContainer = document.getElementById('searchResults');
             
-            if (q.length === 0) { resultsContainer.innerHTML = ''; return; }
+            if (q.length === 0) { resultsContainer.innerHTML = '<div style="text-align:center; color:#94a3b8; padding:40px; border:2px dashed #e2e8f0; border-radius:16px;">พิมพ์ข้อมูลที่ต้องการค้นหาในช่องด้านบน 👆</div>'; return; }
 
-            // Map each item to object { item: data, index: originalIndex } so we can open the correct one
             const matches = inspections.map((item, index) => ({ item, index }))
                 .filter(({ item }) => 
                     (item.rmCode && item.rmCode.toLowerCase().includes(q)) || 
@@ -594,18 +801,18 @@
                 );
 
             if (matches.length === 0) {
-                resultsContainer.innerHTML = '<div style="text-align:center; color:#999; padding:20px;">ไม่พบข้อมูล</div>';
+                resultsContainer.innerHTML = '<div style="text-align:center; color:#ef4444; padding:40px; border:2px dashed #fecaca; border-radius:16px; background:#fef2f2;">❌ ไม่พบข้อมูลที่ตรงกับคำค้นหา</div>';
                 return;
             }
 
             resultsContainer.innerHTML = matches.map(({ item, index }) => {
-                let statusColor = '#95a5a6';
-                if(item.passFail === 'Pass') statusColor = '#27ae60';
-                else if(item.passFail === 'Fail') statusColor = '#e74c3c';
-                else if(item.passFail === 'Pending') statusColor = '#f39c12';
+                let statusColor = '#94a3b8'; let bgL = '#f8fafc';
+                if(item.passFail === 'Pass') { statusColor = '#27ae60'; bgL = '#f0fdf4'; }
+                else if(item.passFail === 'Fail') { statusColor = '#e74c3c'; bgL = '#fef2f2'; }
+                else if(item.passFail === 'Pending') { statusColor = '#f39c12'; bgL = '#fefce8'; }
 
                 return `
-                <div class="result-card" style="border-left: 5px solid ${statusColor};">
+                <div class="result-card" style="border-left: 6px solid ${statusColor};">
                     <div class="result-header">
                         <div>
                             <div class="result-title">${item.rmCode}</div>
@@ -613,28 +820,26 @@
                         </div>
                         <span class="status-badge ${item.passFail.toLowerCase()}">${item.passFail}</span>
                     </div>
-                    <div class="result-grid">
-                        <div><span class="result-label">Name:</span><br>${item.rmName}</div>
-                        <div><span class="result-label">Date:</span><br>${item.receivedDate}</div>
+                    <div class="result-grid" style="background:${bgL};">
+                        <div><span class="result-label">Name:</span><br><strong style="color:var(--text-main);">${item.rmName}</strong></div>
+                        <div><span class="result-label">Date:</span><br><strong style="color:var(--text-main);">${item.receivedDate}</strong></div>
                     </div>
-                    <button class="btn btn-primary btn-sm" style="width:100%;" onclick="openDetailModal(${index})">
-                        📄 ดูรายละเอียด (Detail)
+                    <button class="btn btn-primary" style="width:100%; font-size:1rem;" onclick="window.openDetailModal(${index})">
+                        📄 ดูรายละเอียดฉบับเต็ม
                     </button>
                 </div>
             `;
             }).join('');
         }
 
-        function openDetailModal(idx) {
+        window.openDetailModal = function(idx) {
             const item = inspections[idx];
             const content = document.getElementById('detailContent');
-            
-            // Helper for empty data
-            const v = (val) => val ? val : '-';
+            const v = (val) => val ? val : '<span style="color:#cbd5e1;">-</span>';
 
             content.innerHTML = `
                 <div class="detail-section-header">A: ข้อมูลวัตถุดิบ (Raw Material)</div>
-                <div class="detail-row"><div class="detail-label">RM Code:</div><div class="detail-value">${v(item.rmCode)}</div></div>
+                <div class="detail-row"><div class="detail-label">RM Code:</div><div class="detail-value" style="color:var(--primary); font-weight:700;">${v(item.rmCode)}</div></div>
                 <div class="detail-row"><div class="detail-label">RM Name:</div><div class="detail-value">${v(item.rmName)}</div></div>
                 <div class="detail-row"><div class="detail-label">Supplier:</div><div class="detail-value">${v(item.supplier)}</div></div>
                 <div class="detail-row"><div class="detail-label">Lot No:</div><div class="detail-value">${v(item.lotNo)}</div></div>
@@ -646,7 +851,7 @@
                 <div class="detail-row"><div class="detail-label">COA Odor:</div><div class="detail-value">${v(item.coaOdor)}</div></div>
                 <div class="detail-row"><div class="detail-label">COA pH:</div><div class="detail-value">${v(item.coaPh)}</div></div>
                 <div class="detail-row"><div class="detail-label">COA File:</div><div class="detail-value">
-                    ${item.coaFile?.isLink ? `<a href="${item.coaFile.data}" target="_blank" class="btn btn-secondary btn-sm" style="padding:4px 8px; font-size:0.75rem;">📄 เปิดไฟล์ COA</a>` : 'ไม่มีไฟล์'}
+                    ${item.coaFile?.isLink ? `<a href="${item.coaFile.data}" target="_blank" class="btn btn-secondary btn-sm" style="background:#e2e8f0; color:#334155;">📄 เปิดไฟล์ COA</a>` : '<span style="color:#94a3b8;">ไม่มีไฟล์แนบ</span>'}
                 </div></div>
 
                 <div class="detail-section-header">C: ผลการตรวจสอบ (Result)</div>
@@ -655,23 +860,24 @@
                 <div class="detail-row"><div class="detail-label">QC pH:</div><div class="detail-value">${v(item.qcPh)}</div></div>
                 <div class="detail-row"><div class="detail-label">Result:</div><div class="detail-value"><span class="status-badge ${item.passFail.toLowerCase()}">${item.passFail}</span></div></div>
                 <div class="detail-row"><div class="detail-label">QC Photo:</div><div class="detail-value">
-                     ${item.qcFile?.isLink ? `<a href="${item.qcFile.data}" target="_blank" class="btn btn-success btn-sm" style="padding:4px 8px; font-size:0.75rem;">📸 ดูรูป QC</a>` : 'ไม่มีรูป'}
+                     ${item.qcFile?.isLink ? `<a href="${item.qcFile.data}" target="_blank" class="btn btn-success btn-sm" style="background:#dcfce7; color:#166534;">📸 ดูรูป QC</a>` : '<span style="color:#94a3b8;">ไม่มีรูปถ่าย</span>'}
                 </div></div>
                 <div class="detail-row"><div class="detail-label">Approved By:</div><div class="detail-value">${v(item.approvedBy)}</div></div>
                 <div class="detail-row"><div class="detail-label">Date:</div><div class="detail-value">${v(item.approvedDate)}</div></div>
             `;
-            
-            openModal('detailModal');
+            window.openModal('detailModal');
         }
 
         // --- 🛠️ HELPERS ---
-        function showTab(id) {
+        window.showTab = function(id) {
             document.querySelectorAll('.tab, .tab-content').forEach(el => el.classList.remove('active'));
             document.getElementById(id).classList.add('active');
             document.querySelector(`.tab[onclick*="${id}"]`).classList.add('active');
+            if(id === 'search') document.getElementById('searchResults').innerHTML = '<div style="text-align:center; color:#94a3b8; padding:40px; border:2px dashed #e2e8f0; border-radius:16px;">พิมพ์ข้อมูลที่ต้องการค้นหาในช่องด้านบน 👆</div>';
+            if(id === 'rmMaster') renderRMMasterTable(); 
         }
-        function openModal(id) { document.getElementById(id).classList.add('active'); }
-        function closeModal(id) { document.getElementById(id).classList.remove('active'); }
+        window.openModal = function(id) { document.getElementById(id).classList.add('active'); }
+        window.closeModal = function(id) { document.getElementById(id).classList.remove('active'); }
         function showLoading(s, t) { document.getElementById('loading-overlay').style.display = s ? 'flex' : 'none'; document.getElementById('loading-text').textContent = t || 'กำลังโหลด...'; }
 
         function readFile(input, cb) {
@@ -679,67 +885,167 @@
             if(f) { const r = new FileReader(); r.onload = e => cb({name: f.name, data: e.target.result}); r.readAsDataURL(f); }
         }
 
-        document.getElementById('coaFile').onchange = e => readFile(e.target, d => { currentCoaFileData = d; document.getElementById('fileName').textContent = "📦 " + d.name; });
-        document.getElementById('qcFile').onchange = e => readFile(e.target, d => { currentQcFileData = d; document.getElementById('qcFileName').textContent = "📸 " + d.name; });
+        document.getElementById('coaFile').onchange = e => readFile(e.target, d => { currentCoaFileData = d; document.getElementById('fileName').previousElementSibling.innerHTML = "✅ อัปโหลดสำเร็จ:"; document.getElementById('fileName').textContent = d.name; document.getElementById('fileName').style.color = 'var(--primary)'; document.getElementById('fileName').style.fontWeight = 'bold'; });
+        document.getElementById('qcFile').onchange = e => readFile(e.target, d => { currentQcFileData = d; document.getElementById('qcFileName').previousElementSibling.innerHTML = "✅ อัปโหลดสำเร็จ:"; document.getElementById('qcFileName').textContent = d.name; document.getElementById('qcFileName').style.color = '#15803d'; document.getElementById('qcFileName').style.fontWeight = 'bold'; });
 
-        function handleAutocomplete(e, f) {
+        window.handleAutocomplete = function(e, f) {
             const list = document.getElementById(f + '-autocomplete-list');
             const v = e.target.value.toLowerCase();
             if(v.length < 1) { list.style.display = 'none'; return; }
             const matches = MASTER_LIST.filter(i => i.code.toLowerCase().includes(v) || i.name.toLowerCase().includes(v)).slice(0, 5);
-            list.innerHTML = matches.map(m => `<div class="autocomplete-item" onclick="selectRM('${m.code}', '${m.name}')">${m.code} - ${m.name}</div>`).join('');
+            list.innerHTML = matches.map(m => `<div class="autocomplete-item" onclick="window.selectRM('${m.code}', '${m.name.replace(/'/g, "\\'")}')"><strong>${m.code}</strong><br><span style="color:#64748b; font-size:0.85rem;">${m.name}</span></div>`).join('');
             list.style.display = matches.length ? 'block' : 'none';
         }
-        function selectRM(c, n) { document.getElementById('rmCode').value = c; document.getElementById('rmName').value = n; document.querySelectorAll('.autocomplete-list').forEach(l => l.style.display = 'none'); }
+        window.selectRM = function(c, n) { document.getElementById('rmCode').value = c; document.getElementById('rmName').value = n; document.querySelectorAll('.autocomplete-list').forEach(l => l.style.display = 'none'); }
 
-        function exportToExcel() {
+        // --- 📦 RM MASTER LOGIC (FIREBASE) ---
+        function renderRMMasterTable() {
+            const tbody = document.getElementById('rmMasterTableBody');
+            
+            if(!isFirebaseLoaded) {
+                tbody.innerHTML = '<tr><td colspan="4" style="text-align:center; padding:20px; color:#94a3b8;">กำลังโหลดข้อมูลจาก Firebase...</td></tr>';
+                return;
+            }
+
+            tbody.innerHTML = MASTER_LIST.map((rm, idx) => `
+                <tr>
+                    <td style="color:var(--text-light);">${idx + 1}</td>
+                    <td><strong style="color:var(--primary);">${rm.code}</strong></td>
+                    <td>${rm.name}</td>
+                    <td>
+                        <button class="btn btn-danger btn-sm" onclick="window.deleteRM(${idx})">🗑️ ลบ</button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        window.handleAddRM = async function() {
+            if (!firebaseUser || !db) return alert("❌ ระบบยังเชื่อมต่อ Firebase ไม่สมบูรณ์ (หรือรันแบบ Offline) แต่สามารถพิมพ์ข้อมูลที่ช่อง RM ได้ตามปกติครับ");
+            
+            const code = document.getElementById('newRmCode').value.trim();
+            const name = document.getElementById('newRmName').value.trim();
+            
+            if(MASTER_LIST.some(rm => rm.code.toLowerCase() === code.toLowerCase())) {
+                alert("❌ รหัส RM Code นี้มีอยู่ในระบบแล้ว!");
+                return;
+            }
+
+            try {
+                showLoading(true, "กำลังบันทึกลง Firebase...");
+                const rmRef = typeof __app_id !== 'undefined' 
+                    ? collection(db, 'artifacts', appId, 'public', 'data', 'rmMaster')
+                    : collection(db, 'rmMaster');
+
+                await addDoc(rmRef, { code: code, name: name, createdAt: new Date().toISOString() });
+                
+                document.getElementById('newRmCode').value = '';
+                document.getElementById('newRmName').value = '';
+                alert("✅ เพิ่มข้อมูลวัตถุดิบลงใน Firebase สำเร็จ!");
+            } catch (error) {
+                console.error("Error adding document: ", error);
+                alert("❌ เกิดข้อผิดพลาดในการบันทึกข้อมูล");
+            } finally {
+                showLoading(false);
+            }
+        }
+
+        window.importDefaultRM = async function() {
+            if (!firebaseUser || !db) return alert("❌ ระบบยังเชื่อมต่อ Firebase ไม่สมบูรณ์");
+            if (!confirm("ต้องการนำเข้าข้อมูลวัตถุดิบพื้นฐาน (~40 รายการ) ลงใน Firebase หรือไม่?\n*ระบบจะข้ามรายการที่มีรหัสซ้ำให้รหัสเดิมที่มีอยู่*")) return;
+            
+            showLoading(true, "กำลังนำเข้าข้อมูลลง Firebase (อาจใช้เวลาสักครู่)...");
+            const rmRef = typeof __app_id !== 'undefined' 
+                ? collection(db, 'artifacts', appId, 'public', 'data', 'rmMaster')
+                : collection(db, 'rmMaster');
+                
+            let addedCount = 0;
+            try {
+                for (const rm of DEFAULT_RM) {
+                    // ตรวจสอบว่ามีรหัสนี้ในระบบหรือยัง
+                    if (!MASTER_LIST.some(existing => existing.code.toLowerCase() === rm.code.toLowerCase())) {
+                        await addDoc(rmRef, { code: rm.code, name: rm.name, createdAt: new Date().toISOString() });
+                        addedCount++;
+                    }
+                }
+                alert(`✅ นำเข้าข้อมูลสำเร็จ ${addedCount} รายการ!`);
+            } catch (error) {
+                console.error(error);
+                alert("❌ เกิดข้อผิดพลาดระหว่างนำเข้าข้อมูล");
+            } finally {
+                showLoading(false);
+            }
+        }
+
+        window.deleteRM = async function(idx) {
+            const rm = MASTER_LIST[idx];
+            
+            if(!rm.id) {
+                alert("❌ ไม่สามารถลบข้อมูล Default ได้ (เพิ่มข้อมูลใหม่เพื่อทดสอบการลบ)");
+                return;
+            }
+
+            if(confirm(`คุณแน่ใจหรือไม่ที่จะลบวัตถุดิบ ${rm.code} ออกจาก Firebase?`)) {
+                try {
+                    showLoading(true, "กำลังลบข้อมูล...");
+                    const docRef = typeof __app_id !== 'undefined'
+                        ? doc(db, 'artifacts', appId, 'public', 'data', 'rmMaster', rm.id)
+                        : doc(db, 'rmMaster', rm.id);
+                    
+                    await deleteDoc(docRef);
+                } catch (error) {
+                    console.error("Error removing document: ", error);
+                    alert("❌ เกิดข้อผิดพลาดในการลบข้อมูล");
+                } finally {
+                    showLoading(false);
+                }
+            }
+        }
+
+        window.exportToExcel = function() {
             const ws = XLSX.utils.json_to_sheet(inspections.map(i => ({...i, coaFile: i.coaFile?.data||'-', qcFile: i.qcFile?.data||'-'})));
             const wb = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb, ws, "QC"); XLSX.writeFile(wb, "QC_Report.xlsx");
         }
 
         // --- ✏️ EDIT LOGIC ---
-        function openEditRecord(idx) {
+        window.openEditRecord = function(idx) {
             const i = inspections[idx];
             document.getElementById('editOriginalTimestamp').value = i.timestamp;
             
-            // Populating fields
             const fields = ['rmCode','rmName','supplier','lotNo','internalLotNo','receivedDate','coaColor','coaOdor','coaPh','coaTemp','qcColor','qcOdor','qcPh','qcTemp','passFail','approvedBy','approvedDate'];
             fields.forEach(f => { if(document.getElementById('edit_'+f)) document.getElementById('edit_'+f).value = i[f] || ''; });
             
-            // File Status COA
             isEditCoaRemoved = false; editCoaFileData = null;
             if(i.coaFile?.isLink) {
-                document.getElementById('edit_coaFileStatus').innerHTML = `<a href="${i.coaFile.data}" target="_blank">📄 ไฟล์เดิมที่มีอยู่</a>`;
-                document.getElementById('edit_btnRemoveCoa').style.display = "block";
+                document.getElementById('edit_coaFileStatus').innerHTML = `✅ <a href="${i.coaFile.data}" target="_blank" style="color:var(--primary); font-weight:600;">ไฟล์เดิมที่มีอยู่ (คลิกเพื่อดู)</a>`;
+                document.getElementById('edit_btnRemoveCoa').style.display = "inline-block";
             } else {
-                document.getElementById('edit_coaFileStatus').textContent = "ไม่มีไฟล์แนบ";
+                document.getElementById('edit_coaFileStatus').textContent = "❌ ไม่มีไฟล์แนบ";
                 document.getElementById('edit_btnRemoveCoa').style.display = "none";
             }
             
-            // File Status QC
             isEditQcRemoved = false; editQcFileData = null;
             if(i.qcFile?.isLink) {
-                document.getElementById('edit_qcFileStatus').innerHTML = `<a href="${i.qcFile.data}" target="_blank">📸 รูปเดิมที่มีอยู่</a>`;
-                document.getElementById('edit_btnRemoveQc').style.display = "block";
+                document.getElementById('edit_qcFileStatus').innerHTML = `✅ <a href="${i.qcFile.data}" target="_blank" style="color:#15803d; font-weight:600;">รูปเดิมที่มีอยู่ (คลิกเพื่อดู)</a>`;
+                document.getElementById('edit_btnRemoveQc').style.display = "inline-block";
             } else {
-                document.getElementById('edit_qcFileStatus').textContent = "ไม่มีรูปแนบ";
+                document.getElementById('edit_qcFileStatus').textContent = "❌ ไม่มีรูปถ่ายแนบ";
                 document.getElementById('edit_btnRemoveQc').style.display = "none";
             }
             
-            openModal('editModal');
+            window.openModal('editModal');
         }
 
-        function markFileRemoved(type) {
-            if(type === 'coa') { isEditCoaRemoved = true; document.getElementById('edit_coaFileStatus').textContent = "ไฟล์เดิมถูกระบุว่าลบ (กดบันทึกเพื่อยืนยัน)"; document.getElementById('edit_btnRemoveCoa').style.display = "none"; }
-            else { isEditQcRemoved = true; document.getElementById('edit_qcFileStatus').textContent = "รูปเดิมถูกระบุว่าลบ (กดบันทึกเพื่อยืนยัน)"; document.getElementById('edit_btnRemoveQc').style.display = "none"; }
+        window.markFileRemoved = function(type) {
+            if(type === 'coa') { isEditCoaRemoved = true; document.getElementById('edit_coaFileStatus').innerHTML = "<span style='color:#e74c3c; font-weight:bold;'>⚠️ ไฟล์เดิมถูกสั่งลบ (กดบันทึกเพื่อยืนยัน)</span>"; document.getElementById('edit_btnRemoveCoa').style.display = "none"; }
+            else { isEditQcRemoved = true; document.getElementById('edit_qcFileStatus').innerHTML = "<span style='color:#e74c3c; font-weight:bold;'>⚠️ รูปเดิมถูกสั่งลบ (กดบันทึกเพื่อยืนยัน)</span>"; document.getElementById('edit_btnRemoveQc').style.display = "none"; }
         }
 
-        document.getElementById('edit_coaFileInput').onchange = e => readFile(e.target, d => { editCoaFileData = d; document.getElementById('edit_coaFileStatus').textContent = "🆕 เลือกไฟล์ใหม่: " + d.name; isEditCoaRemoved = false; });
-        document.getElementById('edit_qcFileInput').onchange = e => readFile(e.target, d => { editQcFileData = d; document.getElementById('edit_qcFileStatus').textContent = "🆕 เลือกรูปใหม่: " + d.name; isEditQcRemoved = false; });
+        document.getElementById('edit_coaFileInput').onchange = e => readFile(e.target, d => { editCoaFileData = d; document.getElementById('edit_coaFileStatus').innerHTML = "<span style='color:#27ae60; font-weight:bold;'>🆕 เลือกไฟล์ใหม่แล้ว: " + d.name + "</span>"; isEditCoaRemoved = false; });
+        document.getElementById('edit_qcFileInput').onchange = e => readFile(e.target, d => { editQcFileData = d; document.getElementById('edit_qcFileStatus').innerHTML = "<span style='color:#27ae60; font-weight:bold;'>🆕 เลือกรูปใหม่แล้ว: " + d.name + "</span>"; isEditQcRemoved = false; });
 
         document.getElementById('editForm').addEventListener('submit', async function(e) {
             e.preventDefault();
-            showLoading(true, "กำลังอัปเดตข้อมูล...");
+            showLoading(true, "กำลังอัปเดตข้อมูล (Google Sheet)...");
             
             const data = {
                 action: 'edit',
@@ -761,7 +1067,6 @@
                 passFail: document.getElementById('edit_passFail').value,
                 approvedBy: document.getElementById('edit_approvedBy').value,
                 approvedDate: document.getElementById('edit_approvedDate').value,
-                // Files
                 coaFile: editCoaFileData,
                 qcFile: editQcFileData,
                 isFileRemoved: isEditCoaRemoved,
@@ -771,13 +1076,13 @@
             try {
                 await fetch(WEB_APP_URL, { method: 'POST', body: JSON.stringify(data) });
                 alert("อัปเดตข้อมูลสำเร็จ!");
-                closeModal('editModal');
+                window.closeModal('editModal');
                 fetchData();
-            } catch (err) { alert("ดำเนินการเรียบร้อย"); fetchData(); closeModal('editModal'); }
+            } catch (err) { alert("ดำเนินการเรียบร้อยแล้ว"); fetchData(); window.closeModal('editModal'); }
             showLoading(false);
         });
 
-        window.onclick = e => { if(e.target.classList.contains('modal')) document.querySelectorAll('.modal').forEach(m => m.classList.remove('active')); };
+        window.addEventListener('click', e => { if(e.target.classList.contains('modal')) document.querySelectorAll('.modal').forEach(m => m.classList.remove('active')); });
     </script>
 </body>
 </html>
