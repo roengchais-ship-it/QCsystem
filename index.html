@@ -586,40 +586,67 @@
         // ⚙️ FIREBASE CONFIGURATION
         // ==========================================
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, signInWithCustomToken, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, collection, onSnapshot, addDoc, deleteDoc, doc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { getAnalytics } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-analytics.js";
 
         const myFirebaseConfig = {
-            // apiKey: "YOUR_API_KEY",
-            // authDomain: "your-project.firebaseapp.com",
-            // projectId: "your-project",
-            // ...
+            apiKey: "AIzaSyDP9avz6gEZVn0Ps6oQaq54lGjPs0q1D6c",
+            authDomain: "qc-inspector-2bf02.firebaseapp.com",
+            projectId: "qc-inspector-2bf02",
+            storageBucket: "qc-inspector-2bf02.firebasestorage.app",
+            messagingSenderId: "492051209482",
+            appId: "1:492051209482:web:c79db00fcaa03980b06ef3",
+            measurementId: "G-Y1ZZYDQKZS"
         };
 
-        // Fallback ป้องกันเว็บพังกรณีไม่มี Firebase Config
-        let firebaseConfig = Object.keys(myFirebaseConfig).length > 0 ? myFirebaseConfig : (typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : { apiKey: "dummy-key", projectId: "dummy-project" });
+        // ตรวจสอบว่ามี myFirebaseConfig ครบถ้วนหรือไม่ 
+        // ถ้าใช้โปรเจกต์ของตัวเอง จะไม่ใช้ __firebase_config หรือ __initial_auth_token ของระบบทดสอบ
+        const isUsingCustomConfig = myFirebaseConfig && myFirebaseConfig.apiKey && !myFirebaseConfig.apiKey.includes("YOUR_API_KEY");
         
-        let app, auth, db;
+        let firebaseConfig = isUsingCustomConfig ? myFirebaseConfig : (typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : { apiKey: "dummy-key", projectId: "dummy-project" });
+        
+        let app, auth, db, analytics;
         try {
             app = initializeApp(firebaseConfig);
             auth = getAuth(app);
             db = getFirestore(app);
+            if (isUsingCustomConfig) {
+               analytics = getAnalytics(app);
+            }
         } catch(e) {
-            console.warn("Firebase Initialization Skipped (Running without Firebase Data Sync)");
+            console.warn("Firebase Initialization Skipped (Running without Firebase Data Sync)", e);
         }
 
-        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+        // ถ้าใช้ Custom Config ไม่ต้องใช้ appId ของระบบทดสอบ
+        const appId = isUsingCustomConfig ? null : (typeof __app_id !== 'undefined' ? __app_id : 'default-app-id');
         let firebaseUser = null;
 
         const initAuth = async () => {
             if(!auth) return;
             try {
-                if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
-                    await signInWithCustomToken(auth, __initial_auth_token);
+                // หากใช้ Config ตัวเอง ให้ล็อกอินแบบ Anonymous เสมอ
+                if (isUsingCustomConfig) {
+                    await signInAnonymously(auth);
+                } 
+                // หากใช้ Config ของระบบทดสอบ ให้ลองใช้ Custom Token ถ้ามี
+                else if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+                    // ปิดการใช้ Custom Token เนื่องจากมักจะมีปัญหาในการ Preview ให้ fallback ไปใช้ Anonymous เลย
+                    console.log("Using Anonymous Auth for Preview Environment");
+                    await signInAnonymously(auth);
                 } else {
                     await signInAnonymously(auth);
                 }
-            } catch (error) { console.error("Firebase Auth Error:", error); }
+            } catch (error) { 
+                console.error("Firebase Auth Error:", error);
+                // หากเกิด error (เช่น custom token mismatch) ให้ลองใช้วิธี Anonymous เป็นการสำรอง
+                try {
+                    console.log("Attempting fallback to Anonymous Auth...");
+                    await signInAnonymously(auth);
+                } catch (fallbackError) {
+                    console.error("Fallback Auth Error:", fallbackError);
+                }
+            }
         };
         initAuth();
 
@@ -658,9 +685,10 @@
             onAuthStateChanged(auth, (user) => {
                 firebaseUser = user;
                 if (user) {
-                    const rmRef = typeof __app_id !== 'undefined' 
-                        ? collection(db, 'artifacts', appId, 'public', 'data', 'rmMaster')
-                        : collection(db, 'rmMaster');
+                    // หากใช้ Config ตัวเอง ให้ดึงจาก root collection โดยตรงเลย
+                    const rmRef = isUsingCustomConfig 
+                        ? collection(db, 'rmMaster')
+                        : collection(db, 'artifacts', appId, 'public', 'data', 'rmMaster');
 
                     onSnapshot(rmRef, (snapshot) => {
                         if (!snapshot.empty) {
@@ -675,6 +703,12 @@
                         }
                     }, (error) => {
                         console.error("Firebase Read Error:", error);
+                        // ถ้าเกิด Error อ่านไม่ได้ (อาจจะเพราะ Permission) ให้ใช้ค่าเริ่มต้น
+                        if (!isFirebaseLoaded) {
+                           MASTER_LIST = [...DEFAULT_RM];
+                           isFirebaseLoaded = true;
+                           if(document.getElementById('rmMaster').classList.contains('active')) renderRMMasterTable();
+                        }
                     });
                 }
             });
@@ -932,7 +966,7 @@
 
             try {
                 showLoading(true, "กำลังบันทึกลง Firebase...");
-                const rmRef = typeof __app_id !== 'undefined' 
+                const rmRef = typeof __app_id !== 'undefined' && !isUsingCustomConfig
                     ? collection(db, 'artifacts', appId, 'public', 'data', 'rmMaster')
                     : collection(db, 'rmMaster');
 
@@ -954,7 +988,7 @@
             if (!confirm("ต้องการนำเข้าข้อมูลวัตถุดิบพื้นฐาน (~40 รายการ) ลงใน Firebase หรือไม่?\n*ระบบจะข้ามรายการที่มีรหัสซ้ำให้รหัสเดิมที่มีอยู่*")) return;
             
             showLoading(true, "กำลังนำเข้าข้อมูลลง Firebase (อาจใช้เวลาสักครู่)...");
-            const rmRef = typeof __app_id !== 'undefined' 
+            const rmRef = typeof __app_id !== 'undefined' && !isUsingCustomConfig
                 ? collection(db, 'artifacts', appId, 'public', 'data', 'rmMaster')
                 : collection(db, 'rmMaster');
                 
@@ -987,7 +1021,7 @@
             if(confirm(`คุณแน่ใจหรือไม่ที่จะลบวัตถุดิบ ${rm.code} ออกจาก Firebase?`)) {
                 try {
                     showLoading(true, "กำลังลบข้อมูล...");
-                    const docRef = typeof __app_id !== 'undefined'
+                    const docRef = typeof __app_id !== 'undefined' && !isUsingCustomConfig
                         ? doc(db, 'artifacts', appId, 'public', 'data', 'rmMaster', rm.id)
                         : doc(db, 'rmMaster', rm.id);
                     
