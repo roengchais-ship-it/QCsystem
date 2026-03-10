@@ -24,14 +24,14 @@
             --shadow-sm: 0 2px 8px rgba(0,0,0,0.04);
             --shadow-md: 0 10px 30px rgba(44, 75, 70, 0.08);
             --shadow-hover: 0 15px 35px rgba(44, 75, 70, 0.12);
-    }
+        }
 
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    body { font-family: 'Prompt', sans-serif; background: var(--bg-body); color: var(--text-main); line-height: 1.5; overflow-x: hidden; }
-    .container { max-width: 1400px; margin: 0 auto; width: 100%; }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Prompt', sans-serif; background: var(--bg-body); color: var(--text-main); line-height: 1.5; overflow-x: hidden; }
+        .container { max-width: 1400px; margin: 0 auto; width: 100%; }
 
-    /* --- Login Overlay --- */
-    #login-overlay {
+        /* --- Login Overlay --- */
+        #login-overlay {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: linear-gradient(135deg, var(--primary) 0%, #1a2a28 100%);
             display: flex; justify-content: center; align-items: center; z-index: 10000;
@@ -70,31 +70,40 @@
         @keyframes fadeIn { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
         
         /* General content box */
-    .content-box { background: white; padding: 30px; border-radius: 20px; box-shadow: var(--shadow-md); }
+        .content-box { background: white; padding: 30px; border-radius: 20px; box-shadow: var(--shadow-md); }
 
-    /* --- MODERN FORM ELEMENTS --- */
-    #qcForm { max-width: 100%; margin: 0 auto; }
-    
-    .form-section { 
-        background: white; margin-bottom: 25px; padding: 35px 30px; 
+        /* --- MODERN FORM ELEMENTS --- */
+        #qcForm { max-width: 100%; margin: 0 auto; }
+        
+        .form-section { 
+            background: white; margin-bottom: 25px; padding: 35px 30px; 
             border-radius: 20px; box-shadow: var(--shadow-md); border: 1px solid rgba(0,0,0,0.02);
             transition: transform 0.3s ease, box-shadow 0.3s ease;
         }
         .form-section:hover { transform: translateY(-3px); box-shadow: var(--shadow-hover); }
 
-        .section-title { font-size: 1.15rem; font-weight: 700; color: var(--primary); margin-bottom: 25px; display: flex; align-items: center; gap: 12px; border-bottom: 2px dashed #edf2f7; padding-bottom: 15px; }
-        .section-icon { background: linear-gradient(135deg, var(--primary), var(--primary-soft)); color: white; width: 34px; height: 34px; display: flex; align-items: center; justify-content: center; border-radius: 10px; font-size: 1rem; box-shadow: 0 4px 10px rgba(44, 75, 70, 0.2); }
+        .section-title { font-size: 1.25rem; font-weight: 700; color: var(--primary); margin-bottom: 25px; display: flex; align-items: center; gap: 12px; border-bottom: 2px dashed #edf2f7; padding-bottom: 15px; }
+        .section-title .en-text { font-size: 0.95rem; font-weight: 400; color: #94a3b8; margin-left: 8px; }
+        .section-icon { background: linear-gradient(135deg, var(--primary), var(--primary-soft)); color: white; width: 38px; height: 38px; display: flex; align-items: center; justify-content: center; border-radius: 12px; font-size: 1.1rem; box-shadow: 0 4px 10px rgba(44, 75, 70, 0.2); }
 
         .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px; }
         .form-group { position: relative; }
-        .form-group label { display: block; margin-bottom: 8px; font-weight: 500; font-size: 0.95rem; color: #4a5568; }
+        .form-group label { display: block; margin-bottom: 8px; font-weight: 600; font-size: 0.95rem; color: #334155; }
+        .form-group label .en-label { font-weight: 400; font-size: 0.85em; color: #94a3b8; margin-left: 4px; }
         .required { color: #e74c3c; margin-left: 4px; font-weight: bold; }
         
-        .form-group input, .form-group select { width: 100%; padding: 14px 16px; background-color: var(--input-bg); border: 1.5px solid var(--border-input); border-radius: 12px; font-size: 0.95rem; font-family: 'Prompt'; color: var(--text-main); transition: all 0.3s; }
+        .form-group input, .form-group select { width: 100%; padding: 14px 16px; background-color: var(--input-bg); border: 1.5px solid var(--border-input); border-radius: 12px; font-size: 1rem; font-family: 'Prompt'; color: var(--text-main); transition: all 0.3s; }
         .form-group input:hover, .form-group select:hover { border-color: #cbd5e1; }
         .form-group input:focus, .form-group select:focus { outline: none; background-color: white; border-color: var(--active-green); box-shadow: 0 0 0 4px rgba(39, 174, 96, 0.15); }
 
         select[name="passFail"] { font-weight: 600; cursor: pointer; }
+
+        /* Custom Checklist UI */
+        .checklist-container { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 20px; margin-bottom: 20px; }
+        .checklist-item { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; padding-bottom: 12px; border-bottom: 1px dashed #cbd5e1; }
+        .checklist-item:last-child { margin-bottom: 0; padding-bottom: 0; border-bottom: none; }
+        .checklist-item input[type="checkbox"] { width: 24px; height: 24px; accent-color: var(--active-green); cursor: pointer; }
+        .checklist-item label { margin-bottom: 0 !important; cursor: pointer; font-size: 1rem; color: #475569; }
 
         /* Autocomplete */
         .autocomplete-list { position: absolute; z-index: 1000; top: 100%; left: 0; right: 0; background: white; border: 1px solid #e2e8f0; border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); max-height: 220px; overflow-y: auto; display: none; margin-top: 5px; }
@@ -116,7 +125,7 @@
         .btn-secondary { background: #64748b; color: white; }
         .btn-sm { padding: 8px 12px; font-size: 0.85rem; border-radius: 8px; }
 
-        .btn-submit-form { width: 100%; padding: 18px; font-size: 1.15rem; background: linear-gradient(135deg, var(--primary) 0%, var(--active-green) 100%); color: white; border-radius: 16px; box-shadow: 0 10px 25px rgba(39, 174, 96, 0.3); letter-spacing: 0.5px; }
+        .btn-submit-form { width: 100%; padding: 20px; font-size: 1.25rem; background: linear-gradient(135deg, var(--primary) 0%, var(--active-green) 100%); color: white; border-radius: 16px; box-shadow: 0 10px 25px rgba(39, 174, 96, 0.3); letter-spacing: 0.5px; margin-top: 10px; }
         .btn-submit-form:hover { transform: translateY(-3px); box-shadow: 0 15px 35px rgba(39, 174, 96, 0.4); }
 
         .table-container-scroll { border-radius: 16px; overflow-x: auto; border: 1px solid #f1f5f9; margin-top: 15px; width: 100%; box-shadow: var(--shadow-sm); }
@@ -220,115 +229,154 @@
             <!-- Tab: Form -->
             <div id="form" class="tab-content active">
                 <form id="qcForm">
-                    <!-- Section A -->
+                    <!-- Section 1: General Info -->
                     <div class="form-section">
-                        <div class="section-title"><div class="section-icon">A</div> ข้อมูลวัตถุดิบ (Raw Material)</div>
+                        <div class="section-title"><div class="section-icon">1</div> ข้อมูลการรับเข้า <span class="en-text">(Receiving Information)</span></div>
                         <div class="form-row">
                             <div class="form-group">
-                                <label>รหัสวัตถุดิบ (RM Code) <span class="required">*</span></label>
-                                <input type="text" name="rmCode" id="rmCode" placeholder="พิมพ์เพื่อค้นหารหัส..." onkeyup="window.handleAutocomplete(event, 'rmCode')" required autocomplete="off">
+                                <label>รหัสวัตถุดิบ <span class="en-label">(Material Code)</span> <span class="required">*</span></label>
+                                <input type="text" name="rmCode" id="rmCode" placeholder="พิมพ์รหัสวัตถุดิบ..." onkeyup="window.handleAutocomplete(event, 'rmCode')" required autocomplete="off">
                                 <div class="autocomplete-list" id="rmCode-autocomplete-list"></div>
                             </div>
                             <div class="form-group">
-                                <label>ชื่อวัตถุดิบ (RM Name) <span class="required">*</span></label>
-                                <input type="text" name="rmName" id="rmName" placeholder="พิมพ์เพื่อค้นหาชื่อ..." onkeyup="window.handleAutocomplete(event, 'rmName')" required autocomplete="off">
+                                <label>ชื่อวัตถุดิบ <span class="en-label">(Material Name)</span> <span class="required">*</span></label>
+                                <input type="text" name="rmName" id="rmName" placeholder="พิมพ์ชื่อวัตถุดิบ..." onkeyup="window.handleAutocomplete(event, 'rmName')" required autocomplete="off">
                                 <div class="autocomplete-list" id="rmName-autocomplete-list"></div>
                             </div>
                         </div>
                         <div class="form-row">
                             <div class="form-group">
-                                <label>ผู้จัดจำหน่าย (Supplier) <span class="required">*</span></label>
-                                <input type="text" name="supplier" placeholder="ระบุชื่อ Supplier..." required>
+                                <label>ผู้จัดจำหน่าย <span class="en-label">(Supplier Name)</span> <span class="required">*</span></label>
+                                <input type="text" name="supplier" placeholder="พิมพ์ชื่อ Supplier..." required>
                             </div>
                             <div class="form-group">
-                                <label>Lot No. (จาก Supplier) <span class="required">*</span></label>
-                                <input type="text" name="lotNo" placeholder="ระบุ Lot No..." required>
+                                <label>เลขล็อต <span class="en-label">(Batch/Lot Number)</span> <span class="required">*</span></label>
+                                <input type="text" name="lotNo" placeholder="ระบุเลขลอตจากผู้ผลิต..." required>
                             </div>
                         </div>
                         <div class="form-row">
                             <div class="form-group">
-                                <label>Internal Lot (ถ้ามี)</label>
-                                <input type="text" name="internalLotNo" placeholder="ระบุ Internal Lot...">
+                                <label>ล็อตภายในบริษัท <span class="en-label">(Internal Lot)</span></label>
+                                <input type="text" name="internalLotNo" placeholder="ระบุเลขลอตภายใน (ถ้ามี)...">
                             </div>
                             <div class="form-group">
-                                <label>วันที่รับเข้า (Received Date) <span class="required">*</span></label>
+                                <label>วันที่รับของ <span class="en-label">(Date Received)</span> <span class="required">*</span></label>
                                 <input type="date" name="receivedDate" required>
                             </div>
                         </div>
                     </div>
 
-                    <!-- Section B -->
+                    <!-- Section 2: Document Verification -->
                     <div class="form-section">
-                        <div class="section-title"><div class="section-icon">B</div> ผลจากเอกสาร COA & ไฟล์แนบ</div>
-                        <div class="form-row">
-                            <div class="form-group"><label>สี (COA Color)</label><input type="text" name="coaColor" placeholder="ระบุสีตาม COA..."></div>
-                            <div class="form-group"><label>กลิ่น (COA Odor)</label><input type="text" name="coaOdor" placeholder="ระบุกลิ่นตาม COA..."></div>
+                        <div class="section-title"><div class="section-icon" style="background: #3b82f6;">2</div> การตรวจสอบเอกสาร <span class="en-text">(Document Verification)</span></div>
+                        
+                        <div class="checklist-container">
+                            <div style="font-weight: 600; color:#3b82f6; margin-bottom: 10px;">📋 เช็คลิสต์ตรวจสอบเอกสาร (เพื่อเตือนความจำ):</div>
+                            <div class="checklist-item">
+                                <input type="checkbox" id="chk_doc_coa" required>
+                                <label for="chk_doc_coa">มีเอกสารใบรับรอง COA ครบถ้วน (Certificate of Analysis Available)</label>
+                            </div>
+                            <div class="checklist-item">
+                                <input type="checkbox" id="chk_doc_lot" required>
+                                <label for="chk_doc_lot">เลข Lot. ในเอกสาร ตรงกับสินค้าจริง (Lot number matches COA)</label>
+                            </div>
                         </div>
-                        <div class="form-row">
-                            <div class="form-group"><label>ค่า pH (COA)</label><input type="text" name="coaPh" placeholder="ระบุค่า pH..."></div>
-                            <div class="form-group"><label>อุณหภูมิ (COA Temp)</label><input type="text" name="coaTemp" placeholder="ระบุอุณหภูมิ..."></div>
-                        </div>
-                        <div class="form-group" style="margin-top:20px;">
-                            <label>แนบไฟล์เอกสาร COA (PDF/รูปภาพ)</label>
-                            <div class="file-upload" onclick="document.getElementById('coaFile').click()">
+
+                        <div class="form-group" style="margin-bottom:20px;">
+                            <label>📄 แนบไฟล์เอกสาร COA <span class="en-label">(Upload COA PDF/Image)</span></label>
+                            <div class="file-upload" style="border-color:#bfdbfe; background:#eff6ff;" onclick="document.getElementById('coaFile').click()">
                                 <input type="file" id="coaFile" accept=".pdf,.jpg,.jpeg,.png" style="display:none">
                                 <span class="upload-icon">📄</span>
-                                <span style="font-weight:600; color:var(--primary);">คลิกเพื่ออัปโหลดไฟล์ COA</span>
-                                <span id="fileName" style="color:var(--text-light); font-size:0.9rem; margin-top:5px;">รองรับไฟล์ PDF, JPG, PNG</span>
+                                <span style="font-weight:600; color:#2563eb;">คลิกเพื่ออัปโหลดไฟล์ COA</span>
+                                <span id="fileName" style="color:#64748b; font-size:0.9rem; margin-top:5px;">รองรับไฟล์ PDF, JPG, PNG</span>
+                            </div>
+                        </div>
+
+                        <div style="padding: 15px; background: #f8fafc; border-left: 4px solid #3b82f6; border-radius: 8px;">
+                            <div style="margin-bottom: 15px; font-weight: 600; color: #475569;">👉 กรอกค่าสเปคที่ระบุในใบ COA:</div>
+                            <div class="form-row">
+                                <div class="form-group"><label>สีตาม COA <span class="en-label">(Specification Color)</span></label><input type="text" name="coaColor" placeholder="เช่น สีใส, สีเหลืองอ่อน..."></div>
+                                <div class="form-group"><label>กลิ่นตาม COA <span class="en-label">(Specification Odor)</span></label><input type="text" name="coaOdor" placeholder="เช่น ไม่มีกลิ่น, กลิ่นหอมอ่อนๆ..."></div>
+                            </div>
+                            <div class="form-row" style="margin-bottom:0;">
+                                <div class="form-group"><label>ค่า pH ตาม COA <span class="en-label">(Specification pH)</span></label><input type="text" name="coaPh" placeholder="เช่น 5.5 - 6.5..."></div>
+                                <div class="form-group"><label>อุณหภูมิตาม COA <span class="en-label">(Specification Temp)</span></label><input type="text" name="coaTemp" placeholder="เช่น 25°C..."></div>
                             </div>
                         </div>
                     </div>
 
-                    <!-- Section C -->
+                    <!-- Section 3: Physical & Packaging Inspection -->
                     <div class="form-section">
-                        <div class="section-title"><div class="section-icon">C</div> ผลการตรวจสอบจริง (QC Result)</div>
-                        <div class="form-row">
-                            <div class="form-group"><label>สีที่ตรวจพบ (QC Color) <span class="required">*</span></label><input type="text" name="qcColor" placeholder="ระบุสีที่ตรวจพบ..." required></div>
-                            <div class="form-group"><label>กลิ่นที่ตรวจพบ (QC Odor) <span class="required">*</span></label><input type="text" name="qcOdor" placeholder="ระบุกลิ่นที่ตรวจพบ..." required></div>
+                        <div class="section-title"><div class="section-icon" style="background: #f59e0b;">3</div> การตรวจสอบสภาพหน้างานจริง <span class="en-text">(Physical & Packaging Inspection)</span></div>
+                        
+                        <div class="checklist-container">
+                            <div style="font-weight: 600; color:#d97706; margin-bottom: 10px;">📦 เช็คลิสต์ตรวจสอบบรรจุภัณฑ์ (เพื่อเตือนความจำ):</div>
+                            <div class="checklist-item">
+                                <input type="checkbox" id="chk_pkg_intact" required>
+                                <label for="chk_pkg_intact">สภาพบรรจุภัณฑ์สมบูรณ์ ไม่ชำรุดเสียหาย (Packaging intact)</label>
+                            </div>
+                            <div class="checklist-item">
+                                <input type="checkbox" id="chk_pkg_clean" required>
+                                <label for="chk_pkg_clean">ซีลปิดสนิท และไม่มีการรั่วซึม (Seal intact & No leakage)</label>
+                            </div>
+                            <div class="checklist-item">
+                                <input type="checkbox" id="chk_pkg_label" required>
+                                <label for="chk_pkg_label">ฉลากอ่านออกชัดเจน (Label readable)</label>
+                            </div>
                         </div>
-                        <div class="form-row">
-                            <div class="form-group"><label>ค่า pH (QC) <span class="required">*</span></label><input type="text" name="qcPh" placeholder="ระบุค่า pH ที่วัดได้..." required></div>
-                            <div class="form-group"><label>อุณหภูมิ (QC) <span class="required">*</span></label><input type="text" name="qcTemp" placeholder="ระบุอุณหภูมิ..." required></div>
-                        </div>
-                        <div class="form-group" style="margin-bottom:25px; margin-top:10px;">
-                            <label>📷 แนบรูปถ่ายการตรวจสอบ (QC Photo)</label>
-                            <div class="file-upload" style="border-color:#86efac; background:#f0fdf4;" onclick="document.getElementById('qcFile').click()">
+
+                        <div class="form-group" style="margin-bottom:25px;">
+                            <label>📸 แนบรูปถ่ายหน้างาน <span class="en-label">(QC Photo)</span></label>
+                            <div class="file-upload" style="border-color:#fde68a; background:#fffbeb;" onclick="document.getElementById('qcFile').click()">
                                 <input type="file" id="qcFile" accept=".jpg,.jpeg,.png" style="display:none">
                                 <span class="upload-icon">📸</span>
-                                <span style="font-weight:600; color:#166534;">คลิกเพื่ออัปโหลดรูปถ่าย QC</span>
-                                <span id="qcFileName" style="color:#15803d; font-size:0.9rem; margin-top:5px;">รองรับไฟล์ JPG, PNG</span>
+                                <span style="font-weight:600; color:#d97706;">คลิกเพื่ออัปโหลดรูปถ่ายสินค้าจริง</span>
+                                <span id="qcFileName" style="color:#b45309; font-size:0.9rem; margin-top:5px;">รองรับไฟล์ JPG, PNG</span>
                             </div>
                         </div>
-                        
-                        <div style="background: #f8fafc; padding: 20px; border-radius: 16px; border: 1px solid #e2e8f0; margin-bottom: 20px;">
-                            <div class="form-row" style="margin-bottom: 0;">
-                                <div class="form-group">
-                                    <label style="color:var(--primary); font-weight:700;">ผลการตัดสิน (Final Result) <span class="required">*</span></label>
-                                    <select name="passFail" required style="border-color:var(--primary); border-width:2px; height: 50px; font-size:1.05rem;">
-                                        <option value="">-- กรุณาเลือกผลการตัดสิน --</option>
-                                        <option value="Pass">✅ ผ่าน (Pass)</option>
-                                        <option value="Fail">❌ ไม่ผ่าน (Fail)</option>
-                                        <option value="Pending">⏳ รอผล (Pending)</option>
-                                        <option value="Hold">🔒 อายัด (Hold)</option>
-                                    </select>
-                                </div>
-                                <div class="form-group">
-                                    <div class="form-row" style="gap:10px; margin-bottom:0;">
-                                        <div class="form-group" style="width: 100%;">
-                                            <label>ผู้ตรวจสอบ (Approved By) <span class="required">*</span></label>
-                                            <input type="text" name="approvedBy" placeholder="ลงชื่อผู้ตรวจ..." style="height: 50px;" required>
-                                        </div>
-                                    </div>
-                                </div>
+
+                        <div style="padding: 15px; background: #f8fafc; border-left: 4px solid #f59e0b; border-radius: 8px;">
+                            <div style="margin-bottom: 15px; font-weight: 600; color: #475569;">👉 กรอกผลการตรวจหน้างานจริง (Physical Result):</div>
+                            <div class="form-row">
+                                <div class="form-group"><label>สีที่ตรวจพบจริง <span class="en-label">(Result Color)</span> <span class="required">*</span></label><input type="text" name="qcColor" placeholder="ระบุสีที่มองเห็น..." required></div>
+                                <div class="form-group"><label>กลิ่นที่ตรวจพบจริง <span class="en-label">(Result Odor)</span> <span class="required">*</span></label><input type="text" name="qcOdor" placeholder="ระบุกลิ่นที่ดมได้..." required></div>
                             </div>
-                            <div class="form-group" style="margin-top: 15px;">
-                                <label>วันที่ตรวจสอบ (Approved Date) <span class="required">*</span></label>
-                                <input type="date" name="approvedDate" required>
+                            <div class="form-row" style="margin-bottom:0;">
+                                <div class="form-group"><label>ค่า pH ที่วัดได้ <span class="en-label">(Result pH)</span> <span class="required">*</span></label><input type="text" name="qcPh" placeholder="ระบุค่า pH..." required></div>
+                                <div class="form-group"><label>อุณหภูมิที่วัดได้ <span class="en-label">(Result Temp)</span> <span class="required">*</span></label><input type="text" name="qcTemp" placeholder="ระบุอุณหภูมิ..." required></div>
                             </div>
                         </div>
                     </div>
 
-                    <button type="submit" class="btn btn-submit-form">🚀 บันทึกข้อมูลเข้าสู่ระบบ (Submit QC Report)</button>
+                    <!-- Section 4: QA Decision -->
+                    <div class="form-section" style="background: #f0fdf4; border: 2px solid #86efac;">
+                        <div class="section-title" style="color: #166534; border-bottom-color: #bbf7d0;"><div class="section-icon" style="background: #16a34a;">4</div> สรุปผลการพิจารณา <span class="en-text" style="color:#166534;">(QA Decision)</span></div>
+                        
+                        <div class="form-row" style="margin-bottom: 20px;">
+                            <div class="form-group" style="grid-column: span 2;">
+                                <label style="color:#166534; font-weight:700; font-size:1.1rem;">ผลการตัดสิน <span class="en-label" style="color:#15803d;">(Decision Result)</span> <span class="required">*</span></label>
+                                <select name="passFail" required style="border-color:#16a34a; border-width:2px; height: 60px; font-size:1.1rem; color:#166534; background:white;">
+                                    <option value="">-- กรุณาเลือกผลการตัดสิน --</option>
+                                    <option value="Pass">✅ ผ่าน (Accepted)</option>
+                                    <option value="Fail">❌ ไม่ผ่าน (Rejected)</option>
+                                    <option value="Pending">⏳ รอผลตรวจเพิ่ม (Pending)</option>
+                                    <option value="Hold">🔒 กักกัน / อายัดสินค้า (Quarantine)</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-row" style="margin-bottom: 0;">
+                            <div class="form-group">
+                                <label>ลงชื่อผู้ตรวจสอบ <span class="en-label">(Inspector Name)</span> <span class="required">*</span></label>
+                                <input type="text" name="approvedBy" placeholder="พิมพ์ชื่อพนักงานผู้ตรวจ..." style="height: 50px;" required>
+                            </div>
+                            <div class="form-group">
+                                <label>วันที่ตรวจสอบ <span class="en-label">(Inspection Date)</span> <span class="required">*</span></label>
+                                <input type="date" name="approvedDate" style="height: 50px;" required>
+                            </div>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn btn-submit-form">🚀 ยืนยันการบันทึกข้อมูล (Submit to System)</button>
                 </form>
             </div>
 
@@ -471,71 +519,73 @@
             <form id="editForm">
                 <input type="hidden" id="editOriginalTimestamp">
                 
-                <!-- Section A -->
+                <!-- Section 1 -->
                 <div style="margin-bottom:20px; border:1px solid #e2e8f0; padding:20px; border-radius:16px;">
-                    <div style="font-weight:700; color:var(--primary); margin-bottom:15px;">A: ข้อมูลวัตถุดิบ</div>
+                    <div style="font-weight:700; color:var(--primary); margin-bottom:15px;">1. ข้อมูลการรับเข้า (Receiving Info)</div>
                     <div class="form-row" style="margin-bottom:15px;">
-                        <div class="form-group"><label>RM Code</label><input type="text" id="edit_rmCode" required></div>
-                        <div class="form-group"><label>RM Name</label><input type="text" id="edit_rmName" required></div>
+                        <div class="form-group"><label>รหัสวัตถุดิบ (RM Code)</label><input type="text" id="edit_rmCode" required></div>
+                        <div class="form-group"><label>ชื่อวัตถุดิบ (RM Name)</label><input type="text" id="edit_rmName" required></div>
                     </div>
                     <div class="form-row" style="margin-bottom:15px;">
-                        <div class="form-group"><label>Supplier</label><input type="text" id="edit_supplier" required></div>
-                        <div class="form-group"><label>Lot No.</label><input type="text" id="edit_lotNo" required></div>
+                        <div class="form-group"><label>ผู้จัดจำหน่าย (Supplier)</label><input type="text" id="edit_supplier" required></div>
+                        <div class="form-group"><label>เลขล็อต (Lot No.)</label><input type="text" id="edit_lotNo" required></div>
                     </div>
                     <div class="form-row" style="margin-bottom:0;">
-                        <div class="form-group"><label>Int. Lot</label><input type="text" id="edit_internalLotNo"></div>
-                        <div class="form-group"><label>Rec. Date</label><input type="date" id="edit_receivedDate" required></div>
+                        <div class="form-group"><label>ล็อตภายใน (Int. Lot)</label><input type="text" id="edit_internalLotNo"></div>
+                        <div class="form-group"><label>วันที่รับของ (Rec. Date)</label><input type="date" id="edit_receivedDate" required></div>
                     </div>
                 </div>
 
-                <!-- Section B -->
+                <!-- Section 2 -->
                 <div style="margin-bottom:20px; border:1px solid #e2e8f0; padding:20px; border-radius:16px; background:#f8fafc;">
-                    <div style="font-weight:700; color:var(--primary); margin-bottom:15px;">B: ข้อมูล COA</div>
+                    <div style="font-weight:700; color:#2563eb; margin-bottom:15px;">2. ข้อมูลตาม COA (Document)</div>
                     <div class="form-row" style="margin-bottom:15px;">
-                        <div class="form-group"><label>COA Color</label><input type="text" id="edit_coaColor"></div>
-                        <div class="form-group"><label>COA Odor</label><input type="text" id="edit_coaOdor"></div>
+                        <div class="form-group"><label>สีตาม COA (COA Color)</label><input type="text" id="edit_coaColor"></div>
+                        <div class="form-group"><label>กลิ่นตาม COA (COA Odor)</label><input type="text" id="edit_coaOdor"></div>
                     </div>
                     <div class="form-row" style="margin-bottom:15px;">
-                        <div class="form-group"><label>COA pH</label><input type="text" id="edit_coaPh"></div>
-                        <div class="form-group"><label>COA Temp</label><input type="text" id="edit_coaTemp"></div>
+                        <div class="form-group"><label>pH ตาม COA (COA pH)</label><input type="text" id="edit_coaPh"></div>
+                        <div class="form-group"><label>อุณหภูมิตาม COA (COA Temp)</label><input type="text" id="edit_coaTemp"></div>
                     </div>
                     <div style="background:white; padding:15px; border-radius:12px; border:1px solid #e2e8f0;">
-                        <label style="font-weight:600; font-size:0.9rem; color:#4a5568;">COA File:</label>
+                        <label style="font-weight:600; font-size:0.9rem; color:#4a5568;">ไฟล์เอกสาร COA:</label>
                         <div id="edit_coaFileStatus" style="font-size:0.9rem; margin:8px 0; color:#64748b;"></div>
                         <input type="file" id="edit_coaFileInput" style="font-size:0.9rem; padding:8px 0;">
                         <button type="button" id="edit_btnRemoveCoa" class="btn btn-danger btn-sm" onclick="window.markFileRemoved('coa')" style="display:none; margin-top:5px;">🗑️ ลบไฟล์เดิมทิ้ง</button>
                     </div>
                 </div>
 
-                <!-- Section C -->
+                <!-- Section 3 & 4 -->
                 <div style="margin-bottom:25px; border:1px solid #e2e8f0; padding:20px; border-radius:16px;">
-                    <div style="font-weight:700; color:var(--primary); margin-bottom:15px;">C: ผลการตรวจสอบ</div>
+                    <div style="font-weight:700; color:#d97706; margin-bottom:15px;">3. ผลตรวจสอบหน้างาน (Physical)</div>
                     <div class="form-row" style="margin-bottom:15px;">
-                        <div class="form-group"><label>QC Color</label><input type="text" id="edit_qcColor"></div>
-                        <div class="form-group"><label>QC Odor</label><input type="text" id="edit_qcOdor"></div>
+                        <div class="form-group"><label>สีที่ตรวจพบ (QC Color)</label><input type="text" id="edit_qcColor"></div>
+                        <div class="form-group"><label>กลิ่นที่ตรวจพบ (QC Odor)</label><input type="text" id="edit_qcOdor"></div>
                     </div>
                     <div class="form-row" style="margin-bottom:15px;">
-                        <div class="form-group"><label>QC pH</label><input type="text" id="edit_qcPh"></div>
-                        <div class="form-group"><label>QC Temp</label><input type="text" id="edit_qcTemp"></div>
+                        <div class="form-group"><label>ค่า pH ที่วัดได้ (QC pH)</label><input type="text" id="edit_qcPh"></div>
+                        <div class="form-group"><label>อุณหภูมิที่วัดได้ (QC Temp)</label><input type="text" id="edit_qcTemp"></div>
                     </div>
-                    <div style="background:#f0fdf4; padding:15px; border-radius:12px; border:1px solid #bbf7d0; margin-bottom:20px;">
-                        <label style="font-weight:600; font-size:0.9rem; color:#166534;">QC Photo:</label>
-                        <div id="edit_qcFileStatus" style="font-size:0.9rem; margin:8px 0; color:#15803d;"></div>
+                    <div style="background:#fffbeb; padding:15px; border-radius:12px; border:1px solid #fde68a; margin-bottom:20px;">
+                        <label style="font-weight:600; font-size:0.9rem; color:#b45309;">รูปถ่ายหน้างาน:</label>
+                        <div id="edit_qcFileStatus" style="font-size:0.9rem; margin:8px 0; color:#d97706;"></div>
                         <input type="file" id="edit_qcFileInput" style="font-size:0.9rem; padding:8px 0;">
                         <button type="button" id="edit_btnRemoveQc" class="btn btn-danger btn-sm" onclick="window.markFileRemoved('qc')" style="display:none; margin-top:5px;">🗑️ ลบรูปเดิมทิ้ง</button>
                     </div>
                     
-                    <div class="form-row" style="background:#f8fafc; padding:15px; border-radius:12px; margin-bottom:0;">
+                    <div class="form-row" style="background:#f0fdf4; padding:15px; border-radius:12px; border:1px solid #bbf7d0; margin-bottom:0;">
                         <div class="form-group">
-                            <label style="font-weight: 700;">Result</label>
-                            <select id="edit_passFail" required style="border-width:2px; font-weight:600;">
-                                <option value="Pass">✅ Pass</option><option value="Fail">❌ Fail</option>
-                                <option value="Pending">⏳ Pending</option><option value="Hold">🔒 Hold</option>
+                            <label style="font-weight: 700; color:#166534;">4. ผลการตัดสิน (Decision)</label>
+                            <select id="edit_passFail" required style="border-color:#16a34a; border-width:2px; font-weight:600; color:#166534;">
+                                <option value="Pass">✅ ผ่าน (Accepted)</option>
+                                <option value="Fail">❌ ไม่ผ่าน (Rejected)</option>
+                                <option value="Pending">⏳ รอผล (Pending)</option>
+                                <option value="Hold">🔒 อายัด (Quarantine)</option>
                             </select>
                         </div>
                         <div class="form-group">
-                            <label>Approved By</label><input type="text" id="edit_approvedBy">
-                            <label style="margin-top:10px;">Approved Date</label><input type="date" id="edit_approvedDate">
+                            <label>ผู้ตรวจสอบ</label><input type="text" id="edit_approvedBy">
+                            <label style="margin-top:10px;">วันที่ตรวจสอบ</label><input type="date" id="edit_approvedDate">
                         </div>
                     </div>
                 </div>
@@ -600,8 +650,6 @@
             measurementId: "G-Y1ZZYDQKZS"
         };
 
-        // ตรวจสอบว่ามี myFirebaseConfig ครบถ้วนหรือไม่ 
-        // ถ้าใช้โปรเจกต์ของตัวเอง จะไม่ใช้ __firebase_config หรือ __initial_auth_token ของระบบทดสอบ
         const isUsingCustomConfig = myFirebaseConfig && myFirebaseConfig.apiKey && !myFirebaseConfig.apiKey.includes("YOUR_API_KEY");
         
         let firebaseConfig = isUsingCustomConfig ? myFirebaseConfig : (typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : { apiKey: "dummy-key", projectId: "dummy-project" });
@@ -611,48 +659,22 @@
             app = initializeApp(firebaseConfig);
             auth = getAuth(app);
             db = getFirestore(app);
+            
+            // หุ้มการโหลด Analytics ด้วย try-catch เพื่อป้องกันการค้างกรณีโดเมนถูกบล็อก
             if (isUsingCustomConfig) {
-               analytics = getAnalytics(app);
+               try {
+                   analytics = getAnalytics(app);
+               } catch (analyticsError) {
+                   console.warn("Analytics Load Error (โดเมนพรีวิวอาจถูกจำกัด):", analyticsError);
+               }
             }
         } catch(e) {
-            console.warn("Firebase Initialization Skipped (Running without Firebase Data Sync)", e);
+            console.warn("Firebase Initialization Skipped", e);
         }
 
-        // ถ้าใช้ Custom Config ไม่ต้องใช้ appId ของระบบทดสอบ
         const appId = isUsingCustomConfig ? null : (typeof __app_id !== 'undefined' ? __app_id : 'default-app-id');
         let firebaseUser = null;
-
-        const initAuth = async () => {
-            if(!auth) return;
-            try {
-                // หากใช้ Config ตัวเอง ให้ล็อกอินแบบ Anonymous เสมอ
-                if (isUsingCustomConfig) {
-                    await signInAnonymously(auth);
-                } 
-                // หากใช้ Config ของระบบทดสอบ ให้ลองใช้ Custom Token ถ้ามี
-                else if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
-                    // ปิดการใช้ Custom Token เนื่องจากมักจะมีปัญหาในการ Preview ให้ fallback ไปใช้ Anonymous เลย
-                    console.log("Using Anonymous Auth for Preview Environment");
-                    await signInAnonymously(auth);
-                } else {
-                    await signInAnonymously(auth);
-                }
-            } catch (error) { 
-                console.error("Firebase Auth Error:", error);
-                // หากเกิด error (เช่น custom token mismatch) ให้ลองใช้วิธี Anonymous เป็นการสำรอง
-                try {
-                    console.log("Attempting fallback to Anonymous Auth...");
-                    await signInAnonymously(auth);
-                } catch (fallbackError) {
-                    console.error("Fallback Auth Error:", fallbackError);
-                }
-            }
-        };
-        initAuth();
-
-        // ----------------------------------------------------
-        // ส่วนของ RM Master (เชื่อมต่อ Firebase)
-        // ----------------------------------------------------
+        
         let MASTER_LIST = []; 
         let isFirebaseLoaded = false;
         
@@ -681,11 +703,29 @@
             { code: "RM2-EM-PG40", name: "Eumulgin CO 40" }, { code: "RM2-EM-IPM", name: "Isopropyl myristate (IPM)" }
         ];
 
+        // ใช้งานระบบ Auth แบบดักจับข้อผิดพลาด
+        const initAuth = async () => {
+            if(!auth) return;
+            try {
+                await signInAnonymously(auth);
+            } catch (error) { 
+                console.error("Firebase Auth Error:", error);
+                
+                // หากหน้าพรีวิวโดนบล็อก ให้ข้ามไปใช้ข้อมูลจำลองแทน เพื่อไม่ให้หน้าเว็บค้าง
+                console.warn("⚠️ โปรดเพิ่มโดเมนของเว็บนี้เข้าไปใน Firebase Console -> Authentication -> Settings -> Authorized domains");
+                isFirebaseLoaded = true;
+                MASTER_LIST = [...DEFAULT_RM];
+                if(document.getElementById('rmMaster').classList.contains('active')) {
+                    renderRMMasterTable();
+                }
+            }
+        };
+        initAuth();
+
         if(auth) {
             onAuthStateChanged(auth, (user) => {
                 firebaseUser = user;
                 if (user) {
-                    // หากใช้ Config ตัวเอง ให้ดึงจาก root collection โดยตรงเลย
                     const rmRef = isUsingCustomConfig 
                         ? collection(db, 'rmMaster')
                         : collection(db, 'artifacts', appId, 'public', 'data', 'rmMaster');
@@ -703,7 +743,6 @@
                         }
                     }, (error) => {
                         console.error("Firebase Read Error:", error);
-                        // ถ้าเกิด Error อ่านไม่ได้ (อาจจะเพราะ Permission) ให้ใช้ค่าเริ่มต้น
                         if (!isFirebaseLoaded) {
                            MASTER_LIST = [...DEFAULT_RM];
                            isFirebaseLoaded = true;
@@ -713,7 +752,6 @@
                 }
             });
         } else {
-            // ถ้าไม่มี Firebase ให้ใช้ Default
             MASTER_LIST = [...DEFAULT_RM];
             isFirebaseLoaded = true;
         }
@@ -728,13 +766,11 @@
         let currentCoaFileData = null;
         let currentQcFileData = null;
         
-        // สำหรับ Edit
         let editCoaFileData = null;
         let editQcFileData = null;
         let isEditCoaRemoved = false;
         let isEditQcRemoved = false;
 
-        // --- 📊 DATA ---
         async function fetchData() {
             showLoading(true, "กำลังดึงข้อมูล QC จากระบบ (Google Sheet)...");
             try {
@@ -781,7 +817,6 @@
             showLoading(false);
         });
 
-        // --- 🖥️ UI RENDER ---
         function renderMasterTable() {
             const tbody = document.getElementById('masterTableBody');
             tbody.innerHTML = inspections.map((item, idx) => `
@@ -872,37 +907,39 @@
             const v = (val) => val ? val : '<span style="color:#cbd5e1;">-</span>';
 
             content.innerHTML = `
-                <div class="detail-section-header">A: ข้อมูลวัตถุดิบ (Raw Material)</div>
-                <div class="detail-row"><div class="detail-label">RM Code:</div><div class="detail-value" style="color:var(--primary); font-weight:700;">${v(item.rmCode)}</div></div>
-                <div class="detail-row"><div class="detail-label">RM Name:</div><div class="detail-value">${v(item.rmName)}</div></div>
-                <div class="detail-row"><div class="detail-label">Supplier:</div><div class="detail-value">${v(item.supplier)}</div></div>
-                <div class="detail-row"><div class="detail-label">Lot No:</div><div class="detail-value">${v(item.lotNo)}</div></div>
-                <div class="detail-row"><div class="detail-label">Internal Lot:</div><div class="detail-value">${v(item.internalLotNo)}</div></div>
-                <div class="detail-row"><div class="detail-label">Rec. Date:</div><div class="detail-value">${v(item.receivedDate)}</div></div>
+                <div class="detail-section-header">1. ข้อมูลการรับเข้า (Receiving Info)</div>
+                <div class="detail-row"><div class="detail-label">รหัสวัตถุดิบ:</div><div class="detail-value" style="color:var(--primary); font-weight:700;">${v(item.rmCode)}</div></div>
+                <div class="detail-row"><div class="detail-label">ชื่อวัตถุดิบ:</div><div class="detail-value">${v(item.rmName)}</div></div>
+                <div class="detail-row"><div class="detail-label">ผู้จัดจำหน่าย:</div><div class="detail-value">${v(item.supplier)}</div></div>
+                <div class="detail-row"><div class="detail-label">เลขล็อต:</div><div class="detail-value">${v(item.lotNo)}</div></div>
+                <div class="detail-row"><div class="detail-label">ล็อตภายใน:</div><div class="detail-value">${v(item.internalLotNo)}</div></div>
+                <div class="detail-row"><div class="detail-label">วันที่รับของ:</div><div class="detail-value">${v(item.receivedDate)}</div></div>
 
-                <div class="detail-section-header">B: ข้อมูล COA</div>
-                <div class="detail-row"><div class="detail-label">COA Color:</div><div class="detail-value">${v(item.coaColor)}</div></div>
-                <div class="detail-row"><div class="detail-label">COA Odor:</div><div class="detail-value">${v(item.coaOdor)}</div></div>
-                <div class="detail-row"><div class="detail-label">COA pH:</div><div class="detail-value">${v(item.coaPh)}</div></div>
-                <div class="detail-row"><div class="detail-label">COA File:</div><div class="detail-value">
+                <div class="detail-section-header">2. การตรวจสอบเอกสาร (Document)</div>
+                <div class="detail-row"><div class="detail-label">สีตาม COA:</div><div class="detail-value">${v(item.coaColor)}</div></div>
+                <div class="detail-row"><div class="detail-label">กลิ่นตาม COA:</div><div class="detail-value">${v(item.coaOdor)}</div></div>
+                <div class="detail-row"><div class="detail-label">pH ตาม COA:</div><div class="detail-value">${v(item.coaPh)}</div></div>
+                <div class="detail-row"><div class="detail-label">ไฟล์ COA:</div><div class="detail-value">
                     ${item.coaFile?.isLink ? `<a href="${item.coaFile.data}" target="_blank" class="btn btn-secondary btn-sm" style="background:#e2e8f0; color:#334155;">📄 เปิดไฟล์ COA</a>` : '<span style="color:#94a3b8;">ไม่มีไฟล์แนบ</span>'}
                 </div></div>
 
-                <div class="detail-section-header">C: ผลการตรวจสอบ (Result)</div>
-                <div class="detail-row"><div class="detail-label">QC Color:</div><div class="detail-value">${v(item.qcColor)}</div></div>
-                <div class="detail-row"><div class="detail-label">QC Odor:</div><div class="detail-value">${v(item.qcOdor)}</div></div>
-                <div class="detail-row"><div class="detail-label">QC pH:</div><div class="detail-value">${v(item.qcPh)}</div></div>
-                <div class="detail-row"><div class="detail-label">Result:</div><div class="detail-value"><span class="status-badge ${item.passFail.toLowerCase()}">${item.passFail}</span></div></div>
-                <div class="detail-row"><div class="detail-label">QC Photo:</div><div class="detail-value">
+                <div class="detail-section-header">3. การตรวจสอบสภาพหน้างาน (Physical)</div>
+                <div class="detail-row"><div class="detail-label">สีที่ตรวจพบจริง:</div><div class="detail-value">${v(item.qcColor)}</div></div>
+                <div class="detail-row"><div class="detail-label">กลิ่นที่ตรวจพบจริง:</div><div class="detail-value">${v(item.qcOdor)}</div></div>
+                <div class="detail-row"><div class="detail-label">ค่า pH ที่วัดได้:</div><div class="detail-value">${v(item.qcPh)}</div></div>
+                <div class="detail-row"><div class="detail-label">อุณหภูมิที่วัดได้:</div><div class="detail-value">${v(item.qcTemp)}</div></div>
+                <div class="detail-row"><div class="detail-label">รูปหน้างาน:</div><div class="detail-value">
                      ${item.qcFile?.isLink ? `<a href="${item.qcFile.data}" target="_blank" class="btn btn-success btn-sm" style="background:#dcfce7; color:#166534;">📸 ดูรูป QC</a>` : '<span style="color:#94a3b8;">ไม่มีรูปถ่าย</span>'}
                 </div></div>
-                <div class="detail-row"><div class="detail-label">Approved By:</div><div class="detail-value">${v(item.approvedBy)}</div></div>
-                <div class="detail-row"><div class="detail-label">Date:</div><div class="detail-value">${v(item.approvedDate)}</div></div>
+
+                <div class="detail-section-header">4. สรุปผลการตรวจสอบ (Decision)</div>
+                <div class="detail-row"><div class="detail-label">ผลการตัดสิน:</div><div class="detail-value"><span class="status-badge ${item.passFail.toLowerCase()}">${item.passFail}</span></div></div>
+                <div class="detail-row"><div class="detail-label">ผู้ตรวจสอบ:</div><div class="detail-value">${v(item.approvedBy)}</div></div>
+                <div class="detail-row"><div class="detail-label">วันที่ตรวจ:</div><div class="detail-value">${v(item.approvedDate)}</div></div>
             `;
             window.openModal('detailModal');
         }
 
-        // --- 🛠️ HELPERS ---
         window.showTab = function(id) {
             document.querySelectorAll('.tab, .tab-content').forEach(el => el.classList.remove('active'));
             document.getElementById(id).classList.add('active');
@@ -919,8 +956,8 @@
             if(f) { const r = new FileReader(); r.onload = e => cb({name: f.name, data: e.target.result}); r.readAsDataURL(f); }
         }
 
-        document.getElementById('coaFile').onchange = e => readFile(e.target, d => { currentCoaFileData = d; document.getElementById('fileName').previousElementSibling.innerHTML = "✅ อัปโหลดสำเร็จ:"; document.getElementById('fileName').textContent = d.name; document.getElementById('fileName').style.color = 'var(--primary)'; document.getElementById('fileName').style.fontWeight = 'bold'; });
-        document.getElementById('qcFile').onchange = e => readFile(e.target, d => { currentQcFileData = d; document.getElementById('qcFileName').previousElementSibling.innerHTML = "✅ อัปโหลดสำเร็จ:"; document.getElementById('qcFileName').textContent = d.name; document.getElementById('qcFileName').style.color = '#15803d'; document.getElementById('qcFileName').style.fontWeight = 'bold'; });
+        document.getElementById('coaFile').onchange = e => readFile(e.target, d => { currentCoaFileData = d; document.getElementById('fileName').previousElementSibling.innerHTML = "✅ อัปโหลดสำเร็จ:"; document.getElementById('fileName').textContent = d.name; document.getElementById('fileName').style.color = '#2563eb'; document.getElementById('fileName').style.fontWeight = 'bold'; });
+        document.getElementById('qcFile').onchange = e => readFile(e.target, d => { currentQcFileData = d; document.getElementById('qcFileName').previousElementSibling.innerHTML = "✅ อัปโหลดสำเร็จ:"; document.getElementById('qcFileName').textContent = d.name; document.getElementById('qcFileName').style.color = '#d97706'; document.getElementById('qcFileName').style.fontWeight = 'bold'; });
 
         window.handleAutocomplete = function(e, f) {
             const list = document.getElementById(f + '-autocomplete-list');
@@ -932,106 +969,63 @@
         }
         window.selectRM = function(c, n) { document.getElementById('rmCode').value = c; document.getElementById('rmName').value = n; document.querySelectorAll('.autocomplete-list').forEach(l => l.style.display = 'none'); }
 
-        // --- 📦 RM MASTER LOGIC (FIREBASE) ---
         function renderRMMasterTable() {
             const tbody = document.getElementById('rmMasterTableBody');
-            
             if(!isFirebaseLoaded) {
                 tbody.innerHTML = '<tr><td colspan="4" style="text-align:center; padding:20px; color:#94a3b8;">กำลังโหลดข้อมูลจาก Firebase...</td></tr>';
                 return;
             }
-
             tbody.innerHTML = MASTER_LIST.map((rm, idx) => `
                 <tr>
                     <td style="color:var(--text-light);">${idx + 1}</td>
                     <td><strong style="color:var(--primary);">${rm.code}</strong></td>
                     <td>${rm.name}</td>
-                    <td>
-                        <button class="btn btn-danger btn-sm" onclick="window.deleteRM(${idx})">🗑️ ลบ</button>
-                    </td>
+                    <td><button class="btn btn-danger btn-sm" onclick="window.deleteRM(${idx})">🗑️ ลบ</button></td>
                 </tr>
             `).join('');
         }
 
         window.handleAddRM = async function() {
-            if (!firebaseUser || !db) return alert("❌ ระบบยังเชื่อมต่อ Firebase ไม่สมบูรณ์ (หรือรันแบบ Offline) แต่สามารถพิมพ์ข้อมูลที่ช่อง RM ได้ตามปกติครับ");
-            
+            if (!firebaseUser || !db) return alert("❌ ระบบไม่สามารถเชื่อมต่อ Firebase ได้ในขณะนี้ (ทดสอบระบบจะใช้ข้อมูลชั่วคราวได้ตามปกติ)");
             const code = document.getElementById('newRmCode').value.trim();
             const name = document.getElementById('newRmName').value.trim();
             
-            if(MASTER_LIST.some(rm => rm.code.toLowerCase() === code.toLowerCase())) {
-                alert("❌ รหัส RM Code นี้มีอยู่ในระบบแล้ว!");
-                return;
-            }
-
+            if(MASTER_LIST.some(rm => rm.code.toLowerCase() === code.toLowerCase())) { alert("❌ รหัส RM Code นี้มีอยู่ในระบบแล้ว!"); return; }
             try {
                 showLoading(true, "กำลังบันทึกลง Firebase...");
-                const rmRef = typeof __app_id !== 'undefined' && !isUsingCustomConfig
-                    ? collection(db, 'artifacts', appId, 'public', 'data', 'rmMaster')
-                    : collection(db, 'rmMaster');
-
+                const rmRef = typeof __app_id !== 'undefined' && !isUsingCustomConfig ? collection(db, 'artifacts', appId, 'public', 'data', 'rmMaster') : collection(db, 'rmMaster');
                 await addDoc(rmRef, { code: code, name: name, createdAt: new Date().toISOString() });
-                
-                document.getElementById('newRmCode').value = '';
-                document.getElementById('newRmName').value = '';
+                document.getElementById('newRmCode').value = ''; document.getElementById('newRmName').value = '';
                 alert("✅ เพิ่มข้อมูลวัตถุดิบลงใน Firebase สำเร็จ!");
-            } catch (error) {
-                console.error("Error adding document: ", error);
-                alert("❌ เกิดข้อผิดพลาดในการบันทึกข้อมูล");
-            } finally {
-                showLoading(false);
-            }
+            } catch (error) { console.error("Error adding document: ", error); alert("❌ เกิดข้อผิดพลาดในการบันทึกข้อมูล (โดเมนพรีวิวอาจถูกบล็อกโดย Firebase ของคุณ)"); } finally { showLoading(false); }
         }
 
         window.importDefaultRM = async function() {
-            if (!firebaseUser || !db) return alert("❌ ระบบยังเชื่อมต่อ Firebase ไม่สมบูรณ์");
+            if (!firebaseUser || !db) return alert("❌ ระบบไม่สามารถเชื่อมต่อ Firebase ได้ในขณะนี้");
             if (!confirm("ต้องการนำเข้าข้อมูลวัตถุดิบพื้นฐาน (~40 รายการ) ลงใน Firebase หรือไม่?\n*ระบบจะข้ามรายการที่มีรหัสซ้ำให้รหัสเดิมที่มีอยู่*")) return;
-            
             showLoading(true, "กำลังนำเข้าข้อมูลลง Firebase (อาจใช้เวลาสักครู่)...");
-            const rmRef = typeof __app_id !== 'undefined' && !isUsingCustomConfig
-                ? collection(db, 'artifacts', appId, 'public', 'data', 'rmMaster')
-                : collection(db, 'rmMaster');
-                
+            const rmRef = typeof __app_id !== 'undefined' && !isUsingCustomConfig ? collection(db, 'artifacts', appId, 'public', 'data', 'rmMaster') : collection(db, 'rmMaster');
             let addedCount = 0;
             try {
                 for (const rm of DEFAULT_RM) {
-                    // ตรวจสอบว่ามีรหัสนี้ในระบบหรือยัง
                     if (!MASTER_LIST.some(existing => existing.code.toLowerCase() === rm.code.toLowerCase())) {
                         await addDoc(rmRef, { code: rm.code, name: rm.name, createdAt: new Date().toISOString() });
                         addedCount++;
                     }
                 }
                 alert(`✅ นำเข้าข้อมูลสำเร็จ ${addedCount} รายการ!`);
-            } catch (error) {
-                console.error(error);
-                alert("❌ เกิดข้อผิดพลาดระหว่างนำเข้าข้อมูล");
-            } finally {
-                showLoading(false);
-            }
+            } catch (error) { console.error(error); alert("❌ เกิดข้อผิดพลาดระหว่างนำเข้าข้อมูล (โดเมนพรีวิวอาจถูกบล็อกโดย Firebase ของคุณ)"); } finally { showLoading(false); }
         }
 
         window.deleteRM = async function(idx) {
             const rm = MASTER_LIST[idx];
-            
-            if(!rm.id) {
-                alert("❌ ไม่สามารถลบข้อมูล Default ได้ (เพิ่มข้อมูลใหม่เพื่อทดสอบการลบ)");
-                return;
-            }
-
+            if(!rm.id) { alert("❌ ไม่สามารถลบข้อมูล Default ได้ (เพิ่มข้อมูลใหม่เพื่อทดสอบการลบ)"); return; }
             if(confirm(`คุณแน่ใจหรือไม่ที่จะลบวัตถุดิบ ${rm.code} ออกจาก Firebase?`)) {
                 try {
                     showLoading(true, "กำลังลบข้อมูล...");
-                    const docRef = typeof __app_id !== 'undefined' && !isUsingCustomConfig
-                        ? doc(db, 'artifacts', appId, 'public', 'data', 'rmMaster', rm.id)
-                        : doc(db, 'rmMaster', rm.id);
-                    
+                    const docRef = typeof __app_id !== 'undefined' && !isUsingCustomConfig ? doc(db, 'artifacts', appId, 'public', 'data', 'rmMaster', rm.id) : doc(db, 'rmMaster', rm.id);
                     await deleteDoc(docRef);
-                } catch (error) {
-                    console.error("Error removing document: ", error);
-                    alert("❌ เกิดข้อผิดพลาดในการลบข้อมูล");
-                } finally {
-                    showLoading(false);
-                }
+                } catch (error) { console.error("Error removing document: ", error); alert("❌ เกิดข้อผิดพลาดในการลบข้อมูล (โดเมนพรีวิวอาจถูกบล็อก)"); } finally { showLoading(false); }
             }
         }
 
@@ -1040,31 +1034,19 @@
             const wb = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb, ws, "QC"); XLSX.writeFile(wb, "QC_Report.xlsx");
         }
 
-        // --- ✏️ EDIT LOGIC ---
         window.openEditRecord = function(idx) {
             const i = inspections[idx];
             document.getElementById('editOriginalTimestamp').value = i.timestamp;
-            
             const fields = ['rmCode','rmName','supplier','lotNo','internalLotNo','receivedDate','coaColor','coaOdor','coaPh','coaTemp','qcColor','qcOdor','qcPh','qcTemp','passFail','approvedBy','approvedDate'];
             fields.forEach(f => { if(document.getElementById('edit_'+f)) document.getElementById('edit_'+f).value = i[f] || ''; });
             
             isEditCoaRemoved = false; editCoaFileData = null;
-            if(i.coaFile?.isLink) {
-                document.getElementById('edit_coaFileStatus').innerHTML = `✅ <a href="${i.coaFile.data}" target="_blank" style="color:var(--primary); font-weight:600;">ไฟล์เดิมที่มีอยู่ (คลิกเพื่อดู)</a>`;
-                document.getElementById('edit_btnRemoveCoa').style.display = "inline-block";
-            } else {
-                document.getElementById('edit_coaFileStatus').textContent = "❌ ไม่มีไฟล์แนบ";
-                document.getElementById('edit_btnRemoveCoa').style.display = "none";
-            }
+            if(i.coaFile?.isLink) { document.getElementById('edit_coaFileStatus').innerHTML = `✅ <a href="${i.coaFile.data}" target="_blank" style="color:#2563eb; font-weight:600;">ไฟล์เดิมที่มีอยู่ (คลิกเพื่อดู)</a>`; document.getElementById('edit_btnRemoveCoa').style.display = "inline-block"; } 
+            else { document.getElementById('edit_coaFileStatus').textContent = "❌ ไม่มีไฟล์แนบ"; document.getElementById('edit_btnRemoveCoa').style.display = "none"; }
             
             isEditQcRemoved = false; editQcFileData = null;
-            if(i.qcFile?.isLink) {
-                document.getElementById('edit_qcFileStatus').innerHTML = `✅ <a href="${i.qcFile.data}" target="_blank" style="color:#15803d; font-weight:600;">รูปเดิมที่มีอยู่ (คลิกเพื่อดู)</a>`;
-                document.getElementById('edit_btnRemoveQc').style.display = "inline-block";
-            } else {
-                document.getElementById('edit_qcFileStatus').textContent = "❌ ไม่มีรูปถ่ายแนบ";
-                document.getElementById('edit_btnRemoveQc').style.display = "none";
-            }
+            if(i.qcFile?.isLink) { document.getElementById('edit_qcFileStatus').innerHTML = `✅ <a href="${i.qcFile.data}" target="_blank" style="color:#d97706; font-weight:600;">รูปเดิมที่มีอยู่ (คลิกเพื่อดู)</a>`; document.getElementById('edit_btnRemoveQc').style.display = "inline-block"; } 
+            else { document.getElementById('edit_qcFileStatus').textContent = "❌ ไม่มีรูปถ่ายแนบ"; document.getElementById('edit_btnRemoveQc').style.display = "none"; }
             
             window.openModal('editModal');
         }
@@ -1074,44 +1056,28 @@
             else { isEditQcRemoved = true; document.getElementById('edit_qcFileStatus').innerHTML = "<span style='color:#e74c3c; font-weight:bold;'>⚠️ รูปเดิมถูกสั่งลบ (กดบันทึกเพื่อยืนยัน)</span>"; document.getElementById('edit_btnRemoveQc').style.display = "none"; }
         }
 
-        document.getElementById('edit_coaFileInput').onchange = e => readFile(e.target, d => { editCoaFileData = d; document.getElementById('edit_coaFileStatus').innerHTML = "<span style='color:#27ae60; font-weight:bold;'>🆕 เลือกไฟล์ใหม่แล้ว: " + d.name + "</span>"; isEditCoaRemoved = false; });
-        document.getElementById('edit_qcFileInput').onchange = e => readFile(e.target, d => { editQcFileData = d; document.getElementById('edit_qcFileStatus').innerHTML = "<span style='color:#27ae60; font-weight:bold;'>🆕 เลือกรูปใหม่แล้ว: " + d.name + "</span>"; isEditQcRemoved = false; });
+        document.getElementById('edit_coaFileInput').onchange = e => readFile(e.target, d => { editCoaFileData = d; document.getElementById('edit_coaFileStatus').innerHTML = "<span style='color:#2563eb; font-weight:bold;'>🆕 เลือกไฟล์ใหม่แล้ว: " + d.name + "</span>"; isEditCoaRemoved = false; });
+        document.getElementById('edit_qcFileInput').onchange = e => readFile(e.target, d => { editQcFileData = d; document.getElementById('edit_qcFileStatus').innerHTML = "<span style='color:#d97706; font-weight:bold;'>🆕 เลือกรูปใหม่แล้ว: " + d.name + "</span>"; isEditQcRemoved = false; });
 
         document.getElementById('editForm').addEventListener('submit', async function(e) {
             e.preventDefault();
             showLoading(true, "กำลังอัปเดตข้อมูล (Google Sheet)...");
-            
             const data = {
-                action: 'edit',
-                originalTimestamp: document.getElementById('editOriginalTimestamp').value,
-                rmCode: document.getElementById('edit_rmCode').value,
-                rmName: document.getElementById('edit_rmName').value,
-                supplier: document.getElementById('edit_supplier').value,
-                lotNo: document.getElementById('edit_lotNo').value,
-                internalLotNo: document.getElementById('edit_internalLotNo').value,
-                receivedDate: document.getElementById('edit_receivedDate').value,
-                coaColor: document.getElementById('edit_coaColor').value,
-                coaOdor: document.getElementById('edit_coaOdor').value,
-                coaPh: document.getElementById('edit_coaPh').value,
-                coaTemp: document.getElementById('edit_coaTemp').value,
-                qcColor: document.getElementById('edit_qcColor').value,
-                qcOdor: document.getElementById('edit_qcOdor').value,
-                qcPh: document.getElementById('edit_qcPh').value,
-                qcTemp: document.getElementById('edit_qcTemp').value,
-                passFail: document.getElementById('edit_passFail').value,
-                approvedBy: document.getElementById('edit_approvedBy').value,
-                approvedDate: document.getElementById('edit_approvedDate').value,
-                coaFile: editCoaFileData,
-                qcFile: editQcFileData,
-                isFileRemoved: isEditCoaRemoved,
-                isQcFileRemoved: isEditQcRemoved
+                action: 'edit', originalTimestamp: document.getElementById('editOriginalTimestamp').value,
+                rmCode: document.getElementById('edit_rmCode').value, rmName: document.getElementById('edit_rmName').value,
+                supplier: document.getElementById('edit_supplier').value, lotNo: document.getElementById('edit_lotNo').value,
+                internalLotNo: document.getElementById('edit_internalLotNo').value, receivedDate: document.getElementById('edit_receivedDate').value,
+                coaColor: document.getElementById('edit_coaColor').value, coaOdor: document.getElementById('edit_coaOdor').value,
+                coaPh: document.getElementById('edit_coaPh').value, coaTemp: document.getElementById('edit_coaTemp').value,
+                qcColor: document.getElementById('edit_qcColor').value, qcOdor: document.getElementById('edit_qcOdor').value,
+                qcPh: document.getElementById('edit_qcPh').value, qcTemp: document.getElementById('edit_qcTemp').value,
+                passFail: document.getElementById('edit_passFail').value, approvedBy: document.getElementById('edit_approvedBy').value,
+                approvedDate: document.getElementById('edit_approvedDate').value, coaFile: editCoaFileData, qcFile: editQcFileData,
+                isFileRemoved: isEditCoaRemoved, isQcFileRemoved: isEditQcRemoved
             };
-
             try {
                 await fetch(WEB_APP_URL, { method: 'POST', body: JSON.stringify(data) });
-                alert("อัปเดตข้อมูลสำเร็จ!");
-                window.closeModal('editModal');
-                fetchData();
+                alert("อัปเดตข้อมูลสำเร็จ!"); window.closeModal('editModal'); fetchData();
             } catch (err) { alert("ดำเนินการเรียบร้อยแล้ว"); fetchData(); window.closeModal('editModal'); }
             showLoading(false);
         });
