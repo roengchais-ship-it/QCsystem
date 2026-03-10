@@ -1002,6 +1002,21 @@
                 <div class="detail-row"><div class="detail-label">วันที่รับของ:</div><div class="detail-value">${v(item.receivedDate)}</div></div>
 
                 <div class="detail-section-header">2. การตรวจสอบเอกสาร (Document)</div>
+                
+                <!-- เช็คลิสต์ตรวจสอบเอกสาร (แสดงเฉพาะ View/Print) -->
+                <div class="detail-row" style="flex-direction: column; background: #f8fafc; padding: 15px; border-radius: 8px; margin-bottom: 10px; border: 1px solid #e2e8f0;">
+                    <div style="font-weight: 600; color: #3b82f6; margin-bottom: 8px;">📋 เช็คลิสต์ตรวจสอบเอกสาร:</div>
+                    <div style="display: flex; gap: 8px; align-items: center; margin-bottom: 4px; font-size: 0.95rem;">
+                        <span style="color: var(--active-green); font-size: 1.2rem;">☑</span> <span>มีเอกสารใบรับรอง COA ครบถ้วน (COA Available)</span>
+                    </div>
+                    <div style="display: flex; gap: 8px; align-items: center; margin-bottom: 4px; font-size: 0.95rem;">
+                        <span style="color: var(--active-green); font-size: 1.2rem;">☑</span> <span>เลข Lot. ในเอกสาร ตรงกับสินค้าจริง (Lot number matches COA)</span>
+                    </div>
+                    <div style="display: flex; gap: 8px; align-items: center; font-size: 0.95rem;">
+                        <span style="color: var(--active-green); font-size: 1.2rem;">☑</span> <span>วันที่ผลิตและวันหมดอายุถูกต้อง (Mfg & Exp verified)</span>
+                    </div>
+                </div>
+
                 <div class="detail-row"><div class="detail-label">สีตาม COA:</div><div class="detail-value">${v(item.coaColor)}</div></div>
                 <div class="detail-row"><div class="detail-label">กลิ่นตาม COA:</div><div class="detail-value">${v(item.coaOdor)}</div></div>
                 <div class="detail-row"><div class="detail-label">pH ตาม COA:</div><div class="detail-value">${v(item.coaPh)}</div></div>
@@ -1011,6 +1026,21 @@
                 </div></div>
 
                 <div class="detail-section-header">3. การตรวจสอบสภาพหน้างาน (Physical)</div>
+
+                <!-- เช็คลิสต์ตรวจสอบบรรจุภัณฑ์ (แสดงเฉพาะ View/Print) -->
+                <div class="detail-row" style="flex-direction: column; background: #f8fafc; padding: 15px; border-radius: 8px; margin-bottom: 10px; border: 1px solid #e2e8f0;">
+                    <div style="font-weight: 600; color: #d97706; margin-bottom: 8px;">📦 เช็คลิสต์ตรวจสอบบรรจุภัณฑ์:</div>
+                    <div style="display: flex; gap: 8px; align-items: center; margin-bottom: 4px; font-size: 0.95rem;">
+                        <span style="color: var(--active-green); font-size: 1.2rem;">☑</span> <span>สภาพบรรจุภัณฑ์สมบูรณ์ ไม่ชำรุดเสียหาย (Packaging intact)</span>
+                    </div>
+                    <div style="display: flex; gap: 8px; align-items: center; margin-bottom: 4px; font-size: 0.95rem;">
+                        <span style="color: var(--active-green); font-size: 1.2rem;">☑</span> <span>ซีลปิดสนิท และไม่มีการรั่วซึม (Seal intact & No leakage)</span>
+                    </div>
+                    <div style="display: flex; gap: 8px; align-items: center; font-size: 0.95rem;">
+                        <span style="color: var(--active-green); font-size: 1.2rem;">☑</span> <span>ฉลากอ่านออกชัดเจน (Label readable)</span>
+                    </div>
+                </div>
+
                 <div class="detail-row"><div class="detail-label">ลักษณะปรากฏเทียบ Master:</div><div class="detail-value">${appearanceDisplay}</div></div>
                 <div class="detail-row"><div class="detail-label">สีที่ตรวจพบจริง:</div><div class="detail-value">${v(item.qcColor)}</div></div>
                 <div class="detail-row"><div class="detail-label">กลิ่นที่ตรวจพบจริง:</div><div class="detail-value">${v(item.qcOdor)}</div></div>
