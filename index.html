@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>QC System v6.15 (Firebase + Image Fix)</title>
+    <title>QC System v6.16 (Firebase + File Viewer)</title>
     
     <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
@@ -122,7 +122,7 @@
         .file-upload .upload-icon { font-size: 2.5rem; margin-bottom: 5px; transition: transform 0.3s; }
         .file-upload:hover .upload-icon { transform: translateY(-5px); }
 
-        .btn { padding: 12px 24px; border: none; border-radius: 12px; font-size: 0.95rem; font-weight: 600; cursor: pointer; transition: all 0.3s; display: inline-flex; align-items: center; justify-content: center; gap: 8px; font-family: 'Prompt'; }
+        .btn { padding: 12px 24px; border: none; border-radius: 12px; font-size: 0.95rem; font-weight: 600; cursor: pointer; transition: all 0.3s; display: inline-flex; align-items: center; justify-content: center; gap: 8px; font-family: 'Prompt'; text-decoration: none; }
         .btn-primary { background: var(--primary); color: white; }
         .btn-primary:hover { background: var(--primary-soft); box-shadow: 0 6px 15px rgba(44, 75, 70, 0.3); transform: translateY(-1px); }
         .btn-success { background: #27ae60; color: white; }
@@ -308,7 +308,7 @@
     <div id="login-overlay">
         <div class="login-card">
             <h2>🔐 QC System</h2>
-            <p class="version">v6.15 (Firebase + Image Fix)</p>
+            <p class="version">v6.16 (Firebase + File Viewer)</p>
             
             <div class="login-hint">
                 <div style="font-weight: 600; margin-bottom: 5px;">ข้อมูลสำหรับทดสอบเข้าสู่ระบบ:</div>
@@ -337,7 +337,7 @@
                     <button class="btn btn-warning btn-sm" onclick="window.openModal('passModal')">🔑</button>
                     <button class="btn btn-danger btn-sm" onclick="window.handleLogout()">Logout</button>
                 </div>
-                <h1 style="font-size: 2rem; margin-bottom: 5px;">☁️ QC System v6.15 <small style="font-size:1rem; opacity:0.8;">(Firebase Sync)</small></h1>
+                <h1 style="font-size: 2rem; margin-bottom: 5px;">☁️ QC System v6.16 <small style="font-size:1rem; opacity:0.8;">(Firebase Sync)</small></h1>
                 <p style="opacity: 0.9; font-weight: 300;">ระบบจัดการและตรวจสอบคุณภาพวัตถุดิบครบวงจร</p>
             </div>
 
@@ -767,6 +767,22 @@
                     <button type="button" class="btn btn-secondary" style="flex:1;" onclick="window.closeModal('editModal')">ยกเลิก</button>
                 </div>
             </form>
+        </div>
+    </div>
+
+    <!-- 🖼️ File Viewer Modal (หน้าต่างสำหรับดูรูปภาพ/PDF) -->
+    <div id="fileViewerModal" class="modal" style="z-index: 6000;">
+        <div class="modal-content" style="max-width: 900px; height: 85vh; display: flex; flex-direction: column; padding: 20px;">
+            <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:2px solid #f1f5f9; padding-bottom:15px; margin-bottom:15px;">
+                <h3 style="color:var(--primary); margin:0; font-size:1.3rem;">🖼️ ไฟล์แนบ (Attachment)</h3>
+                <div style="display:flex; gap: 10px;">
+                    <a id="downloadAttachmentBtn" href="#" download class="btn btn-success btn-sm" style="display: flex; align-items: center;">💾 ดาวน์โหลดไฟล์</a>
+                    <button onclick="window.closeModal('fileViewerModal')" style="background:var(--input-bg); border:none; border-radius:50%; width:36px; height:36px; font-size:1.2rem; cursor:pointer; color:#64748b; display:flex; justify-content:center; align-items:center;">&times;</button>
+                </div>
+            </div>
+            <div id="fileViewerContent" style="flex:1; overflow:auto; display:flex; justify-content:center; align-items:center; background:#f8fafc; border-radius:12px; border: 2px dashed #e2e8f0; padding: 10px;">
+                <!-- Content will be injected here by Javascript -->
+            </div>
         </div>
     </div>
 
@@ -1238,9 +1254,37 @@
             }
         };
 
+        // ==========================================
+        // 🔍 FILE VIEWER SYSTEM (ระบบแสดงภาพและ PDF)
+        // ==========================================
+        window.viewAttachment = function(idx, type) {
+            const item = inspections[idx];
+            const file = type === 'coa' ? item.coaFile : item.qcFile;
+            
+            if (!file || !file.data) return alert("❌ ไม่พบข้อมูลไฟล์ในระบบ");
+
+            const content = document.getElementById('fileViewerContent');
+            const dlBtn = document.getElementById('downloadAttachmentBtn');
+            
+            // ตั้งค่าปุ่มดาวน์โหลด
+            dlBtn.href = file.data;
+            dlBtn.download = file.name || (type === 'coa' ? 'COA_Document' : 'QC_Photo');
+
+            // ตรวจสอบประเภทไฟล์เพื่อแสดงผลให้ถูกต้อง
+            if (file.data.startsWith('data:image')) {
+                content.innerHTML = `<img src="${file.data}" style="max-width:100%; max-height:100%; object-fit:contain; border-radius:8px;">`;
+            } else if (file.data.startsWith('data:application/pdf')) {
+                content.innerHTML = `<iframe src="${file.data}" width="100%" height="100%" style="border:none; border-radius:8px;"></iframe>`;
+            } else {
+                content.innerHTML = `<div style="text-align:center;"><p style="color:#64748b; font-size:1.1rem; margin-bottom:15px;">⚠️ เบราว์เซอร์ไม่รองรับการแสดงตัวอย่างไฟล์ประเภทนี้</p><a href="${file.data}" download="${dlBtn.download}" class="btn btn-primary">⬇️ คลิกเพื่อดาวน์โหลดไฟล์แทน</a></div>`;
+            }
+            
+            window.openModal('fileViewerModal');
+        }
+
 
         // ==========================================
-        // ส่วนการ Render ตารางและ UI ต่างๆ (ปรับให้รองรับข้อมูลจาก Firebase)
+        // ส่วนการ Render ตารางและ UI ต่างๆ
         // ==========================================
 
         function renderMasterTable() {
@@ -1257,8 +1301,8 @@
                     <td><strong style="color:var(--primary);">${item.rmCode || '-'}</strong><br><small style="color:var(--text-light);">${item.rmName || '-'}</small></td>
                     <td>${item.lotNo || '-'}</td>
                     <td><span class="status-badge ${(item.passFail || '').toLowerCase()}">${item.passFail || '-'}</span></td>
-                    <td>${item.coaFile?.isLink ? `<a href="${item.coaFile.data}" target="_blank" class="btn btn-secondary btn-sm" style="background:#f1f5f9; color:#475569;">COA File</a>` : '-'}</td>
-                    <td>${item.qcFile?.isLink ? `<a href="${item.qcFile.data}" target="_blank" class="btn btn-success btn-sm" style="background:#dcfce7; color:#166534;">QC Photo</a>` : '-'}</td>
+                    <td>${item.coaFile?.isLink ? `<button class="btn btn-secondary btn-sm" onclick="window.viewAttachment(${idx}, 'coa')">📄 COA File</button>` : '-'}</td>
+                    <td>${item.qcFile?.isLink ? `<button class="btn btn-success btn-sm" onclick="window.viewAttachment(${idx}, 'qc')">📸 QC Photo</button>` : '-'}</td>
                     <td>
                         <button class="btn btn-info btn-sm" onclick="window.openDetailModal(${idx})" style="margin-right: 5px;">📄 View</button>
                         <button class="btn btn-warning btn-sm" onclick="window.openEditRecord(${idx})" style="background:#fef3c7; color:#b45309; border:1px solid #fde68a;">✏️ Edit</button>
@@ -1383,7 +1427,7 @@
                         <div class="detail-row"><div class="detail-label">Specification pH (ค่า pH ตาม COA):</div><div class="detail-value">${v(item.coaPh)}</div></div>
                         <div class="detail-row"><div class="detail-label">Specification Temp (อุณหภูมิตาม COA):</div><div class="detail-value">${v(item.coaTemp)}</div></div>
                         <div class="detail-row print-hide"><div class="detail-label">COA File (ไฟล์ COA):</div><div class="detail-value">
-                            ${item.coaFile?.isLink ? `<a href="${item.coaFile.data}" target="_blank" class="btn btn-secondary btn-sm" style="background:#e2e8f0; color:#334155;">📄 เปิดไฟล์ COA</a>` : '<span style="color:#94a3b8;">ไม่มีไฟล์แนบ</span>'}
+                            ${item.coaFile?.isLink ? `<button class="btn btn-secondary btn-sm" onclick="window.viewAttachment(${idx}, 'coa')" style="background:#e2e8f0; color:#334155;">📄 เปิดไฟล์ COA</button>` : '<span style="color:#94a3b8;">ไม่มีไฟล์แนบ</span>'}
                         </div></div>
 
                         <div class="detail-section-header" style="margin-top: 20px;">3. Physical & Packaging Inspection (การตรวจสอบสภาพหน้างานจริง)</div>
@@ -1401,7 +1445,7 @@
                         <div class="detail-row"><div class="detail-label">Result pH (ค่า pH ที่วัดได้):</div><div class="detail-value">${v(item.qcPh)}</div></div>
                         <div class="detail-row"><div class="detail-label">Result Temp (อุณหภูมิที่วัดได้):</div><div class="detail-value">${v(item.qcTemp)}</div></div>
                         <div class="detail-row print-hide"><div class="detail-label">QC Photo (รูปหน้างาน):</div><div class="detail-value">
-                             ${item.qcFile?.isLink ? `<a href="${item.qcFile.data}" target="_blank" class="btn btn-success btn-sm" style="background:#dcfce7; color:#166534;">📸 ดูรูป QC</a>` : '<span style="color:#94a3b8;">ไม่มีรูปถ่าย</span>'}
+                             ${item.qcFile?.isLink ? `<button class="btn btn-success btn-sm" onclick="window.viewAttachment(${idx}, 'qc')" style="background:#dcfce7; color:#166534;">📸 ดูรูป QC</button>` : '<span style="color:#94a3b8;">ไม่มีรูปถ่าย</span>'}
                         </div></div>
 
                         <div class="detail-section-header" style="margin-top: 20px;">4. QA Decision (สรุปผลการพิจารณา)</div>
@@ -1448,13 +1492,13 @@
         window.closeModal = function(id) { document.getElementById(id).classList.remove('active'); }
         function showLoading(s, t) { document.getElementById('loading-overlay').style.display = s ? 'flex' : 'none'; document.getElementById('loading-text').textContent = t || 'กำลังโหลด...'; }
 
+        // ฟังก์ชันอ่านไฟล์พร้อมบีบอัดสำหรับรูปภาพ
         function readFile(input, cb) {
             const f = input.files[0];
             if(!f) return;
             
             showLoading(true, "กำลังประมวลผลไฟล์...");
             
-            // ถ้าเป็นรูปภาพ ให้ทำการบีบอัดก่อน (ป้องกันเกินโควต้า 1MB ของ Firestore)
             if (f.type.startsWith('image/')) {
                 const reader = new FileReader();
                 reader.onload = function(e) {
@@ -1463,7 +1507,7 @@
                         const canvas = document.createElement('canvas');
                         let w = img.width;
                         let h = img.height;
-                        const MAX_SIZE = 1000; // ปรับขนาดสูงสุดไม่เกิน 1000px
+                        const MAX_SIZE = 1000; 
                         
                         if (w > h && w > MAX_SIZE) { h *= MAX_SIZE / w; w = MAX_SIZE; }
                         else if (h > w && h > MAX_SIZE) { w *= MAX_SIZE / h; h = MAX_SIZE; }
@@ -1473,7 +1517,6 @@
                         const ctx = canvas.getContext('2d');
                         ctx.drawImage(img, 0, 0, w, h);
                         
-                        // ลดคุณภาพเหลือ 60% เพื่อให้ขนาดไฟล์เล็กพอจะเก็บลง Database ได้
                         const dataUrl = canvas.toDataURL('image/jpeg', 0.6); 
                         showLoading(false);
                         cb({ name: f.name, data: dataUrl });
@@ -1482,7 +1525,6 @@
                 };
                 reader.readAsDataURL(f);
             } else {
-                // ถ้าไม่ใช่รูปภาพ (เช่น PDF)
                 if(f.size > 900000) { 
                     alert("⚠️ คำเตือน: ไฟล์เอกสารมีขนาดใหญ่เกินไป (จำกัดไม่เกิน ~900KB) อาจทำให้บันทึกลงฐานข้อมูลไม่ผ่านครับ แนะนำให้ลดขนาดไฟล์ก่อน");
                 }
@@ -1603,11 +1645,11 @@
             fields.forEach(f => { if(document.getElementById('edit_'+f)) document.getElementById('edit_'+f).value = i[f] || ''; });
             
             isEditCoaRemoved = false; editCoaFileData = null;
-            if(i.coaFile?.isLink) { document.getElementById('edit_coaFileStatus').innerHTML = `✅ <a href="${i.coaFile.data}" target="_blank" style="color:#2563eb; font-weight:600;">ไฟล์เดิมที่มีอยู่ (คลิกเพื่อดู)</a>`; document.getElementById('edit_btnRemoveCoa').style.display = "inline-block"; } 
+            if(i.coaFile?.isLink) { document.getElementById('edit_coaFileStatus').innerHTML = `✅ <a href="#" onclick="window.viewAttachment(${idx}, 'coa'); return false;" style="color:#2563eb; font-weight:600;">ไฟล์เดิมที่มีอยู่ (คลิกเพื่อดู)</a>`; document.getElementById('edit_btnRemoveCoa').style.display = "inline-block"; } 
             else { document.getElementById('edit_coaFileStatus').textContent = "❌ ไม่มีไฟล์แนบ"; document.getElementById('edit_btnRemoveCoa').style.display = "none"; }
             
             isEditQcRemoved = false; editQcFileData = null;
-            if(i.qcFile?.isLink) { document.getElementById('edit_qcFileStatus').innerHTML = `✅ <a href="${i.qcFile.data}" target="_blank" style="color:#d97706; font-weight:600;">รูปเดิมที่มีอยู่ (คลิกเพื่อดู)</a>`; document.getElementById('edit_btnRemoveQc').style.display = "inline-block"; } 
+            if(i.qcFile?.isLink) { document.getElementById('edit_qcFileStatus').innerHTML = `✅ <a href="#" onclick="window.viewAttachment(${idx}, 'qc'); return false;" style="color:#d97706; font-weight:600;">รูปเดิมที่มีอยู่ (คลิกเพื่อดู)</a>`; document.getElementById('edit_btnRemoveQc').style.display = "inline-block"; } 
             else { document.getElementById('edit_qcFileStatus').textContent = "❌ ไม่มีรูปถ่ายแนบ"; document.getElementById('edit_btnRemoveQc').style.display = "none"; }
             
             window.openModal('editModal');
@@ -1621,7 +1663,12 @@
         document.getElementById('edit_coaFileInput').onchange = e => readFile(e.target, d => { editCoaFileData = d; document.getElementById('edit_coaFileStatus').innerHTML = "<span style='color:#2563eb; font-weight:bold;'>🆕 เลือกไฟล์ใหม่แล้ว: " + d.name + "</span>"; isEditCoaRemoved = false; });
         document.getElementById('edit_qcFileInput').onchange = e => readFile(e.target, d => { editQcFileData = d; document.getElementById('edit_qcFileStatus').innerHTML = "<span style='color:#d97706; font-weight:bold;'>🆕 เลือกรูปใหม่แล้ว: " + d.name + "</span>"; isEditQcRemoved = false; });
 
-        window.addEventListener('click', e => { if(e.target.classList.contains('modal')) document.querySelectorAll('.modal').forEach(m => m.classList.remove('active')); });
+        // ฟังก์ชันดักจับการคลิกพื้นที่ว่างเพื่อปิด Modal ทีละชั้น
+        window.addEventListener('click', e => { 
+            if(e.target.classList.contains('modal')) {
+                e.target.classList.remove('active');
+            } 
+        });
     </script>
 </body>
 </html>
