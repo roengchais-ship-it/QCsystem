@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>QC System v6.19 (Firebase + Remark Field)</title>
+    <title>QC System v6.20 (Firebase + History Search)</title>
     
     <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
@@ -308,7 +308,7 @@
     <div id="login-overlay">
         <div class="login-card">
             <h2>🔐 QC System</h2>
-            <p class="version">v6.19 (Firebase + Remark Field)</p>
+            <p class="version">v6.20 (Firebase + History Search)</p>
             
             <div class="login-hint">
                 <div style="font-weight: 600; margin-bottom: 5px;">ข้อมูลสำหรับทดสอบเข้าสู่ระบบ:</div>
@@ -337,7 +337,7 @@
                     <button class="btn btn-warning btn-sm" onclick="window.openModal('passModal')">🔑</button>
                     <button class="btn btn-danger btn-sm" onclick="window.handleLogout()">Logout</button>
                 </div>
-                <h1 style="font-size: 2rem; margin-bottom: 5px;">☁️ QC System v6.19 <small style="font-size:1rem; opacity:0.8;">(Firebase Sync)</small></h1>
+                <h1 style="font-size: 2rem; margin-bottom: 5px;">☁️ QC System v6.20 <small style="font-size:1rem; opacity:0.8;">(Firebase Sync)</small></h1>
                 <p style="opacity: 0.9; font-weight: 300;">ระบบจัดการและตรวจสอบคุณภาพวัตถุดิบครบวงจร</p>
             </div>
 
@@ -551,14 +551,20 @@
 
             <!-- Tab: History -->
             <div id="master" class="tab-content content-box">
-                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
-                    <h2 style="color:var(--primary); font-size:1.5rem;">📊 ประวัติการตรวจสอบ (Inspection History)</h2>
-                    <div style="display:flex; gap:10px;">
-                        <button class="btn btn-danger" onclick="window.cleanDuplicateRecords()">🧹 เคลียร์ข้อมูลซ้ำ</button>
-                        <button class="btn btn-warning" onclick="window.migrateFromGoogleSheet()">🔄 ดึงข้อมูลเก่าจาก Sheet</button>
-                        <button class="btn btn-success" onclick="window.exportToExcel()">📥 Export Excel</button>
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px; flex-wrap: wrap; gap: 10px;">
+                    <h2 style="color:var(--primary); font-size:1.5rem; margin:0;">📊 ประวัติการตรวจสอบ (History)</h2>
+                    <div style="display:flex; gap:10px; flex-wrap: wrap;">
+                        <button class="btn btn-danger btn-sm" onclick="window.cleanDuplicateRecords()">🧹 เคลียร์ข้อมูลซ้ำ</button>
+                        <button class="btn btn-warning btn-sm" onclick="window.migrateFromGoogleSheet()">🔄 ดึงข้อมูลเก่าจาก Sheet</button>
+                        <button class="btn btn-success btn-sm" onclick="window.exportToExcel()">📥 Export Excel</button>
                     </div>
                 </div>
+                
+                <!-- ช่องค้นหาเฉพาะในตารางประวัติ -->
+                <div style="margin-bottom: 15px;">
+                    <input type="text" id="historySearchInput" placeholder="🔍 ค้นหาในประวัติ: รหัส, ชื่อ, เลขล็อต, ผลการประเมิน..." style="width:100%; padding:12px 16px; border-radius:12px; border:1.5px solid var(--border-input); font-family:'Prompt'; font-size: 1rem; transition:0.3s; outline:none;" onkeyup="window.filterHistoryTable()" onfocus="this.style.borderColor='var(--primary)'" onblur="this.style.borderColor='var(--border-input)'">
+                </div>
+
                 <div class="table-container-scroll">
                     <table>
                         <thead>
@@ -1346,7 +1352,33 @@
                     </td>
                 </tr>
             `).join('');
+
+            // นำการค้นหาแบบกรองตารางมาใช้งานอัตโนมัติหากมีข้อความค้างอยู่ในช่องค้นหาหน้าประวัติ
+            if (typeof window.filterHistoryTable === 'function') {
+                window.filterHistoryTable();
+            }
         }
+        
+        // 🔍 ฟังก์ชันกรองตารางในหน้า History
+        window.filterHistoryTable = function() {
+            const input = document.getElementById('historySearchInput');
+            if(!input) return;
+            const filter = input.value.toLowerCase();
+            const tbody = document.getElementById('masterTableBody');
+            const trs = tbody.getElementsByTagName('tr');
+
+            for (let i = 0; i < trs.length; i++) {
+                // ข้ามแถวที่บอกว่า "ไม่มีข้อมูล"
+                if (trs[i].cells.length === 1) continue;
+                
+                const rowText = trs[i].textContent.toLowerCase();
+                if (rowText.indexOf(filter) > -1) {
+                    trs[i].style.display = "";
+                } else {
+                    trs[i].style.display = "none";
+                }
+            }
+        };
 
         function renderSummary() {
             const total = inspections.length;
