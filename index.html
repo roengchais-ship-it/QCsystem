@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>QC System v6.13 (Firebase + Fixed RM Master)</title>
+    <title>QC System v6.14 (Firebase + Full RM Master)</title>
     
     <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
@@ -308,7 +308,7 @@
     <div id="login-overlay">
         <div class="login-card">
             <h2>🔐 QC System</h2>
-            <p class="version">v6.13 (Firebase + Fixed RM Master)</p>
+            <p class="version">v6.14 (Firebase + Full RM Master)</p>
             
             <div class="login-hint">
                 <div style="font-weight: 600; margin-bottom: 5px;">ข้อมูลสำหรับทดสอบเข้าสู่ระบบ:</div>
@@ -337,7 +337,7 @@
                     <button class="btn btn-warning btn-sm" onclick="window.openModal('passModal')">🔑</button>
                     <button class="btn btn-danger btn-sm" onclick="window.handleLogout()">Logout</button>
                 </div>
-                <h1 style="font-size: 2rem; margin-bottom: 5px;">☁️ QC System v6.13 <small style="font-size:1rem; opacity:0.8;">(Firebase Sync)</small></h1>
+                <h1 style="font-size: 2rem; margin-bottom: 5px;">☁️ QC System v6.14 <small style="font-size:1rem; opacity:0.8;">(Firebase Sync)</small></h1>
                 <p style="opacity: 0.9; font-weight: 300;">ระบบจัดการและตรวจสอบคุณภาพวัตถุดิบครบวงจร</p>
             </div>
 
@@ -857,7 +857,25 @@
             { code: "RM1-SV-WT", name: "Water" }, { code: "RM2-CA-LRGS", name: "Plantacare 1200 UP" },
             { code: "RM2-CA-DG-DGS", name: "Plantacare 2000 UP" }, { code: "RM2-CA-CGS", name: "Plantacare 810 UP" },
             { code: "RM2-CA-SCG", name: "Galsoft SCG" }, { code: "RM2-CA-CG-GO", name: "LAMESOFT PO 65" },
-            { code: "RM2-CA-DHY", name: "Dehyton K/I5" }, { code: "RM2-HT-ABLE", name: "Organic aloe vera extract" }
+            { code: "RM2-CA-DHY", name: "Dehyton K/I5" }, { code: "RM2-HT-ABLE", name: "Organic aloe vera extract" },
+            { code: "RM2-HT-WTE", name: "White tea extract" }, { code: "RM2-HT-SPCA", name: "Ajidew NL-50 (Sodium PCA)" },
+            { code: "RM2-HT-PPG20", name: "Glucam P-20" }, { code: "RM2-HT-GCR", name: "Glycerine 99.7% USP Food Grade" },
+            { code: "RM3-SR-LPEZ", name: "Lipase enzyme" }, { code: "RM3-SR-VCM", name: "Aristocare Smart" },
+            { code: "RM2-AO-PSME-BA210", name: "Pancil BA-210" }, { code: "RM2-AO-PSME-V20", name: "Pancil V-20" },
+            { code: "RM2-AO-PSME-FG70", name: "Pancil FG-70" }, { code: "RM2-AO-DKE", name: "Pancil TOA-1" },
+            { code: "RM2-PT-SDB", name: "Sodium benzoate" }, { code: "RM-CTA-8HQ", name: "8-HQ" },
+            { code: "RM2-PH-LTA", name: "Lactic acid" }, { code: "RM2-PH-CTA", name: "Citric acid" },
+            { code: "RM2-CTA-2EDTA", name: "Disodium EDTA" }, { code: "RM2-SV-ETN", name: "Sciwis" },
+            { code: "RM2-SV-ETN95", name: "DEB 95 (Ethyl alcohol 95% v/v)" },
+            { code: "RM2-SV-DPM", name: "Dipropylene Glycol Monomethyl Ether (DPM)" },
+            { code: "RM2-EM-DPG", name: "Dipropylene glycol" }, { code: "RM2-PF-PF", name: "Pine Forest Perfume" },
+            { code: "RM2-PF-WTR", name: "White Tea Retreats Perfume" }, { code: "RM2-PF-NG", name: "Neroli Garden Perfume" },
+            { code: "RM2-PF-CLR", name: "Chalene Rose Perfume" }, { code: "RM2-PF-ST", name: "Serene Tea Perfume" },
+            { code: "RM2-PF-CM", name: "Cotton Musk Perfume" }, { code: "RM2-PF-WM", name: "Wild Mint Perfume" },
+            { code: "RM2-PF-CTF", name: "Citropol F" }, { code: "RM2-PF-BPL", name: "Black pepper oil" },
+            { code: "RM2-PT-RDFE", name: "Koprafinol" }, { code: "RM2-PT-KOP", name: "Kopcerin PE1090" },
+            { code: "RM2-PT-STS", name: "Sodium thiosulfate" }, { code: "RM1-OT-SG", name: "Sucrose" },
+            { code: "RM2-EM-PG40", name: "Eumulgin CO 40" }, { code: "RM2-EM-IPM", name: "Isopropyl myristate (IPM)" }
         ];
 
         // 1. ตรวจสอบการ Login ของ Firebase Anonymous
