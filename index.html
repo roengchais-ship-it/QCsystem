@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>QC System v6.12 (Firebase + Clean Duplicates)</title>
+    <title>QC System v6.13 (Firebase + Fixed RM Master)</title>
     
     <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
@@ -308,7 +308,7 @@
     <div id="login-overlay">
         <div class="login-card">
             <h2>🔐 QC System</h2>
-            <p class="version">v6.12 (Firebase + Clean Duplicates)</p>
+            <p class="version">v6.13 (Firebase + Fixed RM Master)</p>
             
             <div class="login-hint">
                 <div style="font-weight: 600; margin-bottom: 5px;">ข้อมูลสำหรับทดสอบเข้าสู่ระบบ:</div>
@@ -337,7 +337,7 @@
                     <button class="btn btn-warning btn-sm" onclick="window.openModal('passModal')">🔑</button>
                     <button class="btn btn-danger btn-sm" onclick="window.handleLogout()">Logout</button>
                 </div>
-                <h1 style="font-size: 2rem; margin-bottom: 5px;">☁️ QC System v6.12 <small style="font-size:1rem; opacity:0.8;">(Firebase Sync)</small></h1>
+                <h1 style="font-size: 2rem; margin-bottom: 5px;">☁️ QC System v6.13 <small style="font-size:1rem; opacity:0.8;">(Firebase Sync)</small></h1>
                 <p style="opacity: 0.9; font-weight: 300;">ระบบจัดการและตรวจสอบคุณภาพวัตถุดิบครบวงจร</p>
             </div>
 
@@ -843,6 +843,7 @@
         let MASTER_LIST = []; 
         let inspections = [];
         let myPieChart = null;
+        let isFirebaseLoaded = false;
 
         // ตัวแปรสำหรับเก็บไฟล์รูปแปลงเป็น Base64
         let currentCoaFileData = null;
@@ -863,7 +864,11 @@
         const initAuth = async () => {
             if(!auth) return;
             try { await signInAnonymously(auth); } 
-            catch (error) { console.error("Firebase Auth Error:", error); }
+            catch (error) { 
+                console.error("Firebase Auth Error:", error); 
+                isFirebaseLoaded = true;
+                if(document.getElementById('rmMaster').classList.contains('active')) renderRMMasterTable();
+            }
         };
         initAuth();
 
@@ -878,11 +883,16 @@
 
                     // A. ดึงข้อมูล RM Master
                     onSnapshot(rmCollectionPath, (snapshot) => {
+                        isFirebaseLoaded = true;
                         if (!snapshot.empty) {
                             MASTER_LIST = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
                         } else { MASTER_LIST = [...DEFAULT_RM]; }
                         if(document.getElementById('rmMaster').classList.contains('active')) renderRMMasterTable();
-                    }, (error) => console.error("RM Read Error:", error));
+                    }, (error) => {
+                        console.error("RM Read Error:", error);
+                        isFirebaseLoaded = true;
+                        if(document.getElementById('rmMaster').classList.contains('active')) renderRMMasterTable();
+                    });
 
                     // B. ดึงข้อมูล QC History
                     onSnapshot(qcCollectionPath, (snapshot) => {
@@ -930,6 +940,8 @@
                     });
                 }
             });
+        } else {
+            isFirebaseLoaded = true;
         }
 
         // ==========================================
