@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>QC System v6.10 (Firebase + Advanced Migration)</title>
+    <title>QC System v6.11 (Firebase + Fixed Sorting)</title>
     
     <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
@@ -307,7 +307,7 @@
     <div id="login-overlay">
         <div class="login-card">
             <h2>🔐 QC System</h2>
-            <p class="version">v6.10 (Firebase + Advanced Migration)</p>
+            <p class="version">v6.11 (Firebase + Fixed Sorting)</p>
             
             <div class="login-hint">
                 <div style="font-weight: 600; margin-bottom: 5px;">ข้อมูลสำหรับทดสอบเข้าสู่ระบบ:</div>
@@ -336,7 +336,7 @@
                     <button class="btn btn-warning btn-sm" onclick="window.openModal('passModal')">🔑</button>
                     <button class="btn btn-danger btn-sm" onclick="window.handleLogout()">Logout</button>
                 </div>
-                <h1 style="font-size: 2rem; margin-bottom: 5px;">☁️ QC System v6.10 <small style="font-size:1rem; opacity:0.8;">(Firebase Sync)</small></h1>
+                <h1 style="font-size: 2rem; margin-bottom: 5px;">☁️ QC System v6.11 <small style="font-size:1rem; opacity:0.8;">(Firebase Sync)</small></h1>
                 <p style="opacity: 0.9; font-weight: 300;">ระบบจัดการและตรวจสอบคุณภาพวัตถุดิบครบวงจร</p>
             </div>
 
@@ -888,8 +888,34 @@
                         snapshot.forEach((doc) => {
                             inspections.push({ id: doc.id, ...doc.data() });
                         });
-                        // เรียงลำดับจากใหม่ไปเก่าตาม timestamp
-                        inspections.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+                        
+                        // ฟังก์ชันช่วยแปลงวันที่ให้เป็นตัวเลขเพื่อใช้คำนวณเรียงลำดับ (รองรับทั้ง ISO และ พ.ศ.)
+                        const getTimestampVal = (ts) => {
+                            if (!ts) return 0;
+                            let d = new Date(ts);
+                            if (!isNaN(d.getTime())) return d.getTime(); // ถ้าเป็น ISO สากล (ของใหม่)
+                            
+                            // กรณีเป็นรูปแบบวันที่ไทยจาก Google Sheet (DD/MM/YYYY HH:mm:ss)
+                            let strTs = String(ts);
+                            let match = strTs.match(/(\d+)\/(\d+)\/(\d+)/);
+                            if (match) {
+                                let day = parseInt(match[1]);
+                                let month = parseInt(match[2]) - 1;
+                                let year = parseInt(match[3]);
+                                if (year > 2400) year -= 543; // แปลง พ.ศ. เป็น ค.ศ.
+                                
+                                let timeMatch = strTs.match(/\s(\d+):(\d+):(\d+)/);
+                                let h = timeMatch ? parseInt(timeMatch[1]) : 0;
+                                let m = timeMatch ? parseInt(timeMatch[2]) : 0;
+                                let s = timeMatch ? parseInt(timeMatch[3]) : 0;
+                                
+                                return new Date(year, month, day, h, m, s).getTime();
+                            }
+                            return 0;
+                        };
+
+                        // เรียงลำดับจากใหม่ไปเก่าตาม timestamp อย่างแม่นยำ
+                        inspections.sort((a, b) => getTimestampVal(b.timestamp) - getTimestampVal(a.timestamp));
                         
                         renderMasterTable();
                         renderSummary();
