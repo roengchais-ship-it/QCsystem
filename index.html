@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>QC System v6.18 (Firebase + Contamination Field)</title>
+    <title>QC System v6.19 (Firebase + Remark Field)</title>
     
     <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
@@ -93,9 +93,9 @@
         .form-group label .en-label { font-weight: 400; font-size: 0.85em; color: #94a3b8; margin-left: 4px; }
         .required { color: #e74c3c; margin-left: 4px; font-weight: bold; }
         
-        .form-group input, .form-group select { width: 100%; padding: 14px 16px; background-color: var(--input-bg); border: 1.5px solid var(--border-input); border-radius: 12px; font-size: 1rem; font-family: 'Prompt'; color: var(--text-main); transition: all 0.3s; }
-        .form-group input:hover, .form-group select:hover { border-color: #cbd5e1; }
-        .form-group input:focus, .form-group select:focus { outline: none; background-color: white; border-color: var(--active-green); box-shadow: 0 0 0 4px rgba(39, 174, 96, 0.15); }
+        .form-group input, .form-group select, .form-group textarea { width: 100%; padding: 14px 16px; background-color: var(--input-bg); border: 1.5px solid var(--border-input); border-radius: 12px; font-size: 1rem; font-family: 'Prompt'; color: var(--text-main); transition: all 0.3s; }
+        .form-group input:hover, .form-group select:hover, .form-group textarea:hover { border-color: #cbd5e1; }
+        .form-group input:focus, .form-group select:focus, .form-group textarea:focus { outline: none; background-color: white; border-color: var(--active-green); box-shadow: 0 0 0 4px rgba(39, 174, 96, 0.15); }
 
         select[name="passFail"], select[name="qcAppearance"], select[name="qcContamination"] { font-weight: 600; cursor: pointer; }
 
@@ -308,7 +308,7 @@
     <div id="login-overlay">
         <div class="login-card">
             <h2>🔐 QC System</h2>
-            <p class="version">v6.18 (Firebase + Contamination Field)</p>
+            <p class="version">v6.19 (Firebase + Remark Field)</p>
             
             <div class="login-hint">
                 <div style="font-weight: 600; margin-bottom: 5px;">ข้อมูลสำหรับทดสอบเข้าสู่ระบบ:</div>
@@ -337,7 +337,7 @@
                     <button class="btn btn-warning btn-sm" onclick="window.openModal('passModal')">🔑</button>
                     <button class="btn btn-danger btn-sm" onclick="window.handleLogout()">Logout</button>
                 </div>
-                <h1 style="font-size: 2rem; margin-bottom: 5px;">☁️ QC System v6.18 <small style="font-size:1rem; opacity:0.8;">(Firebase Sync)</small></h1>
+                <h1 style="font-size: 2rem; margin-bottom: 5px;">☁️ QC System v6.19 <small style="font-size:1rem; opacity:0.8;">(Firebase Sync)</small></h1>
                 <p style="opacity: 0.9; font-weight: 300;">ระบบจัดการและตรวจสอบคุณภาพวัตถุดิบครบวงจร</p>
             </div>
 
@@ -525,6 +525,12 @@
                                     <option value="Pending">⏳ Pending (รอผลตรวจเพิ่ม)</option>
                                     <option value="Hold">🔒 Quarantine (กักกัน / อายัดสินค้า)</option>
                                 </select>
+                            </div>
+                        </div>
+                        <div class="form-row" style="margin-bottom: 20px;">
+                            <div class="form-group" style="grid-column: span 2;">
+                                <label>Remark <span class="en-label">(หมายเหตุ)</span></label>
+                                <textarea name="qcRemark" rows="3" placeholder="ระบุหมายเหตุเพิ่มเติม (ถ้ามี)..." style="resize: vertical;"></textarea>
                             </div>
                         </div>
                         <div class="form-row" style="margin-bottom: 0;">
@@ -764,7 +770,7 @@
                     </div>
                     
                     <div class="form-row" style="background:#f0fdf4; padding:15px; border-radius:12px; border:1px solid #bbf7d0; margin-bottom:0; margin-top:20px;">
-                        <div class="form-group">
+                        <div class="form-group" style="grid-column: span 2;">
                             <label style="font-weight: 700; color:#166534;">4. QA Decision (สรุปผลการพิจารณา)</label>
                             <select id="edit_passFail" required style="border-color:#16a34a; border-width:2px; font-weight:600; color:#166534;">
                                 <option value="Pass">✅ Accepted (ผ่าน)</option>
@@ -773,9 +779,15 @@
                                 <option value="Hold">🔒 Quarantine (อายัด)</option>
                             </select>
                         </div>
+                        <div class="form-group" style="grid-column: span 2;">
+                            <label>Remark (หมายเหตุ)</label>
+                            <textarea id="edit_qcRemark" rows="2" style="resize: vertical;"></textarea>
+                        </div>
                         <div class="form-group">
                             <label>Inspector Name (ผู้ตรวจสอบ)</label><input type="text" id="edit_approvedBy">
-                            <label style="margin-top:10px;">Inspection Date (วันที่ตรวจสอบ)</label><input type="date" id="edit_approvedDate">
+                        </div>
+                        <div class="form-group">
+                            <label>Inspection Date (วันที่ตรวจสอบ)</label><input type="date" id="edit_approvedDate">
                         </div>
                     </div>
                 </div>
@@ -1029,6 +1041,7 @@
                 qcPh: fd.get('qcPh'), 
                 qcTemp: fd.get('qcTemp'),
                 qcContamination: fd.get('qcContamination'),
+                qcRemark: fd.get('qcRemark') || '',
                 passFail: fd.get('passFail'), 
                 approvedBy: fd.get('approvedBy'), 
                 approvedDate: fd.get('approvedDate'),
@@ -1098,6 +1111,7 @@
                 qcPh: document.getElementById('edit_qcPh').value,
                 qcTemp: document.getElementById('edit_qcTemp').value,
                 qcContamination: document.getElementById('edit_qcContamination').value,
+                qcRemark: document.getElementById('edit_qcRemark').value,
                 passFail: document.getElementById('edit_passFail').value, 
                 approvedBy: document.getElementById('edit_approvedBy').value,
                 approvedDate: document.getElementById('edit_approvedDate').value,
@@ -1254,6 +1268,7 @@
                             qcPh: item.qcPh || '',
                             qcTemp: item.qcTemp || '',
                             qcContamination: item.qcContamination || '',
+                            qcRemark: item.qcRemark || '',
                             passFail: item.passFail || '',
                             approvedBy: item.approvedBy || '',
                             approvedDate: item.approvedDate || '',
@@ -1479,6 +1494,7 @@
 
                         <div class="detail-section-header" style="margin-top: 20px;">5. QA Decision (สรุปผลการพิจารณา)</div>
                         <div class="detail-row"><div class="detail-label">Decision Result (ผลการตัดสิน):</div><div class="detail-value"><strong style="font-size:1.1em;">${passFailDisplay}</strong></div></div>
+                        <div class="detail-row"><div class="detail-label">Remark (หมายเหตุ):</div><div class="detail-value">${v(item.qcRemark)}</div></div>
                         
                         <div class="detail-row print-hide"><div class="detail-label">Inspector Name (ผู้ตรวจสอบ):</div><div class="detail-value">${v(item.approvedBy)}</div></div>
                         <div class="detail-row print-hide"><div class="detail-label">Inspection Date (วันที่ตรวจ):</div><div class="detail-value">${v(item.approvedDate)}</div></div>
@@ -1657,6 +1673,7 @@
                 QC_pH: i.qcPh || '',
                 QC_Temp: i.qcTemp || '',
                 QC_Contamination: i.qcContamination || '',
+                Remark: i.qcRemark || '',
                 Status: i.passFail || '',
                 Inspector: i.approvedBy || '',
                 Inspect_Date: i.approvedDate || ''
@@ -1671,7 +1688,7 @@
             document.getElementById('editOriginalDocId').value = i.id;
             document.getElementById('editOriginalTimestamp').value = i.timestamp;
             
-            const fields = ['rmCode','rmName','supplier','lotNo','internalLotNo','mfgDate','expDate','receivedDate','coaColor','coaOdor','coaPh','coaTemp','qcAppearance','qcContamination','qcColor','qcOdor','qcPh','qcTemp','passFail','approvedBy','approvedDate'];
+            const fields = ['rmCode','rmName','supplier','lotNo','internalLotNo','mfgDate','expDate','receivedDate','coaColor','coaOdor','coaPh','coaTemp','qcAppearance','qcContamination','qcColor','qcOdor','qcPh','qcTemp','qcRemark','passFail','approvedBy','approvedDate'];
             fields.forEach(f => { if(document.getElementById('edit_'+f)) document.getElementById('edit_'+f).value = i[f] || ''; });
             
             isEditCoaRemoved = false; editCoaFileData = null;
