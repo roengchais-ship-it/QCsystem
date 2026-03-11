@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>QC System v6.9 (Firebase + Migration)</title>
+    <title>QC System v6.10 (Firebase + Advanced Migration)</title>
     
     <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
@@ -246,6 +246,7 @@
                 margin: 0 !important; font-size: 9.5pt !important; font-weight: bold !important;
                 border-left: none !important; border-radius: 0 !important;
             }
+            /* จัดการเส้นตารางให้เนียนกริบ ไม่เบิ้ล */
             body.printing-detail .detail-row:last-of-type { border-bottom: 1px solid #000 !important; }
             body.printing-detail .detail-section-header + .detail-row { border-top: none !important; }
             
@@ -306,7 +307,7 @@
     <div id="login-overlay">
         <div class="login-card">
             <h2>🔐 QC System</h2>
-            <p class="version">v6.9 (Firebase + Migration Fix)</p>
+            <p class="version">v6.10 (Firebase + Advanced Migration)</p>
             
             <div class="login-hint">
                 <div style="font-weight: 600; margin-bottom: 5px;">ข้อมูลสำหรับทดสอบเข้าสู่ระบบ:</div>
@@ -335,7 +336,7 @@
                     <button class="btn btn-warning btn-sm" onclick="window.openModal('passModal')">🔑</button>
                     <button class="btn btn-danger btn-sm" onclick="window.handleLogout()">Logout</button>
                 </div>
-                <h1 style="font-size: 2rem; margin-bottom: 5px;">☁️ QC System v6.9 <small style="font-size:1rem; opacity:0.8;">(Firebase Sync)</small></h1>
+                <h1 style="font-size: 2rem; margin-bottom: 5px;">☁️ QC System v6.10 <small style="font-size:1rem; opacity:0.8;">(Firebase Sync)</small></h1>
                 <p style="opacity: 0.9; font-weight: 300;">ระบบจัดการและตรวจสอบคุณภาพวัตถุดิบครบวงจร</p>
             </div>
 
@@ -1047,15 +1048,14 @@
             }
         }
         
-        // 🚀 ดึงข้อมูลเก่าจาก Google Sheet เข้า Firebase (Migration) แบบแยก Try-Catch
+        // 🚀 ดึงข้อมูลเก่าจาก Google Sheet เข้า Firebase (Migration) - พร้อมเช็คข้อมูลซ้ำแบบรัดกุม 100%
         window.migrateFromGoogleSheet = async function() {
             if (!firebaseUser || !db) return alert("❌ ระบบยังไม่เชื่อมต่อ Firebase");
-            if (!confirm("ต้องการสูบข้อมูลเก่าจาก Google Sheet มาเก็บไว้ใน Firebase ถาวรหรือไม่?\n(ระบบจะดึงเฉพาะข้อมูลเก่าที่คุณเคยกรอกไว้เข้ามาเติมให้ครับ)")) return;
+            if (!confirm("ต้องการสูบข้อมูลเก่าจาก Google Sheet มาเก็บไว้ใน Firebase ถาวรหรือไม่?\n(ระบบจะดึงเฉพาะข้อมูลที่ไม่ซ้ำเข้ามาเติมให้ครับ)")) return;
 
             let oldData = [];
             showLoading(true, "กำลังดึงข้อมูลเก่าจาก Google Sheet... (อาจใช้เวลา 10-20 วินาที)");
             
-            // Step 1: พยายามดึงข้อมูลจาก Google Sheet
             try {
                 const res = await fetch(OLD_WEB_APP_URL);
                 if (!res.ok) throw new Error("HTTP Status: " + res.status);
@@ -1071,18 +1071,25 @@
                 return alert("⚠️ ดึงข้อมูลได้สำเร็จ แต่ไม่พบประวัติเก่าใน Google Sheet เลยครับ");
             }
 
-            // Step 2: พยายามบันทึกข้อมูลที่ดึงมาลงใน Firebase
             try {
-                showLoading(true, `กำลังบันทึกข้อมูลเก่า ${oldData.length} รายการลง Firebase...`);
+                showLoading(true, `กำลังตรวจสอบและบันทึกข้อมูลเก่า ${oldData.length} รายการลง Firebase...`);
                 const qcCollectionPath = isUsingCustomConfig ? collection(db, 'qcHistory') : collection(db, 'artifacts', appId, 'public', 'data', 'qcHistory');
-                let addedCount = 0;
                 
-                // สร้าง Array ของ Timestamp ที่มีอยู่แล้วเพื่อกันการเพิ่มข้อมูลซ้ำซ้อน
-                const existingTimestamps = inspections.map(i => i.timestamp);
+                let addedCount = 0;
+                let skippedCount = 0;
+                
+                // เก็บข้อมูลทั้งหมดที่มีอยู่แล้วในระบบเพื่อมาเทียบเช็คซ้ำ (กันเหนียว 2 ชั้น)
+                const existingRecords = inspections; 
 
                 for (const item of oldData) {
-                    if (!existingTimestamps.includes(item.timestamp)) {
-                        // แปลงข้อมูลจาก Sheet เข้าสู่โครงสร้างของ Firebase
+                    // การเช็คซ้ำแบบที่ 1: เช็คจาก Timestamp เดิม
+                    // การเช็คซ้ำแบบที่ 2: เช็คจาก รหัสสินค้า + เลขล็อต + วันที่รับของ
+                    const isDuplicate = existingRecords.some(existing => 
+                        existing.timestamp === item.timestamp || 
+                        (existing.rmCode === item.rmCode && existing.lotNo === item.lotNo && existing.receivedDate === item.receivedDate)
+                    );
+
+                    if (!isDuplicate) {
                         const newRecord = {
                             timestamp: item.timestamp || new Date().toISOString(),
                             rmCode: item.rmCode || '',
@@ -1111,9 +1118,11 @@
                         };
                         await addDoc(qcCollectionPath, newRecord);
                         addedCount++;
+                    } else {
+                        skippedCount++;
                     }
                 }
-                alert(`✅ ดึงข้อมูลเก่าจาก Sheet เข้ามาใน Firebase สำเร็จจำนวน ${addedCount} รายการ!`);
+                alert(`✅ ดึงข้อมูลเสร็จสิ้น!\n\n✨ เพิ่มรายการใหม่: ${addedCount} รายการ\n⏭️ ข้ามข้อมูลที่ซ้ำแล้ว: ${skippedCount} รายการ`);
             } catch (error) {
                 console.error("Firebase Migration Save Error:", error);
                 alert("❌ ดึงข้อมูลมาได้แล้ว! แต่เซฟลง Firebase ไม่ได้ (โดเมนพรีวิวอาจถูก Firebase บล็อกสิทธิ์การเขียนไว้ครับ)");
