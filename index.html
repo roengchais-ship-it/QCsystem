@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>QC System v6.16 (Firebase + File Viewer)</title>
+    <title>QC System v6.18 (Firebase + Contamination Field)</title>
     
     <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
@@ -97,7 +97,7 @@
         .form-group input:hover, .form-group select:hover { border-color: #cbd5e1; }
         .form-group input:focus, .form-group select:focus { outline: none; background-color: white; border-color: var(--active-green); box-shadow: 0 0 0 4px rgba(39, 174, 96, 0.15); }
 
-        select[name="passFail"], select[name="qcAppearance"] { font-weight: 600; cursor: pointer; }
+        select[name="passFail"], select[name="qcAppearance"], select[name="qcContamination"] { font-weight: 600; cursor: pointer; }
 
         /* Custom Checklist UI */
         .checklist-container { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 20px; margin-bottom: 20px; }
@@ -308,7 +308,7 @@
     <div id="login-overlay">
         <div class="login-card">
             <h2>🔐 QC System</h2>
-            <p class="version">v6.16 (Firebase + File Viewer)</p>
+            <p class="version">v6.18 (Firebase + Contamination Field)</p>
             
             <div class="login-hint">
                 <div style="font-weight: 600; margin-bottom: 5px;">ข้อมูลสำหรับทดสอบเข้าสู่ระบบ:</div>
@@ -337,7 +337,7 @@
                     <button class="btn btn-warning btn-sm" onclick="window.openModal('passModal')">🔑</button>
                     <button class="btn btn-danger btn-sm" onclick="window.handleLogout()">Logout</button>
                 </div>
-                <h1 style="font-size: 2rem; margin-bottom: 5px;">☁️ QC System v6.16 <small style="font-size:1rem; opacity:0.8;">(Firebase Sync)</small></h1>
+                <h1 style="font-size: 2rem; margin-bottom: 5px;">☁️ QC System v6.18 <small style="font-size:1rem; opacity:0.8;">(Firebase Sync)</small></h1>
                 <p style="opacity: 0.9; font-weight: 300;">ระบบจัดการและตรวจสอบคุณภาพวัตถุดิบครบวงจร</p>
             </div>
 
@@ -442,11 +442,11 @@
                         </div>
                     </div>
 
-                    <!-- Section 3: Physical & Packaging Inspection -->
+                    <!-- Section 3: Packaging Inspection -->
                     <div class="form-section">
-                        <div class="section-title"><div class="section-icon" style="background: #f59e0b;">3</div> Physical & Packaging Inspection <span class="en-text">(การตรวจสอบสภาพหน้างานจริง)</span></div>
+                        <div class="section-title"><div class="section-icon" style="background: #d97706;">3</div> Packaging Inspection <span class="en-text">(การตรวจสอบบรรจุภัณฑ์)</span></div>
                         
-                        <div class="checklist-container">
+                        <div class="checklist-container" style="margin-bottom: 0;">
                             <div style="font-weight: 600; color:#d97706; margin-bottom: 10px;">📦 เช็คลิสต์ตรวจสอบบรรจุภัณฑ์ (เพื่อเตือนความจำ):</div>
                             <div class="checklist-item">
                                 <input type="checkbox" id="chk_pkg_intact" required>
@@ -461,6 +461,11 @@
                                 <label for="chk_pkg_label">Label readable (ฉลากอ่านออกชัดเจน)</label>
                             </div>
                         </div>
+                    </div>
+
+                    <!-- Section 4: RM Physical Inspection -->
+                    <div class="form-section">
+                        <div class="section-title"><div class="section-icon" style="background: #f59e0b;">4</div> RM Physical Inspection <span class="en-text">(การตรวจสอบสภาพวัตถุดิบ)</span></div>
 
                         <div class="form-group" style="margin-bottom:25px;">
                             <label>📸 QC Photo <span class="en-label">(แนบรูปถ่ายหน้างาน)</span></label>
@@ -494,14 +499,21 @@
                             
                             <div class="form-row" style="margin-bottom:0;">
                                 <div class="form-group"><label>Result Temp <span class="en-label">(อุณหภูมิที่วัดได้)</span> <span class="required">*</span></label><input type="text" name="qcTemp" placeholder="ระบุอุณหภูมิ..." required></div>
-                                <div class="form-group"></div> <!-- Empty spacer for grid alignment -->
+                                <div class="form-group">
+                                    <label>Contamination <span class="en-label">(การปนเปื้อน)</span> <span class="required">*</span></label>
+                                    <select name="qcContamination" required style="border-color:#f59e0b;">
+                                        <option value="">-- เลือกผลการตรวจ (Select Result) --</option>
+                                        <option value="Pass">✅ Passed (ผ่าน)</option>
+                                        <option value="Fail">❌ Failed (ไม่ผ่าน)</option>
+                                    </select>
+                                </div>
                             </div>
                         </div>
                     </div>
 
-                    <!-- Section 4: QA Decision -->
+                    <!-- Section 5: QA Decision -->
                     <div class="form-section" style="background: #f0fdf4; border: 2px solid #86efac;">
-                        <div class="section-title" style="color: #166534; border-bottom-color: #bbf7d0;"><div class="section-icon" style="background: #16a34a;">4</div> QA Decision <span class="en-text" style="color:#166534;">(สรุปผลการพิจารณา)</span></div>
+                        <div class="section-title" style="color: #166534; border-bottom-color: #bbf7d0;"><div class="section-icon" style="background: #16a34a;">5</div> QA Decision <span class="en-text" style="color:#166534;">(สรุปผลการพิจารณา)</span></div>
                         
                         <div class="form-row" style="margin-bottom: 20px;">
                             <div class="form-group" style="grid-column: span 2;">
@@ -715,9 +727,9 @@
                     </div>
                 </div>
 
-                <!-- Section 3 & 4 -->
+                <!-- Section 3 & 4 (Combined in UI for compactness but correctly titled) -->
                 <div style="margin-bottom:25px; border:1px solid #e2e8f0; padding:20px; border-radius:16px;">
-                    <div style="font-weight:700; color:#d97706; margin-bottom:15px;">3. Physical Inspection (การตรวจสอบสภาพหน้างาน)</div>
+                    <div style="font-weight:700; color:#d97706; margin-bottom:15px;">3. RM Physical Inspection (การตรวจสอบสภาพวัตถุดิบ)</div>
                     <div class="form-row" style="margin-bottom:15px;">
                         <div class="form-group">
                             <label>Appearance (ลักษณะปรากฏ)</label>
@@ -735,7 +747,14 @@
                     </div>
                     <div class="form-row" style="margin-bottom:15px;">
                         <div class="form-group"><label>Result Temp (อุณหภูมิที่วัดได้)</label><input type="text" id="edit_qcTemp"></div>
-                        <div class="form-group"></div>
+                        <div class="form-group">
+                            <label>Contamination (การปนเปื้อน)</label>
+                            <select id="edit_qcContamination" required>
+                                <option value="">-- เลือกผล --</option>
+                                <option value="Pass">✅ Pass (ผ่าน)</option>
+                                <option value="Fail">❌ Fail (ไม่ผ่าน)</option>
+                            </select>
+                        </div>
                     </div>
                     <div style="background:#fffbeb; padding:15px; border-radius:12px; border:1px solid #fde68a; margin-bottom:20px;">
                         <label style="font-weight:600; font-size:0.9rem; color:#b45309;">QC Photo (รูปถ่ายหน้างาน):</label>
@@ -744,7 +763,7 @@
                         <button type="button" id="edit_btnRemoveQc" class="btn btn-danger btn-sm" onclick="window.markFileRemoved('qc')" style="display:none; margin-top:5px;">🗑️ ลบรูปเดิมทิ้ง</button>
                     </div>
                     
-                    <div class="form-row" style="background:#f0fdf4; padding:15px; border-radius:12px; border:1px solid #bbf7d0; margin-bottom:0;">
+                    <div class="form-row" style="background:#f0fdf4; padding:15px; border-radius:12px; border:1px solid #bbf7d0; margin-bottom:0; margin-top:20px;">
                         <div class="form-group">
                             <label style="font-weight: 700; color:#166534;">4. QA Decision (สรุปผลการพิจารณา)</label>
                             <select id="edit_passFail" required style="border-color:#16a34a; border-width:2px; font-weight:600; color:#166534;">
@@ -1009,6 +1028,7 @@
                 qcOdor: fd.get('qcOdor'), 
                 qcPh: fd.get('qcPh'), 
                 qcTemp: fd.get('qcTemp'),
+                qcContamination: fd.get('qcContamination'),
                 passFail: fd.get('passFail'), 
                 approvedBy: fd.get('approvedBy'), 
                 approvedDate: fd.get('approvedDate'),
@@ -1077,6 +1097,7 @@
                 qcOdor: document.getElementById('edit_qcOdor').value, 
                 qcPh: document.getElementById('edit_qcPh').value,
                 qcTemp: document.getElementById('edit_qcTemp').value,
+                qcContamination: document.getElementById('edit_qcContamination').value,
                 passFail: document.getElementById('edit_passFail').value, 
                 approvedBy: document.getElementById('edit_approvedBy').value,
                 approvedDate: document.getElementById('edit_approvedDate').value,
@@ -1232,6 +1253,7 @@
                             qcOdor: item.qcOdor || '',
                             qcPh: item.qcPh || '',
                             qcTemp: item.qcTemp || '',
+                            qcContamination: item.qcContamination || '',
                             passFail: item.passFail || '',
                             approvedBy: item.approvedBy || '',
                             approvedDate: item.approvedDate || '',
@@ -1388,6 +1410,10 @@
             let appearanceDisplay = v(item.qcAppearance);
             if (item.qcAppearance === 'Pass') appearanceDisplay = '✅ Pass (ผ่าน)';
             if (item.qcAppearance === 'Fail') appearanceDisplay = '❌ Fail (ไม่ผ่าน)';
+
+            let contaminationDisplay = v(item.qcContamination);
+            if (item.qcContamination === 'Pass') contaminationDisplay = '✅ Pass (ผ่าน)';
+            if (item.qcContamination === 'Fail') contaminationDisplay = '❌ Fail (ไม่ผ่าน)';
             
             let passFailDisplay = v(item.passFail);
             if (item.passFail === 'Pass') passFailDisplay = '✅ Accepted (ผ่าน)';
@@ -1430,7 +1456,7 @@
                             ${item.coaFile?.isLink ? `<button class="btn btn-secondary btn-sm" onclick="window.viewAttachment(${idx}, 'coa')" style="background:#e2e8f0; color:#334155;">📄 เปิดไฟล์ COA</button>` : '<span style="color:#94a3b8;">ไม่มีไฟล์แนบ</span>'}
                         </div></div>
 
-                        <div class="detail-section-header" style="margin-top: 20px;">3. Physical & Packaging Inspection (การตรวจสอบสภาพหน้างานจริง)</div>
+                        <div class="detail-section-header" style="margin-top: 20px;">3. Packaging Inspection (การตรวจสอบบรรจุภัณฑ์)</div>
 
                         <div class="detail-checklist-box">
                             <div class="chk-title">📦 Packaging Checklist (เช็คลิสต์ตรวจสอบบรรจุภัณฑ์):</div>
@@ -1439,16 +1465,19 @@
                             <div class="chk-item"><span class="chk-icon">☑</span> <span>Label readable (ฉลากอ่านออกชัดเจน)</span></div>
                         </div>
 
-                        <div class="detail-row"><div class="detail-label">Appearance (ลักษณะปรากฏเทียบ Master):</div><div class="detail-value">${appearanceDisplay}</div></div>
+                        <div class="detail-section-header" style="margin-top: 20px;">4. RM Physical Inspection (การตรวจสอบสภาพวัตถุดิบ)</div>
+
+                        <div class="detail-row"><div class="detail-label">Appearance (ลักษณะปรากฏ):</div><div class="detail-value">${appearanceDisplay}</div></div>
                         <div class="detail-row"><div class="detail-label">Result Color (สีที่ตรวจพบจริง):</div><div class="detail-value">${v(item.qcColor)}</div></div>
                         <div class="detail-row"><div class="detail-label">Result Odor (กลิ่นที่ตรวจพบจริง):</div><div class="detail-value">${v(item.qcOdor)}</div></div>
                         <div class="detail-row"><div class="detail-label">Result pH (ค่า pH ที่วัดได้):</div><div class="detail-value">${v(item.qcPh)}</div></div>
                         <div class="detail-row"><div class="detail-label">Result Temp (อุณหภูมิที่วัดได้):</div><div class="detail-value">${v(item.qcTemp)}</div></div>
+                        <div class="detail-row"><div class="detail-label">Contamination (การปนเปื้อน):</div><div class="detail-value">${contaminationDisplay}</div></div>
                         <div class="detail-row print-hide"><div class="detail-label">QC Photo (รูปหน้างาน):</div><div class="detail-value">
                              ${item.qcFile?.isLink ? `<button class="btn btn-success btn-sm" onclick="window.viewAttachment(${idx}, 'qc')" style="background:#dcfce7; color:#166534;">📸 ดูรูป QC</button>` : '<span style="color:#94a3b8;">ไม่มีรูปถ่าย</span>'}
                         </div></div>
 
-                        <div class="detail-section-header" style="margin-top: 20px;">4. QA Decision (สรุปผลการพิจารณา)</div>
+                        <div class="detail-section-header" style="margin-top: 20px;">5. QA Decision (สรุปผลการพิจารณา)</div>
                         <div class="detail-row"><div class="detail-label">Decision Result (ผลการตัดสิน):</div><div class="detail-value"><strong style="font-size:1.1em;">${passFailDisplay}</strong></div></div>
                         
                         <div class="detail-row print-hide"><div class="detail-label">Inspector Name (ผู้ตรวจสอบ):</div><div class="detail-value">${v(item.approvedBy)}</div></div>
@@ -1627,6 +1656,7 @@
                 QC_Odor: i.qcOdor || '',
                 QC_pH: i.qcPh || '',
                 QC_Temp: i.qcTemp || '',
+                QC_Contamination: i.qcContamination || '',
                 Status: i.passFail || '',
                 Inspector: i.approvedBy || '',
                 Inspect_Date: i.approvedDate || ''
@@ -1641,7 +1671,7 @@
             document.getElementById('editOriginalDocId').value = i.id;
             document.getElementById('editOriginalTimestamp').value = i.timestamp;
             
-            const fields = ['rmCode','rmName','supplier','lotNo','internalLotNo','mfgDate','expDate','receivedDate','coaColor','coaOdor','coaPh','coaTemp','qcAppearance','qcColor','qcOdor','qcPh','qcTemp','passFail','approvedBy','approvedDate'];
+            const fields = ['rmCode','rmName','supplier','lotNo','internalLotNo','mfgDate','expDate','receivedDate','coaColor','coaOdor','coaPh','coaTemp','qcAppearance','qcContamination','qcColor','qcOdor','qcPh','qcTemp','passFail','approvedBy','approvedDate'];
             fields.forEach(f => { if(document.getElementById('edit_'+f)) document.getElementById('edit_'+f).value = i[f] || ''; });
             
             isEditCoaRemoved = false; editCoaFileData = null;
