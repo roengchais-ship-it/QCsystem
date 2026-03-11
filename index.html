@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>QC System v6.8 (Firebase + Migration)</title>
+    <title>QC System v6.9 (Firebase + Migration)</title>
     
     <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
@@ -306,7 +306,7 @@
     <div id="login-overlay">
         <div class="login-card">
             <h2>🔐 QC System</h2>
-            <p class="version">v6.8 (Firebase + Migration)</p>
+            <p class="version">v6.9 (Firebase + Migration Fix)</p>
             
             <div class="login-hint">
                 <div style="font-weight: 600; margin-bottom: 5px;">ข้อมูลสำหรับทดสอบเข้าสู่ระบบ:</div>
@@ -335,7 +335,7 @@
                     <button class="btn btn-warning btn-sm" onclick="window.openModal('passModal')">🔑</button>
                     <button class="btn btn-danger btn-sm" onclick="window.handleLogout()">Logout</button>
                 </div>
-                <h1 style="font-size: 2rem; margin-bottom: 5px;">☁️ QC System v6.8 <small style="font-size:1rem; opacity:0.8;">(Firebase Sync)</small></h1>
+                <h1 style="font-size: 2rem; margin-bottom: 5px;">☁️ QC System v6.9 <small style="font-size:1rem; opacity:0.8;">(Firebase Sync)</small></h1>
                 <p style="opacity: 0.9; font-weight: 300;">ระบบจัดการและตรวจสอบคุณภาพวัตถุดิบครบวงจร</p>
             </div>
 
@@ -1047,16 +1047,33 @@
             }
         }
         
-        // 🚀 ดึงข้อมูลเก่าจาก Google Sheet เข้า Firebase (Migration)
+        // 🚀 ดึงข้อมูลเก่าจาก Google Sheet เข้า Firebase (Migration) แบบแยก Try-Catch
         window.migrateFromGoogleSheet = async function() {
             if (!firebaseUser || !db) return alert("❌ ระบบยังไม่เชื่อมต่อ Firebase");
             if (!confirm("ต้องการสูบข้อมูลเก่าจาก Google Sheet มาเก็บไว้ใน Firebase ถาวรหรือไม่?\n(ระบบจะดึงเฉพาะข้อมูลเก่าที่คุณเคยกรอกไว้เข้ามาเติมให้ครับ)")) return;
 
+            let oldData = [];
             showLoading(true, "กำลังดึงข้อมูลเก่าจาก Google Sheet... (อาจใช้เวลา 10-20 วินาที)");
+            
+            // Step 1: พยายามดึงข้อมูลจาก Google Sheet
             try {
                 const res = await fetch(OLD_WEB_APP_URL);
-                const oldData = await res.json();
-                
+                if (!res.ok) throw new Error("HTTP Status: " + res.status);
+                oldData = await res.json();
+            } catch (error) {
+                console.error("Sheet Fetch Error:", error);
+                showLoading(false);
+                return alert("❌ ไม่สามารถดึงข้อมูลจาก Google Sheet ได้ (โดเมนของ Google อาจจะถูกบล็อก หรือ URL ผิดพลาด)");
+            }
+
+            if (!oldData || oldData.length === 0) {
+                showLoading(false);
+                return alert("⚠️ ดึงข้อมูลได้สำเร็จ แต่ไม่พบประวัติเก่าใน Google Sheet เลยครับ");
+            }
+
+            // Step 2: พยายามบันทึกข้อมูลที่ดึงมาลงใน Firebase
+            try {
+                showLoading(true, `กำลังบันทึกข้อมูลเก่า ${oldData.length} รายการลง Firebase...`);
                 const qcCollectionPath = isUsingCustomConfig ? collection(db, 'qcHistory') : collection(db, 'artifacts', appId, 'public', 'data', 'qcHistory');
                 let addedCount = 0;
                 
@@ -1098,8 +1115,8 @@
                 }
                 alert(`✅ ดึงข้อมูลเก่าจาก Sheet เข้ามาใน Firebase สำเร็จจำนวน ${addedCount} รายการ!`);
             } catch (error) {
-                console.error("Migration Error:", error);
-                alert("❌ เกิดข้อผิดพลาดในการดึงข้อมูลจาก Google Sheet");
+                console.error("Firebase Migration Save Error:", error);
+                alert("❌ ดึงข้อมูลมาได้แล้ว! แต่เซฟลง Firebase ไม่ได้ (โดเมนพรีวิวอาจถูก Firebase บล็อกสิทธิ์การเขียนไว้ครับ)");
             } finally {
                 showLoading(false);
             }
