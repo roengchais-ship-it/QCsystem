@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>QC System v6.11 (Firebase + Fixed Sorting)</title>
+    <title>QC System v6.12 (Firebase + Clean Duplicates)</title>
     
     <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
@@ -130,6 +130,7 @@
         .btn-warning { background: #f39c12; color: white; }
         .btn-warning:hover { background: #d68910; }
         .btn-danger { background: #e74c3c; color: white; }
+        .btn-danger:hover { background: #c0392b; }
         .btn-secondary { background: #64748b; color: white; }
         .btn-info { background: #3b82f6; color: white; }
         .btn-info:hover { background: #2563eb; }
@@ -181,7 +182,7 @@
         .detail-section-header { background: #f0fdfa; color: var(--primary); padding: 10px 16px; border-radius: 8px; font-weight: 700; margin: 25px 0 15px 0; font-size: 1.1rem; border-left: 4px solid var(--active-green); }
 
         /* =========================================
-           🖨️ PRINT STYLES (แก้กระดาษเปล่า & กระชับพื้นที่ 100%)
+           🖨️ PRINT STYLES
            ========================================= */
         @media print {
             @page { size: A4 portrait; margin: 10mm; } 
@@ -307,7 +308,7 @@
     <div id="login-overlay">
         <div class="login-card">
             <h2>🔐 QC System</h2>
-            <p class="version">v6.11 (Firebase + Fixed Sorting)</p>
+            <p class="version">v6.12 (Firebase + Clean Duplicates)</p>
             
             <div class="login-hint">
                 <div style="font-weight: 600; margin-bottom: 5px;">ข้อมูลสำหรับทดสอบเข้าสู่ระบบ:</div>
@@ -336,7 +337,7 @@
                     <button class="btn btn-warning btn-sm" onclick="window.openModal('passModal')">🔑</button>
                     <button class="btn btn-danger btn-sm" onclick="window.handleLogout()">Logout</button>
                 </div>
-                <h1 style="font-size: 2rem; margin-bottom: 5px;">☁️ QC System v6.11 <small style="font-size:1rem; opacity:0.8;">(Firebase Sync)</small></h1>
+                <h1 style="font-size: 2rem; margin-bottom: 5px;">☁️ QC System v6.12 <small style="font-size:1rem; opacity:0.8;">(Firebase Sync)</small></h1>
                 <p style="opacity: 0.9; font-weight: 300;">ระบบจัดการและตรวจสอบคุณภาพวัตถุดิบครบวงจร</p>
             </div>
 
@@ -535,6 +536,7 @@
                 <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
                     <h2 style="color:var(--primary); font-size:1.5rem;">📊 ประวัติการตรวจสอบ (Inspection History)</h2>
                     <div style="display:flex; gap:10px;">
+                        <button class="btn btn-danger" onclick="window.cleanDuplicateRecords()">🧹 เคลียร์ข้อมูลซ้ำ</button>
                         <button class="btn btn-warning" onclick="window.migrateFromGoogleSheet()">🔄 ดึงข้อมูลเก่าจาก Sheet</button>
                         <button class="btn btn-success" onclick="window.exportToExcel()">📥 Export Excel</button>
                     </div>
@@ -1074,7 +1076,57 @@
             }
         }
         
-        // 🚀 ดึงข้อมูลเก่าจาก Google Sheet เข้า Firebase (Migration) - พร้อมเช็คข้อมูลซ้ำแบบรัดกุม 100%
+        // 🚀 สแกนและลบข้อมูลที่ซ้ำกัน (Clean Duplicates)
+        window.cleanDuplicateRecords = async function() {
+            if (!firebaseUser || !db) return alert("❌ ระบบยังไม่เชื่อมต่อ Firebase");
+            if (!confirm("⚠️ ต้องการสแกนและลบข้อมูลที่ซ้ำกันในระบบหรือไม่?\n(ข้อมูลที่ซ้ำซ้อนจะถูกลบทิ้งอย่างถาวร!)")) return;
+
+            showLoading(true, "กำลังสแกนหาข้อมูลที่ซ้ำกัน...");
+            try {
+                const seen = new Set();
+                const duplicateIds = [];
+
+                // สแกนหาตัวซ้ำ โดยอิงจาก Timestamp + โค้ดสินค้า + ล็อต + วันที่รับ
+                for (const item of inspections) {
+                    const key = `${item.timestamp}_${item.rmCode}_${item.lotNo}_${item.receivedDate}`;
+
+                    if (seen.has(key)) {
+                        duplicateIds.push(item.id); // เจอตัวที่ 2 เป็นต้นไป ให้จำ ID ไว้ลบ
+                    } else {
+                        seen.add(key); // ตัวแรกให้จำไว้ว่าเคยเจอแล้ว
+                    }
+                }
+
+                if (duplicateIds.length === 0) {
+                    showLoading(false);
+                    return alert("✅ ระบบสะอาด! ไม่พบข้อมูลซ้ำในระบบครับ");
+                }
+
+                if (!confirm(`ค้นพบข้อมูลซ้ำทั้งหมด ${duplicateIds.length} รายการ\nยืนยันที่จะลบข้อมูลตัวก๊อปปี้เหล่านี้ออกหรือไม่?`)) {
+                    showLoading(false);
+                    return;
+                }
+
+                showLoading(true, `กำลังลบข้อมูลซ้ำ ${duplicateIds.length} รายการ...`);
+                let deletedCount = 0;
+                
+                // ทำการลบข้อมูลซ้ำออกทีละตัว
+                for (const docId of duplicateIds) {
+                    const docRef = isUsingCustomConfig ? doc(db, 'qcHistory', docId) : doc(db, 'artifacts', appId, 'public', 'data', 'qcHistory', docId);
+                    await deleteDoc(docRef);
+                    deletedCount++;
+                }
+
+                alert(`🗑️ เคลียร์ข้อมูลซ้ำสำเร็จจำนวน ${deletedCount} รายการ!`);
+            } catch (error) {
+                console.error("Clean Duplicates Error:", error);
+                alert("❌ เกิดข้อผิดพลาดในการลบข้อมูลซ้ำ");
+            } finally {
+                showLoading(false);
+            }
+        }
+
+        // 🚀 ดึงข้อมูลเก่าจาก Google Sheet เข้า Firebase (Migration)
         window.migrateFromGoogleSheet = async function() {
             if (!firebaseUser || !db) return alert("❌ ระบบยังไม่เชื่อมต่อ Firebase");
             if (!confirm("ต้องการสูบข้อมูลเก่าจาก Google Sheet มาเก็บไว้ใน Firebase ถาวรหรือไม่?\n(ระบบจะดึงเฉพาะข้อมูลที่ไม่ซ้ำเข้ามาเติมให้ครับ)")) return;
