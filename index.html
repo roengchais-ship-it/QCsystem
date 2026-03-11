@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>QC System v6.5 (Firebase Edition)</title>
+    <title>QC System v6.7 (Full Firebase)</title>
     
     <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
@@ -180,7 +180,7 @@
         .detail-section-header { background: #f0fdfa; color: var(--primary); padding: 10px 16px; border-radius: 8px; font-weight: 700; margin: 25px 0 15px 0; font-size: 1.1rem; border-left: 4px solid var(--active-green); }
 
         /* =========================================
-           🖨️ PRINT STYLES (แก้หน้ากระดาษเปล่า & กระชับพื้นที่ 100%)
+           🖨️ PRINT STYLES (แก้กระดาษเปล่า & กระชับพื้นที่ 100%)
            ========================================= */
         @media print {
             @page { size: A4 portrait; margin: 10mm; } 
@@ -188,21 +188,19 @@
             html, body { 
                 background: white !important; 
                 color: black !important; 
-                font-size: 8.5pt !important; /* ย่อฟอนต์ */
-                line-height: 1.3 !important; /* บีบช่องไฟบรรทัด */
+                font-size: 8.5pt !important; 
+                line-height: 1.3 !important; 
                 height: auto !important; 
                 margin: 0 !important; 
                 padding: 0 !important;
-                overflow: hidden !important; /* ห้ามมี scrollbar โผล่มากวนใจ */
+                overflow: hidden !important; 
                 font-family: 'Prompt', sans-serif !important;
             }
             
-            /* ซ่อนสิ่งที่อยู่ด้านหลังทั้งหมดเพื่อกันไม่ให้ดันหน้ากระดาษเปล่า */
             body.printing-detail > *:not(#detailModal) {
                 display: none !important;
             }
 
-            /* ปรับ Modal #detailModal เท่านั้นให้ทำงานเป็นหน้ากระดาษหลัก */
             body.printing-detail #detailModal { 
                 position: static !important; 
                 display: block !important; 
@@ -221,7 +219,6 @@
                 max-height: none !important; overflow: visible !important;
             }
 
-            /* 🌟 กรอบเอกสารล้อมรอบทั้งหมด 🌟 */
             body.printing-detail .print-container {
                 border: 2px solid #000 !important;
                 width: 100% !important;
@@ -248,7 +245,6 @@
                 margin: 0 !important; font-size: 9.5pt !important; font-weight: bold !important;
                 border-left: none !important; border-radius: 0 !important;
             }
-            /* จัดการเส้นตารางให้เนียนกริบ ไม่เบิ้ล */
             body.printing-detail .detail-row:last-of-type { border-bottom: 1px solid #000 !important; }
             body.printing-detail .detail-section-header + .detail-row { border-top: none !important; }
             
@@ -309,7 +305,7 @@
     <div id="login-overlay">
         <div class="login-card">
             <h2>🔐 QC System</h2>
-            <p class="version">v6.5 (Firebase Edition)</p>
+            <p class="version">v6.7 (Full Firebase Edition)</p>
             
             <div class="login-hint">
                 <div style="font-weight: 600; margin-bottom: 5px;">ข้อมูลสำหรับทดสอบเข้าสู่ระบบ:</div>
@@ -338,7 +334,7 @@
                     <button class="btn btn-warning btn-sm" onclick="window.openModal('passModal')">🔑</button>
                     <button class="btn btn-danger btn-sm" onclick="window.handleLogout()">Logout</button>
                 </div>
-                <h1 style="font-size: 2rem; margin-bottom: 5px;">☁️ QC System v6.5 <small style="font-size:1rem; opacity:0.8;">(Firebase Sync)</small></h1>
+                <h1 style="font-size: 2rem; margin-bottom: 5px;">☁️ QC System v6.7 <small style="font-size:1rem; opacity:0.8;">(Full Firebase Sync)</small></h1>
                 <p style="opacity: 0.9; font-weight: 300;">ระบบจัดการและตรวจสอบคุณภาพวัตถุดิบครบวงจร</p>
             </div>
 
@@ -528,7 +524,7 @@
                         </div>
                     </div>
 
-                    <button type="submit" class="btn btn-submit-form">🚀 ยืนยันการบันทึกข้อมูล (Submit to System)</button>
+                    <button type="submit" class="btn btn-submit-form">🚀 ยืนยันการบันทึกข้อมูล (Submit to Firebase)</button>
                 </form>
             </div>
 
@@ -538,7 +534,6 @@
                     <h2 style="color:var(--primary); font-size:1.5rem;">📊 ประวัติการตรวจสอบ (Inspection History)</h2>
                     <div style="display:flex; gap:10px;">
                         <button class="btn btn-success" onclick="window.exportToExcel()">📥 Export Excel</button>
-                        <button class="btn btn-secondary" onclick="window.fetchData()">🔄 Refresh</button>
                     </div>
                 </div>
                 <div class="table-container-scroll">
@@ -591,7 +586,7 @@
             <!-- Tab: RM Master -->
             <div id="rmMaster" class="tab-content content-box">
                 <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
-                    <h2 style="color:var(--primary); font-size:1.5rem; margin:0;">📦 ฐานข้อมูลวัตถุดิบ (RM Master <span style="color:#f59e0b;">Firebase</span>)</h2>
+                    <h2 style="color:var(--primary); font-size:1.5rem; margin:0;">📦 ฐานข้อมูลวัตถุดิบ (RM Master)</h2>
                     <button class="btn btn-secondary btn-sm" onclick="window.importDefaultRM()">📥 โหลดข้อมูลเริ่มต้น (Import Default)</button>
                 </div>
                 
@@ -672,6 +667,7 @@
             </div>
             
             <form id="editForm">
+                <input type="hidden" id="editOriginalDocId">
                 <input type="hidden" id="editOriginalTimestamp">
                 
                 <!-- Section 1 -->
@@ -762,6 +758,7 @@
 
                 <div style="text-align:center; display:flex; gap:15px; border-top: 2px solid #f1f5f9; padding-top: 20px;">
                     <button type="submit" class="btn btn-primary" style="flex:2; font-size: 1.1rem; padding: 14px;">💾 บันทึกการอัปเดตข้อมูล</button>
+                    <button type="button" class="btn btn-danger" style="flex:1;" onclick="window.deleteQCRecord()">🗑️ ลบรายการนี้</button>
                     <button type="button" class="btn btn-secondary" style="flex:1;" onclick="window.closeModal('editModal')">ยกเลิก</button>
                 </div>
             </form>
@@ -770,7 +767,7 @@
 
     <script type="module">
         // ----------------------------------------------------
-        // ส่วนของระบบ Login ที่ถูกแยกออกมาเพื่อให้โหลดได้เสมอ
+        // ระบบ Login พื้นฐานแบบ Local
         // ----------------------------------------------------
         if (!localStorage.getItem('qc_users')) localStorage.setItem('qc_users', JSON.stringify({'qc':'1234','admin':'1234'}));
 
@@ -783,7 +780,6 @@
                 document.getElementById('login-overlay').style.display = 'none';
                 document.getElementById('main-app').style.display = 'block';
                 document.getElementById('displayUser').textContent = "User: " + u;
-                if(typeof window.fetchData === 'function') window.fetchData();
             } else { 
                 document.getElementById('loginError').style.display = 'block'; 
             }
@@ -803,13 +799,13 @@
         }
 
         // ==========================================
-        // ⚙️ FIREBASE CONFIGURATION
+        // ⚙️ FIREBASE CONFIGURATION (FULL FIREBASE MODE)
         // ==========================================
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, collection, onSnapshot, addDoc, deleteDoc, doc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
-        import { getAnalytics } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-analytics.js";
+        import { getFirestore, collection, onSnapshot, addDoc, updateDoc, deleteDoc, doc, query, orderBy } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
+        // ตั้งค่า Firebase ตรงนี้
         const myFirebaseConfig = {
             apiKey: "AIzaSyDP9avz6gEZVn0Ps6oQaq54lGjPs0q1D6c",
             authDomain: "qc-inspector-2bf02.firebaseapp.com",
@@ -821,22 +817,13 @@
         };
 
         const isUsingCustomConfig = myFirebaseConfig && myFirebaseConfig.apiKey && !myFirebaseConfig.apiKey.includes("YOUR_API_KEY");
-        
         let firebaseConfig = isUsingCustomConfig ? myFirebaseConfig : (typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : { apiKey: "dummy-key", projectId: "dummy-project" });
         
-        let app, auth, db, analytics;
+        let app, auth, db;
         try {
             app = initializeApp(firebaseConfig);
             auth = getAuth(app);
             db = getFirestore(app);
-            
-            if (isUsingCustomConfig) {
-               try {
-                   analytics = getAnalytics(app);
-               } catch (analyticsError) {
-                   console.warn("Analytics Load Error (โดเมนพรีวิวอาจถูกจำกัด):", analyticsError);
-               }
-            }
         } catch(e) {
             console.warn("Firebase Initialization Skipped", e);
         }
@@ -844,154 +831,236 @@
         const appId = isUsingCustomConfig ? null : (typeof __app_id !== 'undefined' ? __app_id : 'default-app-id');
         let firebaseUser = null;
         
+        // ตัวแปรเก็บข้อมูล
         let MASTER_LIST = []; 
-        let isFirebaseLoaded = false;
-        
-        const DEFAULT_RM = [
-            { code: "RM1-SV-WT", name: "Water" }, { code: "RM2-CA-LRGS", name: "Plantacare 1200 UP" },
-            { code: "RM2-CA-DG-DGS", name: "Plantacare 2000 UP" }, { code: "RM2-CA-CGS", name: "Plantacare 810 UP" },
-            { code: "RM2-CA-SCG", name: "Galsoft SCG" }, { code: "RM2-CA-CG-GO", name: "LAMESOFT PO 65" },
-            { code: "RM2-CA-DHY", name: "Dehyton K/I5" }, { code: "RM2-HT-ABLE", name: "Organic aloe vera extract" },
-            { code: "RM2-HT-WTE", name: "White tea extract" }, { code: "RM2-HT-SPCA", name: "Ajidew NL-50 (Sodium PCA)" },
-            { code: "RM2-HT-PPG20", name: "Glucam P-20" }, { code: "RM3-SR-LPEZ", name: "Lipase enzyme" },
-            { code: "RM3-SR-VCM", name: "Aristocare Smart" }, { code: "RM2-AO-PSME-BA210", name: "Pancil BA-210" },
-            { code: "RM2-AO-PSME-V20", name: "Pancil V-20" }, { code: "RM2-AO-PSME-FG70", name: "Pancil FG-70" },
-            { code: "RM2-AO-DKE", name: "Pancil TOA-1" }, { code: "RM2-PT-SDB", name: "Sodium benzoate" },
-            { code: "RM-CTA-8HQ", name: "8-HQ" }, { code: "RM2-PH-LTA", name: "Lactic acid" },
-            { code: "RM2-PH-CTA", name: "Citric acid" }, { code: "RM2-CTA-2EDTA", name: "Disodium EDTA" },
-            { code: "RM2-SV-ETN", name: "Sciwis" }, { code: "RM2-SV-ETN95", name: "DEB 95 (Ethyl alcohol 95% v/v)" },
-            { code: "RM2-SV-DPM", name: "Dipropylene Glycol Monomethyl Ether (DPM)" }, { code: "RM2-EM-DPG", name: "Dipropylene glycol" },
-            { code: "RM2-PF-PF", name: "Pine Forest Perfume" }, { code: "RM2-PF-WTR", name: "White Tea Retreats Perfume" },
-            { code: "RM2-PF-NG", name: "Neroli Garden Perfume" }, { code: "RM2-PF-CLR", name: "Chalene Rose Perfume" },
-            { code: "RM2-PF-ST", name: "Serene Tea Perfume" }, { code: "RM2-PF-CM", name: "Cotton Musk Perfume" },
-            { code: "RM2-PF-WM", name: "Wild Mint Perfume" }, { code: "RM2-PF-CTF", name: "Citropol F" },
-            { code: "RM2-PF-BPL", name: "Black pepper oil" }, { code: "RM2-PT-RDFE", name: "Koprafinol" },
-            { code: "RM2-PT-KOP", name: "Kopcerin PE1090" }, { code: "RM2-PT-STS", name: "Sodium thiosulfate" },
-            { code: "RM1-OT-SG", name: "Sucrose" }, { code: "RM2-EM-PG40", name: "Eumulgin CO 40" },
-            { code: "RM2-EM-IPM", name: "Isopropyl myristate (IPM)" }
-        ];
-
-        const initAuth = async () => {
-            if(!auth) return;
-            try {
-                await signInAnonymously(auth);
-            } catch (error) { 
-                console.error("Firebase Auth Error:", error);
-                
-                console.warn("⚠️ โปรดเพิ่มโดเมนของเว็บนี้เข้าไปใน Firebase Console -> Authentication -> Settings -> Authorized domains");
-                isFirebaseLoaded = true;
-                MASTER_LIST = [...DEFAULT_RM];
-                if(document.getElementById('rmMaster').classList.contains('active')) {
-                    renderRMMasterTable();
-                }
-            }
-        };
-        initAuth();
-
-        if(auth) {
-            onAuthStateChanged(auth, (user) => {
-                firebaseUser = user;
-                if (user) {
-                    const rmRef = isUsingCustomConfig 
-                        ? collection(db, 'rmMaster')
-                        : collection(db, 'artifacts', appId, 'public', 'data', 'rmMaster');
-
-                    onSnapshot(rmRef, (snapshot) => {
-                        if (!snapshot.empty) {
-                            MASTER_LIST = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-                        } else {
-                            MASTER_LIST = [...DEFAULT_RM];
-                        }
-                        isFirebaseLoaded = true;
-                        
-                        if(document.getElementById('rmMaster').classList.contains('active')) {
-                            renderRMMasterTable();
-                        }
-                    }, (error) => {
-                        console.error("Firebase Read Error:", error);
-                        if (!isFirebaseLoaded) {
-                           MASTER_LIST = [...DEFAULT_RM];
-                           isFirebaseLoaded = true;
-                           if(document.getElementById('rmMaster').classList.contains('active')) renderRMMasterTable();
-                        }
-                    });
-                }
-            });
-        } else {
-            MASTER_LIST = [...DEFAULT_RM];
-            isFirebaseLoaded = true;
-        }
-
-        // ----------------------------------------------------
-        // ส่วนของระบบเดิม (เชื่อม Google Apps Script)
-        // ----------------------------------------------------
-        const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbwdpL4fbmZg3lrLR2XCpCMqrU7Ee_893AEuD_3Oc8Qi6q7bC0m0FIZQ3rEV3TJ3zKufAQ/exec";
-        
         let inspections = [];
         let myPieChart = null;
+
+        // ตัวแปรสำหรับเก็บไฟล์รูปแปลงเป็น Base64
         let currentCoaFileData = null;
         let currentQcFileData = null;
-        
         let editCoaFileData = null;
         let editQcFileData = null;
         let isEditCoaRemoved = false;
         let isEditQcRemoved = false;
 
-        async function fetchData() {
-            showLoading(true, "กำลังดึงข้อมูล QC จากระบบ (Google Sheet)...");
-            try {
-                const res = await fetch(WEB_APP_URL);
-                const data = await res.json();
-                inspections = data.reverse();
-                renderMasterTable();
-                renderSummary();
-            } catch (e) { console.error(e); }
-            showLoading(false);
-        }
-        window.fetchData = fetchData;
+        const DEFAULT_RM = [
+            { code: "RM1-SV-WT", name: "Water" }, { code: "RM2-CA-LRGS", name: "Plantacare 1200 UP" },
+            { code: "RM2-CA-DG-DGS", name: "Plantacare 2000 UP" }, { code: "RM2-CA-CGS", name: "Plantacare 810 UP" },
+            { code: "RM2-CA-SCG", name: "Galsoft SCG" }, { code: "RM2-CA-CG-GO", name: "LAMESOFT PO 65" },
+            { code: "RM2-CA-DHY", name: "Dehyton K/I5" }, { code: "RM2-HT-ABLE", name: "Organic aloe vera extract" }
+        ];
 
+        // 1. ตรวจสอบการ Login ของ Firebase Anonymous
+        const initAuth = async () => {
+            if(!auth) return;
+            try { await signInAnonymously(auth); } 
+            catch (error) { console.error("Firebase Auth Error:", error); }
+        };
+        initAuth();
+
+        // 2. ดึงข้อมูลแบบ Real-time (ทั้ง RM Master และ QC History)
+        if(auth) {
+            onAuthStateChanged(auth, (user) => {
+                firebaseUser = user;
+                if (user && db) {
+                    // กำหนด Collection Paths
+                    const rmCollectionPath = isUsingCustomConfig ? collection(db, 'rmMaster') : collection(db, 'artifacts', appId, 'public', 'data', 'rmMaster');
+                    const qcCollectionPath = isUsingCustomConfig ? collection(db, 'qcHistory') : collection(db, 'artifacts', appId, 'public', 'data', 'qcHistory');
+
+                    // A. ดึงข้อมูล RM Master
+                    onSnapshot(rmCollectionPath, (snapshot) => {
+                        if (!snapshot.empty) {
+                            MASTER_LIST = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                        } else { MASTER_LIST = [...DEFAULT_RM]; }
+                        if(document.getElementById('rmMaster').classList.contains('active')) renderRMMasterTable();
+                    }, (error) => console.error("RM Read Error:", error));
+
+                    // B. ดึงข้อมูล QC History
+                    onSnapshot(qcCollectionPath, (snapshot) => {
+                        inspections = [];
+                        snapshot.forEach((doc) => {
+                            inspections.push({ id: doc.id, ...doc.data() });
+                        });
+                        // เรียงลำดับจากใหม่ไปเก่าตาม timestamp
+                        inspections.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+                        
+                        renderMasterTable();
+                        renderSummary();
+                        
+                        // ปิดหน้าจอ Loading ถ้ากำลังโหลดอยู่
+                        showLoading(false);
+                    }, (error) => {
+                        console.error("QC Read Error:", error);
+                        showLoading(false);
+                    });
+                }
+            });
+        }
+
+        // ==========================================
+        // 🚀 FIREBASE CRUD OPERATIONS สำหรับฟอร์ม QC
+        // ==========================================
+
+        // บันทึกฟอร์มใหม่ลง Firebase
         document.getElementById('qcForm').addEventListener('submit', async function(e) {
             e.preventDefault();
-            showLoading(true, "กำลังส่งข้อมูล QC เข้า Google Sheet...");
+            if (!firebaseUser || !db) return alert("❌ ระบบยังไม่เชื่อมต่อ Firebase ไม่สามารถบันทึกได้");
+
+            showLoading(true, "กำลังส่งข้อมูลเข้าสู่ Firebase...");
             const fd = new FormData(this);
-            const data = {
-                action: 'insert',
-                timestamp: new Date().toLocaleString('th-TH'),
-                rmCode: fd.get('rmCode'), rmName: fd.get('rmName'), supplier: fd.get('supplier'), lotNo: fd.get('lotNo'), internalLotNo: fd.get('internalLotNo'),
-                mfgDate: fd.get('mfgDate'), expDate: fd.get('expDate'),
-                receivedDate: fd.get('receivedDate'), coaColor: fd.get('coaColor'), coaOdor: fd.get('coaOdor'), coaPh: fd.get('coaPh'), coaTemp: fd.get('coaTemp'),
-                qcAppearance: fd.get('qcAppearance'), qcColor: fd.get('qcColor'), qcOdor: fd.get('qcOdor'), qcPh: fd.get('qcPh'), qcTemp: fd.get('qcTemp'),
-                passFail: fd.get('passFail'), approvedBy: fd.get('approvedBy'), approvedDate: fd.get('approvedDate'),
-                coaFile: currentCoaFileData, qcFile: currentQcFileData
+            
+            // เตรียมข้อมูลให้เป็น Object
+            const newQCRecord = {
+                timestamp: new Date().toISOString(),
+                rmCode: fd.get('rmCode'), 
+                rmName: fd.get('rmName'), 
+                supplier: fd.get('supplier'), 
+                lotNo: fd.get('lotNo'), 
+                internalLotNo: fd.get('internalLotNo'),
+                mfgDate: fd.get('mfgDate'), 
+                expDate: fd.get('expDate'),
+                receivedDate: fd.get('receivedDate'), 
+                coaColor: fd.get('coaColor'), 
+                coaOdor: fd.get('coaOdor'), 
+                coaPh: fd.get('coaPh'), 
+                coaTemp: fd.get('coaTemp'),
+                qcAppearance: fd.get('qcAppearance'), 
+                qcColor: fd.get('qcColor'), 
+                qcOdor: fd.get('qcOdor'), 
+                qcPh: fd.get('qcPh'), 
+                qcTemp: fd.get('qcTemp'),
+                passFail: fd.get('passFail'), 
+                approvedBy: fd.get('approvedBy'), 
+                approvedDate: fd.get('approvedDate'),
+                // จัดเก็บไฟล์แบบ Base64 (ถ้ามี)
+                coaFile: currentCoaFileData ? { isLink: true, data: currentCoaFileData.data, name: currentCoaFileData.name } : null,
+                qcFile: currentQcFileData ? { isLink: true, data: currentQcFileData.data, name: currentQcFileData.name } : null
             };
+
             try {
-                await fetch(WEB_APP_URL, { method: 'POST', body: JSON.stringify(data) });
-                alert("บันทึกข้อมูลสำเร็จ!"); this.reset(); currentCoaFileData = null; currentQcFileData = null;
+                const qcCollectionPath = isUsingCustomConfig ? collection(db, 'qcHistory') : collection(db, 'artifacts', appId, 'public', 'data', 'qcHistory');
+                await addDoc(qcCollectionPath, newQCRecord);
+                
+                alert("✅ บันทึกข้อมูลสำเร็จ!"); 
+                this.reset(); 
+                
+                // ล้างค่าไฟล์
+                currentCoaFileData = null; currentQcFileData = null;
                 document.getElementById('fileName').innerHTML = "รองรับไฟล์ PDF, JPG, PNG";
                 document.getElementById('fileName').previousElementSibling.textContent = "Upload COA PDF/Image (แนบไฟล์เอกสาร COA)";
                 document.getElementById('qcFileName').innerHTML = "รองรับไฟล์ JPG, PNG";
                 document.getElementById('qcFileName').previousElementSibling.textContent = "QC Photo (แนบรูปถ่ายหน้างาน)";
-                fetchData();
-            } catch (err) { 
-                alert("ส่งข้อมูลเข้าระบบเรียบร้อยแล้ว"); 
-                this.reset(); currentCoaFileData = null; currentQcFileData = null;
-                document.getElementById('fileName').innerHTML = "รองรับไฟล์ PDF, JPG, PNG";
-                document.getElementById('fileName').previousElementSibling.textContent = "Upload COA PDF/Image (แนบไฟล์เอกสาร COA)";
-                document.getElementById('qcFileName').innerHTML = "รองรับไฟล์ JPG, PNG";
-                document.getElementById('qcFileName').previousElementSibling.textContent = "QC Photo (แนบรูปถ่ายหน้างาน)";
-                fetchData(); 
+                
+                showTab('master'); // เด้งไปหน้าประวัติ
+            } catch (error) { 
+                console.error("Firebase Add Error: ", error);
+                alert("❌ เกิดข้อผิดพลาดในการบันทึกข้อมูล กรุณาลองใหม่"); 
+            } finally {
+                showLoading(false);
             }
-            showLoading(false);
         });
+
+        // อัปเดตข้อมูลที่หน้า Edit กลับไป Firebase
+        document.getElementById('editForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const docId = document.getElementById('editOriginalDocId').value;
+            if (!docId || !db) return alert("❌ ไม่พบ ID ของเอกสาร หรือ Firebase ไม่พร้อมใช้งาน");
+
+            showLoading(true, "กำลังอัปเดตข้อมูลใน Firebase...");
+            
+            // ดึงข้อมูลเดิมมาเช็คเรื่องไฟล์
+            const originalRecord = inspections.find(i => i.id === docId);
+            
+            let finalCoaFile = originalRecord.coaFile;
+            if (isEditCoaRemoved) finalCoaFile = null;
+            else if (editCoaFileData) finalCoaFile = { isLink: true, data: editCoaFileData.data, name: editCoaFileData.name };
+
+            let finalQcFile = originalRecord.qcFile;
+            if (isEditQcRemoved) finalQcFile = null;
+            else if (editQcFileData) finalQcFile = { isLink: true, data: editQcFileData.data, name: editQcFileData.name };
+
+            const updateData = {
+                rmCode: document.getElementById('edit_rmCode').value, 
+                rmName: document.getElementById('edit_rmName').value,
+                supplier: document.getElementById('edit_supplier').value, 
+                lotNo: document.getElementById('edit_lotNo').value,
+                internalLotNo: document.getElementById('edit_internalLotNo').value, 
+                mfgDate: document.getElementById('edit_mfgDate').value, 
+                expDate: document.getElementById('edit_expDate').value,
+                receivedDate: document.getElementById('edit_receivedDate').value,
+                coaColor: document.getElementById('edit_coaColor').value, 
+                coaOdor: document.getElementById('edit_coaOdor').value,
+                coaPh: document.getElementById('edit_coaPh').value, 
+                coaTemp: document.getElementById('edit_coaTemp').value,
+                qcAppearance: document.getElementById('edit_qcAppearance').value, 
+                qcColor: document.getElementById('edit_qcColor').value,
+                qcOdor: document.getElementById('edit_qcOdor').value, 
+                qcPh: document.getElementById('edit_qcPh').value,
+                qcTemp: document.getElementById('edit_qcTemp').value,
+                passFail: document.getElementById('edit_passFail').value, 
+                approvedBy: document.getElementById('edit_approvedBy').value,
+                approvedDate: document.getElementById('edit_approvedDate').value,
+                coaFile: finalCoaFile, 
+                qcFile: finalQcFile,
+                lastUpdated: new Date().toISOString()
+            };
+
+            try {
+                const docRef = isUsingCustomConfig ? doc(db, 'qcHistory', docId) : doc(db, 'artifacts', appId, 'public', 'data', 'qcHistory', docId);
+                await updateDoc(docRef, updateData);
+                alert("✅ อัปเดตข้อมูลสำเร็จ!"); 
+                window.closeModal('editModal');
+            } catch (error) { 
+                console.error("Firebase Update Error: ", error);
+                alert("❌ เกิดข้อผิดพลาดในการอัปเดตข้อมูล"); 
+            } finally {
+                showLoading(false);
+            }
+        });
+
+        // ลบข้อมูล Record ของ QC
+        window.deleteQCRecord = async function() {
+            const docId = document.getElementById('editOriginalDocId').value;
+            const rmCode = document.getElementById('edit_rmCode').value;
+            
+            if(!docId) return;
+            
+            if(confirm(`⚠️ คุณแน่ใจหรือไม่ที่จะ "ลบ" ข้อมูลการรับเข้าของ ${rmCode} รายการนี้อย่างถาวร?`)) {
+                showLoading(true, "กำลังลบข้อมูลออกจากระบบ...");
+                try {
+                    const docRef = isUsingCustomConfig ? doc(db, 'qcHistory', docId) : doc(db, 'artifacts', appId, 'public', 'data', 'qcHistory', docId);
+                    await deleteDoc(docRef);
+                    alert("🗑️ ลบข้อมูลสำเร็จเรียบร้อย");
+                    window.closeModal('editModal');
+                } catch (error) {
+                    console.error("Firebase Delete Error: ", error);
+                    alert("❌ เกิดข้อผิดพลาดในการลบข้อมูล");
+                } finally {
+                    showLoading(false);
+                }
+            }
+        }
+
+
+        // ==========================================
+        // ส่วนการ Render ตารางและ UI ต่างๆ (ปรับให้รองรับข้อมูลจาก Firebase)
+        // ==========================================
 
         function renderMasterTable() {
             const tbody = document.getElementById('masterTableBody');
+            
+            if(inspections.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="7" style="text-align:center; padding:20px; color:#94a3b8;">ยังไม่มีข้อมูลการตรวจสอบในระบบ (No Data)</td></tr>';
+                return;
+            }
+
             tbody.innerHTML = inspections.map((item, idx) => `
                 <tr>
-                    <td>${item.receivedDate}</td>
-                    <td><strong style="color:var(--primary);">${item.rmCode}</strong><br><small style="color:var(--text-light);">${item.rmName}</small></td>
-                    <td>${item.lotNo}</td>
-                    <td><span class="status-badge ${item.passFail.toLowerCase()}">${item.passFail}</span></td>
+                    <td>${item.receivedDate || '-'}</td>
+                    <td><strong style="color:var(--primary);">${item.rmCode || '-'}</strong><br><small style="color:var(--text-light);">${item.rmName || '-'}</small></td>
+                    <td>${item.lotNo || '-'}</td>
+                    <td><span class="status-badge ${(item.passFail || '').toLowerCase()}">${item.passFail || '-'}</span></td>
                     <td>${item.coaFile?.isLink ? `<a href="${item.coaFile.data}" target="_blank" class="btn btn-secondary btn-sm" style="background:#f1f5f9; color:#475569;">COA File</a>` : '-'}</td>
                     <td>${item.qcFile?.isLink ? `<a href="${item.qcFile.data}" target="_blank" class="btn btn-success btn-sm" style="background:#dcfce7; color:#166534;">QC Photo</a>` : '-'}</td>
                     <td>
@@ -1057,7 +1126,7 @@
                             <div class="result-title">${item.rmCode}</div>
                             <div class="result-lot">Lot: ${item.lotNo}</div>
                         </div>
-                        <span class="status-badge ${item.passFail.toLowerCase()}">${item.passFail}</span>
+                        <span class="status-badge ${(item.passFail||'').toLowerCase()}">${item.passFail}</span>
                     </div>
                     <div class="result-grid" style="background:${bgL};">
                         <div><span class="result-label">Name:</span><br><strong style="color:var(--text-main);">${item.rmName}</strong></div>
@@ -1086,7 +1155,6 @@
             if (item.passFail === 'Pending') passFailDisplay = '⏳ Pending (รอผลตรวจเพิ่ม)';
             if (item.passFail === 'Hold') passFailDisplay = '🔒 Quarantine (กักกัน / อายัดสินค้า)';
 
-            // เปลี่ยนโครงสร้าง HTML เป็นแบบ Grid/Table สำหรับการพิมพ์ที่สวยงาม
             content.innerHTML = `
                 <div class="print-container">
                     <div class="print-header" style="display: none;">
@@ -1263,13 +1331,39 @@
         }
 
         window.exportToExcel = function() {
-            const ws = XLSX.utils.json_to_sheet(inspections.map(i => ({...i, coaFile: i.coaFile?.data||'-', qcFile: i.qcFile?.data||'-'})));
-            const wb = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb, ws, "QC"); XLSX.writeFile(wb, "QC_Report.xlsx");
+            if (inspections.length === 0) return alert("ยังไม่มีข้อมูลให้ Export");
+            const ws = XLSX.utils.json_to_sheet(inspections.map(i => ({
+                Date_Received: i.receivedDate || '',
+                RM_Code: i.rmCode || '',
+                RM_Name: i.rmName || '',
+                Supplier: i.supplier || '',
+                Lot_No: i.lotNo || '',
+                Mfg_Date: i.mfgDate || '',
+                Exp_Date: i.expDate || '',
+                Internal_Lot: i.internalLotNo || '',
+                COA_Color: i.coaColor || '',
+                COA_Odor: i.coaOdor || '',
+                COA_pH: i.coaPh || '',
+                COA_Temp: i.coaTemp || '',
+                QC_Appearance: i.qcAppearance || '',
+                QC_Color: i.qcColor || '',
+                QC_Odor: i.qcOdor || '',
+                QC_pH: i.qcPh || '',
+                QC_Temp: i.qcTemp || '',
+                Status: i.passFail || '',
+                Inspector: i.approvedBy || '',
+                Inspect_Date: i.approvedDate || ''
+            })));
+            const wb = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb, ws, "QC_Data"); XLSX.writeFile(wb, "QC_Report_Firebase.xlsx");
         }
 
         window.openEditRecord = function(idx) {
             const i = inspections[idx];
+            
+            // เก็บ ID ของ Firestore ไว้ใช้อัปเดต
+            document.getElementById('editOriginalDocId').value = i.id;
             document.getElementById('editOriginalTimestamp').value = i.timestamp;
+            
             const fields = ['rmCode','rmName','supplier','lotNo','internalLotNo','mfgDate','expDate','receivedDate','coaColor','coaOdor','coaPh','coaTemp','qcAppearance','qcColor','qcOdor','qcPh','qcTemp','passFail','approvedBy','approvedDate'];
             fields.forEach(f => { if(document.getElementById('edit_'+f)) document.getElementById('edit_'+f).value = i[f] || ''; });
             
@@ -1291,32 +1385,6 @@
 
         document.getElementById('edit_coaFileInput').onchange = e => readFile(e.target, d => { editCoaFileData = d; document.getElementById('edit_coaFileStatus').innerHTML = "<span style='color:#2563eb; font-weight:bold;'>🆕 เลือกไฟล์ใหม่แล้ว: " + d.name + "</span>"; isEditCoaRemoved = false; });
         document.getElementById('edit_qcFileInput').onchange = e => readFile(e.target, d => { editQcFileData = d; document.getElementById('edit_qcFileStatus').innerHTML = "<span style='color:#d97706; font-weight:bold;'>🆕 เลือกรูปใหม่แล้ว: " + d.name + "</span>"; isEditQcRemoved = false; });
-
-        document.getElementById('editForm').addEventListener('submit', async function(e) {
-            e.preventDefault();
-            showLoading(true, "กำลังอัปเดตข้อมูล (Google Sheet)...");
-            const data = {
-                action: 'edit', originalTimestamp: document.getElementById('editOriginalTimestamp').value,
-                rmCode: document.getElementById('edit_rmCode').value, rmName: document.getElementById('edit_rmName').value,
-                supplier: document.getElementById('edit_supplier').value, lotNo: document.getElementById('edit_lotNo').value,
-                internalLotNo: document.getElementById('edit_internalLotNo').value, 
-                mfgDate: document.getElementById('edit_mfgDate').value, expDate: document.getElementById('edit_expDate').value,
-                receivedDate: document.getElementById('edit_receivedDate').value,
-                coaColor: document.getElementById('edit_coaColor').value, coaOdor: document.getElementById('edit_coaOdor').value,
-                coaPh: document.getElementById('edit_coaPh').value, coaTemp: document.getElementById('edit_coaTemp').value,
-                qcAppearance: document.getElementById('edit_qcAppearance').value, qcColor: document.getElementById('edit_qcColor').value,
-                qcOdor: document.getElementById('edit_qcOdor').value, qcPh: document.getElementById('edit_qcPh').value,
-                qcTemp: document.getElementById('edit_qcTemp').value,
-                passFail: document.getElementById('edit_passFail').value, approvedBy: document.getElementById('edit_approvedBy').value,
-                approvedDate: document.getElementById('edit_approvedDate').value, coaFile: editCoaFileData, qcFile: editQcFileData,
-                isFileRemoved: isEditCoaRemoved, isQcFileRemoved: isEditQcRemoved
-            };
-            try {
-                await fetch(WEB_APP_URL, { method: 'POST', body: JSON.stringify(data) });
-                alert("อัปเดตข้อมูลสำเร็จ!"); window.closeModal('editModal'); fetchData();
-            } catch (err) { alert("ดำเนินการเรียบร้อยแล้ว"); fetchData(); window.closeModal('editModal'); }
-            showLoading(false);
-        });
 
         window.addEventListener('click', e => { if(e.target.classList.contains('modal')) document.querySelectorAll('.modal').forEach(m => m.classList.remove('active')); });
     </script>
