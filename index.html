@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>QC System v6.20 (Firebase + History Search)</title>
+    <title>QC System v6.21 (Firebase + Image Quality Fix)</title>
     
     <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
@@ -308,7 +308,7 @@
     <div id="login-overlay">
         <div class="login-card">
             <h2>🔐 QC System</h2>
-            <p class="version">v6.20 (Firebase + History Search)</p>
+            <p class="version">v6.21 (Firebase + Image Quality Fix)</p>
             
             <div class="login-hint">
                 <div style="font-weight: 600; margin-bottom: 5px;">ข้อมูลสำหรับทดสอบเข้าสู่ระบบ:</div>
@@ -337,7 +337,7 @@
                     <button class="btn btn-warning btn-sm" onclick="window.openModal('passModal')">🔑</button>
                     <button class="btn btn-danger btn-sm" onclick="window.handleLogout()">Logout</button>
                 </div>
-                <h1 style="font-size: 2rem; margin-bottom: 5px;">☁️ QC System v6.20 <small style="font-size:1rem; opacity:0.8;">(Firebase Sync)</small></h1>
+                <h1 style="font-size: 2rem; margin-bottom: 5px;">☁️ QC System v6.21 <small style="font-size:1rem; opacity:0.8;">(Firebase Sync)</small></h1>
                 <p style="opacity: 0.9; font-weight: 300;">ระบบจัดการและตรวจสอบคุณภาพวัตถุดิบครบวงจร</p>
             </div>
 
@@ -1584,7 +1584,7 @@
                         const canvas = document.createElement('canvas');
                         let w = img.width;
                         let h = img.height;
-                        const MAX_SIZE = 1000; 
+                        const MAX_SIZE = 1600; // 🌟 เพิ่มขนาดสูงสุดเป็น 1600px เพื่อความคมชัด
                         
                         if (w > h && w > MAX_SIZE) { h *= MAX_SIZE / w; w = MAX_SIZE; }
                         else if (h > w && h > MAX_SIZE) { w *= MAX_SIZE / h; h = MAX_SIZE; }
@@ -1594,7 +1594,15 @@
                         const ctx = canvas.getContext('2d');
                         ctx.drawImage(img, 0, 0, w, h);
                         
-                        const dataUrl = canvas.toDataURL('image/jpeg', 0.6); 
+                        // 🌟 เพิ่มคุณภาพ JPEG เป็น 85% (จากเดิม 60%) เพื่อไม่ให้ภาพแตก แต่ยังปลอดภัยกับขนาดไฟล์ 1MB
+                        const dataUrl = canvas.toDataURL('image/jpeg', 0.85); 
+                        
+                        // เช็คขนาดไฟล์คร่าวๆ หลังบีบอัด (Base64 size / 1.33 = File size)
+                        const approxSizeKB = (dataUrl.length / 1.33) / 1024;
+                        if (approxSizeKB > 950) {
+                            alert("⚠️ รูปภาพมีความซับซ้อนมากและอาจมีขนาดใกล้เคียงขีดจำกัดของระบบ หากบันทึกไม่ผ่าน กรุณาลดความละเอียดกล้องลงเล็กน้อยครับ");
+                        }
+
                         showLoading(false);
                         cb({ name: f.name, data: dataUrl });
                     }
