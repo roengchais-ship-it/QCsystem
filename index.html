@@ -868,6 +868,17 @@
                     </div>
 
                     <div class="form-row" style="margin-bottom:15px;">
+                        <div class="form-group">
+                            <label>Appearance (ลักษณะปรากฏ)</label>
+                            <select id="edit_qcAppearance" required>
+                                <option value="">-- เลือกผล --</option>
+                                <option value="Pass">✅ Pass (ผ่าน)</option>
+                                <option value="Fail">❌ Fail (ไม่ผ่าน)</option>
+                            </select>
+                        </div>
+                        <div class="form-group"><label>Result Color (สีที่ตรวจพบ)</label><input type="text" id="edit_qcColor"></div>
+                    </div>
+                    <div class="form-row" style="margin-bottom:15px;">
                         <div class="form-group"><label>Result Odor (กลิ่นที่ตรวจพบ)</label><input type="text" id="edit_qcOdor"></div>
                         <div class="form-group"><label>Result pH (ค่า pH ที่วัดได้)</label><input type="text" id="edit_qcPh"></div>
                     </div>
@@ -1431,7 +1442,6 @@
             const wb = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb, ws, "QC_Data"); XLSX.writeFile(wb, "QC_Report_Firebase.xlsx");
         }
 
-        // --- ส่วนที่เหลือใช้โค้ดเดิม ---
         window.viewAttachment = function(idx, type) { 
             const item = inspections[idx];
             const file = type === 'coa' ? item.coaFile : item.qcFile;
@@ -1531,18 +1541,30 @@
             }
 
             let appearanceDisplay = item.qcAppearance === 'Pass' ? '✅ Pass' : (item.qcAppearance === 'Fail' ? '❌ Fail' : v(item.qcAppearance));
+            
+            let contaminationDisplay = v(item.qcContamination);
+            if (item.qcContamination === 'Pass') contaminationDisplay = '✅ Pass (ผ่าน)';
+            if (item.qcContamination === 'Fail') contaminationDisplay = '❌ Fail (ไม่ผ่าน)';
+
             let passFailDisplay = item.passFail === 'Pass' ? '✅ Accepted' : (item.passFail === 'Fail' ? '❌ Rejected' : v(item.passFail));
 
             const cIcon = (val) => val ? '<span class="chk-icon" style="color:#27ae60;">☑</span>' : '<span class="chk-icon" style="color:#e74c3c;">☒</span>';
 
             content.innerHTML = `
                 <div class="print-container">
+                    <div class="print-header" style="display: none;">
+                        <h2>RAW MATERIAL RECEIVING & VENDOR CHECKLIST (QA)</h2>
+                        <p>แบบฟอร์มตรวจสอบคุณภาพวัตถุดิบรับเข้า</p>
+                    </div>
                     <div class="print-wrapper">
                         <div class="detail-section-header">1. Receiving Information (ข้อมูลการรับเข้า)</div>
                         <div class="detail-row"><div class="detail-label">Material Code:</div><div class="detail-value" style="font-weight:700;">${v(item.rmCode)}</div></div>
                         <div class="detail-row"><div class="detail-label">Material Name:</div><div class="detail-value">${v(item.rmName)}</div></div>
                         <div class="detail-row"><div class="detail-label">Supplier Name:</div><div class="detail-value">${v(item.supplier)}</div></div>
                         <div class="detail-row"><div class="detail-label">Lot Number:</div><div class="detail-value">${v(item.lotNo)}</div></div>
+                        <div class="detail-row"><div class="detail-label">Manufacturing Date:</div><div class="detail-value">${v(item.mfgDate)}</div></div>
+                        <div class="detail-row"><div class="detail-label">Expiry Date:</div><div class="detail-value">${v(item.expDate)}</div></div>
+                        <div class="detail-row"><div class="detail-label">Internal Lot:</div><div class="detail-value">${v(item.internalLotNo)}</div></div>
                         <div class="detail-row"><div class="detail-label">Date Received:</div><div class="detail-value">${v(item.receivedDate)}</div></div>
 
                         <div class="detail-section-header" style="margin-top: 20px;">2. Document Verification (การตรวจสอบเอกสาร)</div>
@@ -1553,6 +1575,11 @@
                             <div class="chk-item">${cIcon(item.chk_doc_lot)} <span>Lot number matches COA (เลข Lot. ในเอกสาร ตรงกับสินค้าจริง)</span></div>
                             <div class="chk-item">${cIcon(item.chk_doc_mfg)} <span>Manufacturing & Expiry date verified (วันที่ผลิตและวันหมดอายุถูกต้อง)</span></div>
                         </div>
+
+                        <div class="detail-row"><div class="detail-label">Specification Color:</div><div class="detail-value">${v(item.coaColor)}</div></div>
+                        <div class="detail-row"><div class="detail-label">Specification Odor:</div><div class="detail-value">${v(item.coaOdor)}</div></div>
+                        <div class="detail-row"><div class="detail-label">Specification pH:</div><div class="detail-value">${v(item.coaPh)}</div></div>
+                        <div class="detail-row"><div class="detail-label">Specification Temp:</div><div class="detail-value">${v(item.coaTemp)}</div></div>
 
                         <div class="detail-row" style="background:#f5f3ff;"><div class="detail-label" style="color:#6b21a8;">COA Status:</div><div class="detail-value" style="font-weight:bold; color:#6b21a8;">${coaStatDisplay}</div></div>
                         ${coaAgingDisplay}
@@ -1568,12 +1595,34 @@
 
                         <div class="detail-section-header" style="margin-top: 20px;">4. RM Physical Inspection</div>
                         <div class="detail-row"><div class="detail-label">Appearance:</div><div class="detail-value">${appearanceDisplay}</div></div>
+                        <div class="detail-row"><div class="detail-label">Result Color:</div><div class="detail-value">${v(item.qcColor)}</div></div>
+                        <div class="detail-row"><div class="detail-label">Result Odor:</div><div class="detail-value">${v(item.qcOdor)}</div></div>
+                        <div class="detail-row"><div class="detail-label">Result pH:</div><div class="detail-value">${v(item.qcPh)}</div></div>
+                        <div class="detail-row"><div class="detail-label">Result Temp:</div><div class="detail-value">${v(item.qcTemp)}</div></div>
+                        <div class="detail-row"><div class="detail-label">Contamination:</div><div class="detail-value">${contaminationDisplay}</div></div>
+
                         <div class="detail-row print-hide"><div class="detail-label">QC Photo:</div><div class="detail-value">${item.qcFile?.isLink ? `<button class="btn btn-success btn-sm" onclick="window.viewAttachment(${idx}, 'qc')">📸 ดูรูป QC</button>` : '<span style="color:#94a3b8;">ไม่มีรูปถ่าย</span>'}</div></div>
 
                         <div class="detail-section-header" style="margin-top: 20px;">5. QA Decision (ผลการตัดสิน)</div>
                         <div class="detail-row"><div class="detail-label">Result:</div><div class="detail-value"><strong style="font-size:1.1em;">${passFailDisplay}</strong></div></div>
                         <div class="detail-row"><div class="detail-label">Remark:</div><div class="detail-value">${v(item.qcRemark)}</div></div>
                         <div class="detail-row print-hide"><div class="detail-label">Inspector Name:</div><div class="detail-value">${v(item.approvedBy)}</div></div>
+                        <div class="detail-row print-hide"><div class="detail-label">Inspection Date:</div><div class="detail-value">${v(item.approvedDate)}</div></div>
+
+                        <div class="signature-area" style="display: none;">
+                            <div class="signature-box">
+                                <div class="signature-line"></div>
+                                <div style="font-weight: bold;">( ${v(item.approvedBy)} )</div>
+                                <div style="font-size: 0.9em; margin-top: 5px;">Inspector Name (ผู้ตรวจสอบ)</div>
+                                <div style="font-size: 0.9em;">Date (วันที่): ${v(item.approvedDate)}</div>
+                            </div>
+                            <div class="signature-box">
+                                <div class="signature-line"></div>
+                                <div style="font-weight: bold;">( .................................................... )</div>
+                                <div style="font-size: 0.9em; margin-top: 5px;">QA Manager / Approver (ผู้อนุมัติ)</div>
+                                <div style="font-size: 0.9em;">Date (วันที่): _______/_______/_______</div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             `;
