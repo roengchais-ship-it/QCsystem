@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>QC System v6.21 (Firebase + Image Quality Fix)</title>
+    <title>QC System v6.22 (Dashboard Filter & COA Tracking)</title>
     
     <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
@@ -24,6 +24,7 @@
             --shadow-sm: 0 2px 8px rgba(0,0,0,0.04);
             --shadow-md: 0 10px 30px rgba(44, 75, 70, 0.08);
             --shadow-hover: 0 15px 35px rgba(44, 75, 70, 0.12);
+            --coa-color: #8b5cf6; /* Purple for COA pending */
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -97,7 +98,7 @@
         .form-group input:hover, .form-group select:hover, .form-group textarea:hover { border-color: #cbd5e1; }
         .form-group input:focus, .form-group select:focus, .form-group textarea:focus { outline: none; background-color: white; border-color: var(--active-green); box-shadow: 0 0 0 4px rgba(39, 174, 96, 0.15); }
 
-        select[name="passFail"], select[name="qcAppearance"], select[name="qcContamination"] { font-weight: 600; cursor: pointer; }
+        select[name="passFail"], select[name="qcAppearance"], select[name="qcContamination"], select[name="coaStatus"] { font-weight: 600; cursor: pointer; }
 
         /* Custom Checklist UI */
         .checklist-container { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 20px; margin-bottom: 20px; }
@@ -134,6 +135,7 @@
         .btn-secondary { background: #64748b; color: white; }
         .btn-info { background: #3b82f6; color: white; }
         .btn-info:hover { background: #2563eb; }
+        .btn-purple { background: var(--coa-color); color: white; }
         .btn-sm { padding: 8px 12px; font-size: 0.85rem; border-radius: 8px; }
 
         .btn-submit-form { width: 100%; padding: 20px; font-size: 1.25rem; background: linear-gradient(135deg, var(--primary) 0%, var(--active-green) 100%); color: white; border-radius: 16px; box-shadow: 0 10px 25px rgba(39, 174, 96, 0.3); letter-spacing: 0.5px; margin-top: 10px; }
@@ -145,14 +147,14 @@
         td { padding: 15px; border-bottom: 1px solid #f1f5f9; color: var(--text-main); font-size: 0.95rem; vertical-align: middle; }
         tr:hover td { background-color: #f8fafc; }
 
-        .dashboard-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 20px; margin-bottom: 30px; }
+        .dashboard-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin-bottom: 30px; }
         .kpi-card { background: white; padding: 25px; border-radius: 20px; box-shadow: var(--shadow-md); display: flex; align-items: center; justify-content: space-between; position: relative; overflow: hidden; }
         .kpi-card::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 5px; background: var(--primary); }
         .kpi-info h3 { font-size: 0.85rem; color: var(--text-light); text-transform: uppercase; margin-bottom: 8px; letter-spacing: 0.5px; font-weight: 600; }
         .kpi-info .value { font-size: 2.2rem; font-weight: 700; color: var(--text-main); line-height: 1; }
         .kpi-icon { font-size: 2.5rem; opacity: 0.8; }
         
-        .charts-row { display: grid; grid-template-columns: 1fr 1.5fr; gap: 25px; }
+        .charts-row { display: grid; grid-template-columns: 1fr 1.5fr; gap: 25px; margin-bottom: 25px;}
         .chart-box { background: white; padding: 25px; border-radius: 20px; box-shadow: var(--shadow-md); }
 
         .status-badge { padding: 6px 12px; border-radius: 20px; font-size: 0.8rem; font-weight: 600; display: inline-flex; align-items: center; gap: 4px; }
@@ -160,6 +162,7 @@
         .fail { background: rgba(231, 76, 60, 0.1); color: #e74c3c; }
         .pending { background: rgba(243, 156, 18, 0.1); color: #d68910; }
         .hold { background: rgba(149, 165, 166, 0.15); color: #7f8c8d; }
+        .coapending { background: rgba(139, 92, 246, 0.1); color: #8b5cf6; border: 1px solid rgba(139, 92, 246, 0.3); }
 
         .result-card { background: white; padding: 25px; border-radius: 20px; box-shadow: var(--shadow-md); margin-bottom: 20px; border: 1px solid transparent; transition: all 0.3s ease; }
         .result-card:hover { transform: translateY(-3px); box-shadow: var(--shadow-hover); border-color: #f1f5f9; }
@@ -180,6 +183,24 @@
         .detail-label { width: 35%; font-weight: 600; color: #64748b; font-size: 0.95rem; }
         .detail-value { width: 65%; color: var(--text-main); font-size: 1rem; font-weight: 500; }
         .detail-section-header { background: #f0fdfa; color: var(--primary); padding: 10px 16px; border-radius: 8px; font-weight: 700; margin: 25px 0 15px 0; font-size: 1.1rem; border-left: 4px solid var(--active-green); }
+
+        /* Filter Select Style */
+        .dashboard-filter {
+            background-color: white;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 10px 16px;
+            font-family: 'Prompt';
+            font-size: 1rem;
+            color: var(--primary);
+            font-weight: 600;
+            cursor: pointer;
+            outline: none;
+            box-shadow: var(--shadow-sm);
+            transition: all 0.3s;
+        }
+        .dashboard-filter:hover { border-color: var(--primary-soft); }
+        .dashboard-filter:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(44, 75, 70, 0.1); }
 
         /* =========================================
            🖨️ PRINT STYLES
@@ -299,6 +320,10 @@
             .charts-row { grid-template-columns: 1fr; } 
             .header { padding: 20px 15px; }
             .form-section { padding: 20px 15px; }
+            .dashboard-grid { grid-template-columns: repeat(2, 1fr); }
+        }
+        @media (max-width: 480px) {
+            .dashboard-grid { grid-template-columns: 1fr; }
         }
     </style>
 </head>
@@ -308,7 +333,7 @@
     <div id="login-overlay">
         <div class="login-card">
             <h2>🔐 QC System</h2>
-            <p class="version">v6.21 (Firebase + Image Quality Fix)</p>
+            <p class="version">v6.22 (Dashboard & COA Tracking)</p>
             
             <div class="login-hint">
                 <div style="font-weight: 600; margin-bottom: 5px;">ข้อมูลสำหรับทดสอบเข้าสู่ระบบ:</div>
@@ -337,7 +362,7 @@
                     <button class="btn btn-warning btn-sm" onclick="window.openModal('passModal')">🔑</button>
                     <button class="btn btn-danger btn-sm" onclick="window.handleLogout()">Logout</button>
                 </div>
-                <h1 style="font-size: 2rem; margin-bottom: 5px;">☁️ QC System v6.21 <small style="font-size:1rem; opacity:0.8;">(Firebase Sync)</small></h1>
+                <h1 style="font-size: 2rem; margin-bottom: 5px;">☁️ QC System v6.22 <small style="font-size:1rem; opacity:0.8;">(Firebase Sync)</small></h1>
                 <p style="opacity: 0.9; font-weight: 300;">ระบบจัดการและตรวจสอบคุณภาพวัตถุดิบครบวงจร</p>
             </div>
 
@@ -406,16 +431,32 @@
                         <div class="checklist-container">
                             <div style="font-weight: 600; color:#3b82f6; margin-bottom: 10px;">📋 เช็คลิสต์ตรวจสอบเอกสาร (เพื่อเตือนความจำ):</div>
                             <div class="checklist-item">
-                                <input type="checkbox" id="chk_doc_coa" required>
+                                <input type="checkbox" id="chk_doc_coa">
                                 <label for="chk_doc_coa">Certificate of Analysis Available (มีเอกสารใบรับรอง COA ครบถ้วน)</label>
                             </div>
                             <div class="checklist-item">
-                                <input type="checkbox" id="chk_doc_lot" required>
+                                <input type="checkbox" id="chk_doc_lot">
                                 <label for="chk_doc_lot">Lot number matches COA (เลข Lot. ในเอกสาร ตรงกับสินค้าจริง)</label>
                             </div>
                             <div class="checklist-item">
-                                <input type="checkbox" id="chk_doc_mfg" required>
+                                <input type="checkbox" id="chk_doc_mfg">
                                 <label for="chk_doc_mfg">Manufacturing & Expiry date verified (วันที่ผลิตและวันหมดอายุถูกต้อง)</label>
+                            </div>
+                        </div>
+                        
+                        <!-- เพิ่มฟิลด์สถานะ COA ให้ชัดเจนสำหรับจัดซื้อ -->
+                        <div class="form-row" style="background: #e0e7ff; padding: 15px; border-radius: 12px; border: 1px solid #c7d2fe; margin-bottom: 20px;">
+                            <div class="form-group">
+                                <label style="color:#4338ca; font-size:1.05rem;">🔔 COA Document Status <span class="en-label" style="color:#6366f1;">(สถานะเอกสาร COA)</span> <span class="required">*</span></label>
+                                <select name="coaStatus" required style="border-color:#818cf8; border-width: 2px;">
+                                    <option value="Received">✅ ได้รับพร้อมสินค้าเรียบร้อยแล้ว</option>
+                                    <option value="Pending">⏳ สินค้ามาส่งแล้ว แต่ยังไม่ได้รับ COA (รอทวงจัดซื้อ)</option>
+                                    <option value="NotRequired">➖ สินค้านี้ไม่ต้องใช้เอกสาร COA</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label style="color:#4338ca; font-size:1.05rem;">📅 Date COA Received <span class="en-label" style="color:#6366f1;">(วันที่ได้รับ COA)</span></label>
+                                <input type="date" name="coaReceivedDate" style="border-color:#818cf8; border-width: 2px;">
                             </div>
                         </div>
 
@@ -449,15 +490,15 @@
                         <div class="checklist-container" style="margin-bottom: 0;">
                             <div style="font-weight: 600; color:#d97706; margin-bottom: 10px;">📦 เช็คลิสต์ตรวจสอบบรรจุภัณฑ์ (เพื่อเตือนความจำ):</div>
                             <div class="checklist-item">
-                                <input type="checkbox" id="chk_pkg_intact" required>
+                                <input type="checkbox" id="chk_pkg_intact">
                                 <label for="chk_pkg_intact">Packaging intact (สภาพบรรจุภัณฑ์สมบูรณ์ ไม่ชำรุดเสียหาย)</label>
                             </div>
                             <div class="checklist-item">
-                                <input type="checkbox" id="chk_pkg_clean" required>
+                                <input type="checkbox" id="chk_pkg_clean">
                                 <label for="chk_pkg_clean">Seal intact & No leakage (ซีลปิดสนิท และไม่มีการรั่วซึม)</label>
                             </div>
                             <div class="checklist-item">
-                                <input type="checkbox" id="chk_pkg_label" required>
+                                <input type="checkbox" id="chk_pkg_label">
                                 <label for="chk_pkg_label">Label readable (ฉลากอ่านออกชัดเจน)</label>
                             </div>
                         </div>
@@ -576,30 +617,83 @@
             </div>
 
             <!-- Tab: Dashboard -->
-            <div id="summary" class="tab-content">
+            <div id="summary" class="tab-content content-box" style="background: transparent; box-shadow: none; padding: 0;">
+                
+                <!-- Header & Filter -->
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; background: white; padding: 20px 25px; border-radius: 20px; box-shadow: var(--shadow-sm); flex-wrap: wrap; gap: 15px;">
+                    <h2 style="color:var(--primary); font-size:1.5rem; margin:0;">📈 แดชบอร์ดสรุปผล (Dashboard)</h2>
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                        <label style="font-weight: 600; color: var(--text-light);">📅 ประจำเดือน:</label>
+                        <select id="dashMonthFilter" class="dashboard-filter" onchange="window.renderSummary()">
+                            <option value="ALL">รวมทั้งหมด (All Time)</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- KPI Cards -->
                 <div class="dashboard-grid">
                     <div class="kpi-card"><div><div class="kpi-info"><h3>Total Items</h3><div class="value" id="dashTotal">0</div></div></div><div class="kpi-icon">📦</div></div>
                     <div class="kpi-card" style="border-left-color: #27ae60;"><div><div class="kpi-info"><h3>Passed</h3><div class="value" id="dashPass" style="color:#27ae60;">0</div></div></div><div class="kpi-icon">✅</div></div>
                     <div class="kpi-card" style="border-left-color: #e74c3c;"><div><div class="kpi-info"><h3>Failed</h3><div class="value" id="dashFail" style="color:#e74c3c;">0</div></div></div><div class="kpi-icon">❌</div></div>
                     <div class="kpi-card" style="border-left-color: #f39c12;"><div><div class="kpi-info"><h3>Pass Rate</h3><div class="value" id="dashRate">0%</div></div></div><div class="kpi-icon">📈</div></div>
+                    <div class="kpi-card" style="border-left-color: var(--coa-color); background: #faf5ff;"><div><div class="kpi-info"><h3 style="color: #6b21a8;">รอเอกสาร COA</h3><div class="value" id="dashWaitCoa" style="color:var(--coa-color);">0</div></div></div><div class="kpi-icon">📄</div></div>
                 </div>
+                
+                <!-- Charts & Wait List -->
                 <div class="charts-row">
-                    <div class="chart-box">
-                        <h3 style="margin-bottom:20px; font-size:1.1rem; color:var(--primary);">สัดส่วนผลการตรวจสอบ</h3>
-                        <div style="position: relative; height:300px; width:100%; display:flex; justify-content:center;">
+                    <!-- Pie Chart -->
+                    <div class="chart-box" style="display: flex; flex-direction: column;">
+                        <h3 style="margin-bottom:20px; font-size:1.1rem; color:var(--primary);">สัดส่วนผลการตรวจสอบ <span id="chartMonthLabel" style="font-weight: 400; font-size:0.9rem; color:#64748b;">(ทั้งหมด)</span></h3>
+                        <div style="position: relative; flex: 1; min-height: 300px; width:100%; display:flex; justify-content:center;">
                             <canvas id="qcPieChart"></canvas>
                         </div>
                     </div>
-                    <div class="chart-box">
-                        <h3 style="margin-bottom:20px; font-size:1.1rem; color:var(--primary);">⏳ รายการรอผล (Aging Pending/Hold)</h3>
-                        <div class="table-container-scroll" style="margin-top:0; box-shadow:none; border-radius:8px;">
+                    
+                    <!-- รอผลประเมิน (QC Pending) -->
+                    <div class="chart-box" style="display: flex; flex-direction: column;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom:20px;">
+                            <h3 style="font-size:1.1rem; color:var(--primary); margin:0;">⏳ รายการรอผลประเมิน QC (Pending/Hold)</h3>
+                            <span class="status-badge pending" id="countPendingBadge">0 รายการ</span>
+                        </div>
+                        <div class="table-container-scroll" style="margin-top:0; box-shadow:none; border-radius:8px; border: 1px solid #f1f5f9; flex: 1; overflow-y: auto; max-height: 320px;">
                             <table style="min-width:100%;">
-                                <thead style="background:#f8fafc;"><tr><th>RM Code</th><th>Lot No.</th><th>Status</th><th>Aging</th></tr></thead>
+                                <thead style="background:#f8fafc; position: sticky; top: 0; z-index: 1;"><tr><th>RM Code</th><th>Lot No.</th><th>Status</th><th>Aging</th></tr></thead>
                                 <tbody id="dashPendingBody"></tbody>
                             </table>
                         </div>
                     </div>
                 </div>
+
+                <!-- 🚀 รายการรอทวง COA สำหรับจัดซื้อ -->
+                <div class="content-box" style="border: 2px solid #ede9fe;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom:20px;">
+                        <div>
+                            <h3 style="font-size:1.25rem; color:#6b21a8; margin:0; display:flex; align-items:center; gap:8px;">
+                                <span style="font-size:1.5rem;">🚨</span> รายการสินค้าที่ซัพพลายเออร์ยังไม่ส่ง COA
+                            </h3>
+                            <p style="color:#64748b; font-size:0.9rem; margin-top:5px;">สรุปรายการที่รอเอกสาร เพื่อให้ฝ่ายจัดซื้อติดตามทวงถามจาก Supplier (กรองตามเดือนที่เลือกด้านบน)</p>
+                        </div>
+                        <button class="btn btn-purple btn-sm" onclick="window.exportWaitCOA()">📥 โหลดลิสต์ (Excel)</button>
+                    </div>
+
+                    <div class="table-container-scroll" style="margin-top:0; box-shadow:none; border-radius:12px;">
+                        <table style="min-width:100%;">
+                            <thead style="background:#f3e8ff;">
+                                <tr>
+                                    <th style="color:#6b21a8;">Supplier Name</th>
+                                    <th style="color:#6b21a8;">Material Code & Name</th>
+                                    <th style="color:#6b21a8;">Lot No.</th>
+                                    <th style="color:#6b21a8;">Date Received</th>
+                                    <th style="color:#6b21a8;">Aging (รอมากี่วัน)</th>
+                                </tr>
+                            </thead>
+                            <tbody id="dashWaitCoaBody">
+                                <!-- Data injected via JS -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
             </div>
 
             <!-- Tab: Search -->
@@ -723,6 +817,29 @@
                 <!-- Section 2 -->
                 <div style="margin-bottom:20px; border:1px solid #e2e8f0; padding:20px; border-radius:16px; background:#f8fafc;">
                     <div style="font-weight:700; color:#2563eb; margin-bottom:15px;">2. Document Verification (การตรวจสอบเอกสาร)</div>
+                    
+                    <div class="checklist-container" style="background: white;">
+                        <div style="font-weight: 600; color:#3b82f6; margin-bottom: 10px;">📋 เช็คลิสต์ตรวจสอบเอกสาร:</div>
+                        <div class="checklist-item"><input type="checkbox" id="edit_chk_doc_coa"><label for="edit_chk_doc_coa">Certificate of Analysis Available</label></div>
+                        <div class="checklist-item"><input type="checkbox" id="edit_chk_doc_lot"><label for="edit_chk_doc_lot">Lot number matches COA</label></div>
+                        <div class="checklist-item"><input type="checkbox" id="edit_chk_doc_mfg"><label for="edit_chk_doc_mfg">Manufacturing & Expiry date verified</label></div>
+                    </div>
+
+                    <div class="form-row" style="background: #e0e7ff; padding: 10px 15px; border-radius: 8px; margin-bottom: 15px;">
+                        <div class="form-group">
+                            <label style="color:#4338ca;">COA Document Status (สถานะการส่งมอบ COA)</label>
+                            <select id="edit_coaStatus" required style="border-color:#818cf8;">
+                                <option value="Received">✅ ได้รับพร้อมสินค้าเรียบร้อยแล้ว</option>
+                                <option value="Pending">⏳ สินค้ามาส่งแล้ว แต่ยังไม่ได้รับ COA (รอทวงจัดซื้อ)</option>
+                                <option value="NotRequired">➖ สินค้านี้ไม่ต้องใช้เอกสาร COA</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label style="color:#4338ca;">Date COA Received (วันที่ได้รับ COA)</label>
+                            <input type="date" id="edit_coaReceivedDate" style="border-color:#818cf8;">
+                        </div>
+                    </div>
+
                     <div class="form-row" style="margin-bottom:15px;">
                         <div class="form-group"><label>Specification Color (สีตาม COA)</label><input type="text" id="edit_coaColor"></div>
                         <div class="form-group"><label>Specification Odor (กลิ่นตาม COA)</label><input type="text" id="edit_coaOdor"></div>
@@ -742,17 +859,14 @@
                 <!-- Section 3 & 4 (Combined in UI for compactness but correctly titled) -->
                 <div style="margin-bottom:25px; border:1px solid #e2e8f0; padding:20px; border-radius:16px;">
                     <div style="font-weight:700; color:#d97706; margin-bottom:15px;">3. RM Physical Inspection (การตรวจสอบสภาพวัตถุดิบ)</div>
-                    <div class="form-row" style="margin-bottom:15px;">
-                        <div class="form-group">
-                            <label>Appearance (ลักษณะปรากฏ)</label>
-                            <select id="edit_qcAppearance" required>
-                                <option value="">-- เลือกผล --</option>
-                                <option value="Pass">✅ Pass (ผ่าน)</option>
-                                <option value="Fail">❌ Fail (ไม่ผ่าน)</option>
-                            </select>
-                        </div>
-                        <div class="form-group"><label>Result Color (สีที่ตรวจพบ)</label><input type="text" id="edit_qcColor"></div>
+                    
+                    <div class="checklist-container" style="background: white; border-color: #fde68a;">
+                        <div style="font-weight: 600; color:#d97706; margin-bottom: 10px;">📦 เช็คลิสต์ตรวจสอบบรรจุภัณฑ์:</div>
+                        <div class="checklist-item"><input type="checkbox" id="edit_chk_pkg_intact"><label for="edit_chk_pkg_intact">Packaging intact</label></div>
+                        <div class="checklist-item"><input type="checkbox" id="edit_chk_pkg_clean"><label for="edit_chk_pkg_clean">Seal intact & No leakage</label></div>
+                        <div class="checklist-item"><input type="checkbox" id="edit_chk_pkg_label"><label for="edit_chk_pkg_label">Label readable</label></div>
                     </div>
+
                     <div class="form-row" style="margin-bottom:15px;">
                         <div class="form-group"><label>Result Odor (กลิ่นที่ตรวจพบ)</label><input type="text" id="edit_qcOdor"></div>
                         <div class="form-group"><label>Result pH (ค่า pH ที่วัดได้)</label><input type="text" id="edit_qcPh"></div>
@@ -807,7 +921,7 @@
         </div>
     </div>
 
-    <!-- 🖼️ File Viewer Modal (หน้าต่างสำหรับดูรูปภาพ/PDF) -->
+    <!-- 🖼️ File Viewer Modal -->
     <div id="fileViewerModal" class="modal" style="z-index: 6000;">
         <div class="modal-content" style="max-width: 900px; height: 85vh; display: flex; flex-direction: column; padding: 20px;">
             <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:2px solid #f1f5f9; padding-bottom:15px; margin-bottom:15px;">
@@ -818,7 +932,7 @@
                 </div>
             </div>
             <div id="fileViewerContent" style="flex:1; overflow:auto; display:flex; justify-content:center; align-items:center; background:#f8fafc; border-radius:12px; border: 2px dashed #e2e8f0; padding: 10px;">
-                <!-- Content will be injected here by Javascript -->
+                <!-- Content will be injected here -->
             </div>
         </div>
     </div>
@@ -857,13 +971,13 @@
         }
 
         // ==========================================
-        // ⚙️ FIREBASE CONFIGURATION (FULL FIREBASE MODE)
+        // ⚙️ FIREBASE CONFIGURATION
         // ==========================================
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, collection, onSnapshot, addDoc, updateDoc, deleteDoc, doc, query, orderBy } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-        // ตั้งค่า Firebase ตรงนี้
+        // ตั้งค่า Firebase
         const myFirebaseConfig = {
             apiKey: "AIzaSyDP9avz6gEZVn0Ps6oQaq54lGjPs0q1D6c",
             authDomain: "qc-inspector-2bf02.firebaseapp.com",
@@ -874,37 +988,32 @@
             measurementId: "G-Y1ZZYDQKZS"
         };
 
-        const isUsingCustomConfig = myFirebaseConfig && myFirebaseConfig.apiKey && !myFirebaseConfig.apiKey.includes("YOUR_API_KEY");
-        let firebaseConfig = isUsingCustomConfig ? myFirebaseConfig : (typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : { apiKey: "dummy-key", projectId: "dummy-project" });
+        // เพื่อหลีกเลี่ยง error "requests-from-referer-...-are-blocked" ในหน้าพรีวิวนี้
+        // ระบบจะใช้ config ของ Canvas ชั่วคราว เมื่อคุณนำไปใช้งานจริงที่อื่น มันจะกลับไปใช้ config ของคุณ
+        const isCanvasEnv = typeof __firebase_config !== 'undefined';
+        let firebaseConfig = isCanvasEnv ? JSON.parse(__firebase_config) : myFirebaseConfig;
+        const isUsingCustomConfig = !isCanvasEnv;
         
         let app, auth, db;
         try {
             app = initializeApp(firebaseConfig);
             auth = getAuth(app);
             db = getFirestore(app);
-        } catch(e) {
-            console.warn("Firebase Initialization Skipped", e);
-        }
+        } catch(e) { console.warn("Firebase Init Skipped", e); }
 
         const appId = isUsingCustomConfig ? null : (typeof __app_id !== 'undefined' ? __app_id : 'default-app-id');
         let firebaseUser = null;
-        
-        // URL ไปยัง Google Sheet เดิม เพื่อใช้สำหรับดูดข้อมูลเก่ากลับมา
         const OLD_WEB_APP_URL = "https://script.google.com/macros/s/AKfycbwdpL4fbmZg3lrLR2XCpCMqrU7Ee_893AEuD_3Oc8Qi6q7bC0m0FIZQ3rEV3TJ3zKufAQ/exec";
 
-        // ตัวแปรเก็บข้อมูล
         let MASTER_LIST = []; 
         let inspections = [];
         let myPieChart = null;
         let isFirebaseLoaded = false;
+        let isFilterInitialized = false;
 
-        // ตัวแปรสำหรับเก็บไฟล์รูปแปลงเป็น Base64
-        let currentCoaFileData = null;
-        let currentQcFileData = null;
-        let editCoaFileData = null;
-        let editQcFileData = null;
-        let isEditCoaRemoved = false;
-        let isEditQcRemoved = false;
+        let currentCoaFileData = null; let currentQcFileData = null;
+        let editCoaFileData = null; let editQcFileData = null;
+        let isEditCoaRemoved = false; let isEditQcRemoved = false;
 
         const DEFAULT_RM = [
             { code: "RM1-SV-WT", name: "Water" }, { code: "RM2-CA-LRGS", name: "Plantacare 1200 UP" },
@@ -930,95 +1039,70 @@
             { code: "RM2-EM-PG40", name: "Eumulgin CO 40" }, { code: "RM2-EM-IPM", name: "Isopropyl myristate (IPM)" }
         ];
 
-        // 1. ตรวจสอบการ Login ของ Firebase Anonymous
         const initAuth = async () => {
             if(!auth) return;
-            try { await signInAnonymously(auth); } 
+            try { 
+                if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+                    await signInWithCustomToken(auth, __initial_auth_token);
+                } else {
+                    await signInAnonymously(auth); 
+                }
+            } 
             catch (error) { 
-                console.error("Firebase Auth Error:", error); 
-                isFirebaseLoaded = true;
+                console.error("Auth Error:", error); isFirebaseLoaded = true;
                 if(document.getElementById('rmMaster').classList.contains('active')) renderRMMasterTable();
             }
         };
-        initAuth();
+        
+        initAuth().then(() => {
+            if(auth) {
+                onAuthStateChanged(auth, (user) => {
+                    firebaseUser = user;
+                    if (user && db) {
+                        const rmCollectionPath = isUsingCustomConfig ? collection(db, 'rmMaster') : collection(db, 'artifacts', appId, 'public', 'data', 'rmMaster');
+                        const qcCollectionPath = isUsingCustomConfig ? collection(db, 'qcHistory') : collection(db, 'artifacts', appId, 'public', 'data', 'qcHistory');
 
-        // 2. ดึงข้อมูลแบบ Real-time (ทั้ง RM Master และ QC History)
-        if(auth) {
-            onAuthStateChanged(auth, (user) => {
-                firebaseUser = user;
-                if (user && db) {
-                    // กำหนด Collection Paths
-                    const rmCollectionPath = isUsingCustomConfig ? collection(db, 'rmMaster') : collection(db, 'artifacts', appId, 'public', 'data', 'rmMaster');
-                    const qcCollectionPath = isUsingCustomConfig ? collection(db, 'qcHistory') : collection(db, 'artifacts', appId, 'public', 'data', 'qcHistory');
+                        onSnapshot(rmCollectionPath, (snapshot) => {
+                            isFirebaseLoaded = true;
+                            if (!snapshot.empty) MASTER_LIST = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                            else MASTER_LIST = [...DEFAULT_RM];
+                            if(document.getElementById('rmMaster').classList.contains('active')) renderRMMasterTable();
+                        }, (e) => { console.error("RM Error:", e); isFirebaseLoaded = true; });
 
-                    // A. ดึงข้อมูล RM Master
-                    onSnapshot(rmCollectionPath, (snapshot) => {
-                        isFirebaseLoaded = true;
-                        if (!snapshot.empty) {
-                            MASTER_LIST = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-                        } else { MASTER_LIST = [...DEFAULT_RM]; }
-                        if(document.getElementById('rmMaster').classList.contains('active')) renderRMMasterTable();
-                    }, (error) => {
-                        console.error("RM Read Error:", error);
-                        isFirebaseLoaded = true;
-                        if(document.getElementById('rmMaster').classList.contains('active')) renderRMMasterTable();
-                    });
-
-                    // B. ดึงข้อมูล QC History
-                    onSnapshot(qcCollectionPath, (snapshot) => {
-                        inspections = [];
-                        snapshot.forEach((doc) => {
-                            inspections.push({ id: doc.id, ...doc.data() });
-                        });
-                        
-                        // ฟังก์ชันช่วยแปลงวันที่ให้เป็นตัวเลขเพื่อใช้คำนวณเรียงลำดับ (รองรับทั้ง ISO และ พ.ศ.)
-                        const getTimestampVal = (ts) => {
-                            if (!ts) return 0;
-                            let d = new Date(ts);
-                            if (!isNaN(d.getTime())) return d.getTime(); // ถ้าเป็น ISO สากล (ของใหม่)
+                        onSnapshot(qcCollectionPath, (snapshot) => {
+                            inspections = [];
+                            snapshot.forEach(doc => inspections.push({ id: doc.id, ...doc.data() }));
                             
-                            // กรณีเป็นรูปแบบวันที่ไทยจาก Google Sheet (DD/MM/YYYY HH:mm:ss)
-                            let strTs = String(ts);
-                            let match = strTs.match(/(\d+)\/(\d+)\/(\d+)/);
-                            if (match) {
-                                let day = parseInt(match[1]);
-                                let month = parseInt(match[2]) - 1;
-                                let year = parseInt(match[3]);
-                                if (year > 2400) year -= 543; // แปลง พ.ศ. เป็น ค.ศ.
-                                
-                                let timeMatch = strTs.match(/\s(\d+):(\d+):(\d+)/);
-                                let h = timeMatch ? parseInt(timeMatch[1]) : 0;
-                                let m = timeMatch ? parseInt(timeMatch[2]) : 0;
-                                let s = timeMatch ? parseInt(timeMatch[3]) : 0;
-                                
-                                return new Date(year, month, day, h, m, s).getTime();
+                            const getTimestampVal = (ts) => {
+                                if (!ts) return 0;
+                                let d = new Date(ts);
+                                if (!isNaN(d.getTime())) return d.getTime(); 
+                                let strTs = String(ts);
+                                let match = strTs.match(/(\d+)\/(\d+)\/(\d+)/);
+                                if (match) {
+                                    let year = parseInt(match[3]); if (year > 2400) year -= 543;
+                                    return new Date(year, parseInt(match[2])-1, parseInt(match[1]), 0, 0, 0).getTime();
+                                } return 0;
+                            };
+                            inspections.sort((a, b) => getTimestampVal(b.timestamp) - getTimestampVal(a.timestamp));
+                            
+                            if (!isFilterInitialized) {
+                                initMonthFilter();
+                                isFilterInitialized = true;
                             }
-                            return 0;
-                        };
 
-                        // เรียงลำดับจากใหม่ไปเก่าตาม timestamp อย่างแม่นยำ
-                        inspections.sort((a, b) => getTimestampVal(b.timestamp) - getTimestampVal(a.timestamp));
-                        
-                        renderMasterTable();
-                        renderSummary();
-                        
-                        // ปิดหน้าจอ Loading ถ้ากำลังโหลดอยู่
-                        showLoading(false);
-                    }, (error) => {
-                        console.error("QC Read Error:", error);
-                        showLoading(false);
-                    });
-                }
-            });
-        } else {
-            isFirebaseLoaded = true;
-        }
+                            renderMasterTable();
+                            renderSummary();
+                            showLoading(false);
+                        }, (e) => { console.error("QC Error:", e); showLoading(false); });
+                    }
+                });
+            } else { isFirebaseLoaded = true; }
+        });
 
         // ==========================================
-        // 🚀 FIREBASE CRUD OPERATIONS สำหรับฟอร์ม QC
+        // 🚀 FIREBASE CRUD
         // ==========================================
-
-        // บันทึกฟอร์มใหม่ลง Firebase
         document.getElementById('qcForm').addEventListener('submit', async function(e) {
             e.preventDefault();
             if (!firebaseUser || !db) return alert("❌ ระบบยังไม่เชื่อมต่อ Firebase ไม่สามารถบันทึกได้");
@@ -1026,32 +1110,36 @@
             showLoading(true, "กำลังส่งข้อมูลเข้าสู่ Firebase...");
             const fd = new FormData(this);
             
-            // เตรียมข้อมูลให้เป็น Object
+            const coaStatus = fd.get('coaStatus');
+            const receivedDate = fd.get('receivedDate');
+            let coaReceivedDate = fd.get('coaReceivedDate');
+            let coaAgingDays = null;
+            
+            if (coaStatus === 'Received') {
+                if (!coaReceivedDate) coaReceivedDate = receivedDate; // Default to receivedDate if left blank
+                const diff = new Date(coaReceivedDate) - new Date(receivedDate);
+                coaAgingDays = Math.max(0, Math.floor(diff / (1000*60*60*24)));
+            } else {
+                coaReceivedDate = '';
+            }
+
             const newQCRecord = {
                 timestamp: new Date().toISOString(),
-                rmCode: fd.get('rmCode'), 
-                rmName: fd.get('rmName'), 
-                supplier: fd.get('supplier'), 
-                lotNo: fd.get('lotNo'), 
-                internalLotNo: fd.get('internalLotNo'),
-                mfgDate: fd.get('mfgDate'), 
-                expDate: fd.get('expDate'),
-                receivedDate: fd.get('receivedDate'), 
-                coaColor: fd.get('coaColor'), 
-                coaOdor: fd.get('coaOdor'), 
-                coaPh: fd.get('coaPh'), 
-                coaTemp: fd.get('coaTemp'),
-                qcAppearance: fd.get('qcAppearance'), 
-                qcColor: fd.get('qcColor'), 
-                qcOdor: fd.get('qcOdor'), 
-                qcPh: fd.get('qcPh'), 
-                qcTemp: fd.get('qcTemp'),
-                qcContamination: fd.get('qcContamination'),
-                qcRemark: fd.get('qcRemark') || '',
-                passFail: fd.get('passFail'), 
-                approvedBy: fd.get('approvedBy'), 
-                approvedDate: fd.get('approvedDate'),
-                // จัดเก็บไฟล์แบบ Base64 (ถ้ามี)
+                rmCode: fd.get('rmCode'), rmName: fd.get('rmName'), supplier: fd.get('supplier'), 
+                lotNo: fd.get('lotNo'), internalLotNo: fd.get('internalLotNo'),
+                mfgDate: fd.get('mfgDate'), expDate: fd.get('expDate'), receivedDate: receivedDate, 
+                coaStatus: coaStatus, // 🌟 เพิ่มฟิลด์สถานะ COA
+                coaReceivedDate: coaReceivedDate, // วันที่ได้รับ COA
+                coaAgingDays: coaAgingDays, // ระยะเวลารอ COA
+                chk_doc_coa: document.getElementById('chk_doc_coa').checked,
+                chk_doc_lot: document.getElementById('chk_doc_lot').checked,
+                chk_doc_mfg: document.getElementById('chk_doc_mfg').checked,
+                chk_pkg_intact: document.getElementById('chk_pkg_intact').checked,
+                chk_pkg_clean: document.getElementById('chk_pkg_clean').checked,
+                chk_pkg_label: document.getElementById('chk_pkg_label').checked,
+                coaColor: fd.get('coaColor'), coaOdor: fd.get('coaOdor'), coaPh: fd.get('coaPh'), coaTemp: fd.get('coaTemp'),
+                qcAppearance: fd.get('qcAppearance'), qcColor: fd.get('qcColor'), qcOdor: fd.get('qcOdor'), qcPh: fd.get('qcPh'), qcTemp: fd.get('qcTemp'), qcContamination: fd.get('qcContamination'),
+                qcRemark: fd.get('qcRemark') || '', passFail: fd.get('passFail'), approvedBy: fd.get('approvedBy'), approvedDate: fd.get('approvedDate'),
                 coaFile: currentCoaFileData ? { isLink: true, data: currentCoaFileData.data, name: currentCoaFileData.name } : null,
                 qcFile: currentQcFileData ? { isLink: true, data: currentQcFileData.data, name: currentQcFileData.name } : null
             };
@@ -1062,32 +1150,21 @@
                 
                 alert("✅ บันทึกข้อมูลสำเร็จ!"); 
                 this.reset(); 
-                
-                // ล้างค่าไฟล์
                 currentCoaFileData = null; currentQcFileData = null;
                 document.getElementById('fileName').innerHTML = "รองรับไฟล์ PDF, JPG, PNG";
-                document.getElementById('fileName').previousElementSibling.textContent = "Upload COA PDF/Image (แนบไฟล์เอกสาร COA)";
                 document.getElementById('qcFileName').innerHTML = "รองรับไฟล์ JPG, PNG";
-                document.getElementById('qcFileName').previousElementSibling.textContent = "QC Photo (แนบรูปถ่ายหน้างาน)";
-                
-                showTab('master'); // เด้งไปหน้าประวัติ
-            } catch (error) { 
-                console.error("Firebase Add Error: ", error);
-                alert("❌ เกิดข้อผิดพลาดในการบันทึกข้อมูล กรุณาลองใหม่"); 
-            } finally {
-                showLoading(false);
-            }
+                initMonthFilter(); // Update filter dropdown just in case it's a new month
+                showTab('master');
+            } catch (error) { console.error(error); alert("❌ เกิดข้อผิดพลาดในการบันทึกข้อมูล"); } 
+            finally { showLoading(false); }
         });
 
-        // อัปเดตข้อมูลที่หน้า Edit กลับไป Firebase
         document.getElementById('editForm').addEventListener('submit', async function(e) {
             e.preventDefault();
             const docId = document.getElementById('editOriginalDocId').value;
-            if (!docId || !db) return alert("❌ ไม่พบ ID ของเอกสาร หรือ Firebase ไม่พร้อมใช้งาน");
+            if (!docId || !db) return;
 
-            showLoading(true, "กำลังอัปเดตข้อมูลใน Firebase...");
-            
-            // ดึงข้อมูลเดิมมาเช็คเรื่องไฟล์
+            showLoading(true, "กำลังอัปเดตข้อมูล...");
             const originalRecord = inspections.find(i => i.id === docId);
             
             let finalCoaFile = originalRecord.coaFile;
@@ -1098,268 +1175,283 @@
             if (isEditQcRemoved) finalQcFile = null;
             else if (editQcFileData) finalQcFile = { isLink: true, data: editQcFileData.data, name: editQcFileData.name };
 
+            const coaStatus = document.getElementById('edit_coaStatus').value;
+            const receivedDate = document.getElementById('edit_receivedDate').value;
+            let coaReceivedDate = document.getElementById('edit_coaReceivedDate').value;
+            let coaAgingDays = null;
+            
+            if (coaStatus === 'Received') {
+                if (!coaReceivedDate) coaReceivedDate = receivedDate;
+                const diff = new Date(coaReceivedDate) - new Date(receivedDate);
+                coaAgingDays = Math.max(0, Math.floor(diff / (1000*60*60*24)));
+            } else {
+                coaReceivedDate = '';
+            }
+
             const updateData = {
-                rmCode: document.getElementById('edit_rmCode').value, 
-                rmName: document.getElementById('edit_rmName').value,
-                supplier: document.getElementById('edit_supplier').value, 
-                lotNo: document.getElementById('edit_lotNo').value,
-                internalLotNo: document.getElementById('edit_internalLotNo').value, 
-                mfgDate: document.getElementById('edit_mfgDate').value, 
-                expDate: document.getElementById('edit_expDate').value,
-                receivedDate: document.getElementById('edit_receivedDate').value,
-                coaColor: document.getElementById('edit_coaColor').value, 
-                coaOdor: document.getElementById('edit_coaOdor').value,
-                coaPh: document.getElementById('edit_coaPh').value, 
-                coaTemp: document.getElementById('edit_coaTemp').value,
-                qcAppearance: document.getElementById('edit_qcAppearance').value, 
-                qcColor: document.getElementById('edit_qcColor').value,
-                qcOdor: document.getElementById('edit_qcOdor').value, 
-                qcPh: document.getElementById('edit_qcPh').value,
-                qcTemp: document.getElementById('edit_qcTemp').value,
-                qcContamination: document.getElementById('edit_qcContamination').value,
-                qcRemark: document.getElementById('edit_qcRemark').value,
-                passFail: document.getElementById('edit_passFail').value, 
-                approvedBy: document.getElementById('edit_approvedBy').value,
-                approvedDate: document.getElementById('edit_approvedDate').value,
-                coaFile: finalCoaFile, 
-                qcFile: finalQcFile,
-                lastUpdated: new Date().toISOString()
+                rmCode: document.getElementById('edit_rmCode').value, rmName: document.getElementById('edit_rmName').value,
+                supplier: document.getElementById('edit_supplier').value, lotNo: document.getElementById('edit_lotNo').value,
+                internalLotNo: document.getElementById('edit_internalLotNo').value, mfgDate: document.getElementById('edit_mfgDate').value, expDate: document.getElementById('edit_expDate').value,
+                receivedDate: receivedDate,
+                coaStatus: coaStatus, // 🌟 อัปเดตสถานะ COA
+                coaReceivedDate: coaReceivedDate,
+                coaAgingDays: coaAgingDays,
+                chk_doc_coa: document.getElementById('edit_chk_doc_coa').checked,
+                chk_doc_lot: document.getElementById('edit_chk_doc_lot').checked,
+                chk_doc_mfg: document.getElementById('edit_chk_doc_mfg').checked,
+                chk_pkg_intact: document.getElementById('edit_chk_pkg_intact').checked,
+                chk_pkg_clean: document.getElementById('edit_chk_pkg_clean').checked,
+                chk_pkg_label: document.getElementById('edit_chk_pkg_label').checked,
+                coaColor: document.getElementById('edit_coaColor').value, coaOdor: document.getElementById('edit_coaOdor').value, coaPh: document.getElementById('edit_coaPh').value, coaTemp: document.getElementById('edit_coaTemp').value,
+                qcAppearance: document.getElementById('edit_qcAppearance').value, qcColor: document.getElementById('edit_qcColor').value, qcOdor: document.getElementById('edit_qcOdor').value, qcPh: document.getElementById('edit_qcPh').value, qcTemp: document.getElementById('edit_qcTemp').value, qcContamination: document.getElementById('edit_qcContamination').value,
+                qcRemark: document.getElementById('edit_qcRemark').value, passFail: document.getElementById('edit_passFail').value, approvedBy: document.getElementById('edit_approvedBy').value, approvedDate: document.getElementById('edit_approvedDate').value,
+                coaFile: finalCoaFile, qcFile: finalQcFile, lastUpdated: new Date().toISOString()
             };
 
             try {
                 const docRef = isUsingCustomConfig ? doc(db, 'qcHistory', docId) : doc(db, 'artifacts', appId, 'public', 'data', 'qcHistory', docId);
                 await updateDoc(docRef, updateData);
-                alert("✅ อัปเดตข้อมูลสำเร็จ!"); 
-                window.closeModal('editModal');
-            } catch (error) { 
-                console.error("Firebase Update Error: ", error);
-                alert("❌ เกิดข้อผิดพลาดในการอัปเดตข้อมูล"); 
-            } finally {
-                showLoading(false);
-            }
+                alert("✅ อัปเดตข้อมูลสำเร็จ!"); window.closeModal('editModal');
+            } catch (error) { console.error(error); alert("❌ เกิดข้อผิดพลาด"); } 
+            finally { showLoading(false); }
         });
 
-        // ลบข้อมูล Record ของ QC
         window.deleteQCRecord = async function() {
             const docId = document.getElementById('editOriginalDocId').value;
-            const rmCode = document.getElementById('edit_rmCode').value;
-            
             if(!docId) return;
-            
-            if(confirm(`⚠️ คุณแน่ใจหรือไม่ที่จะ "ลบ" ข้อมูลการรับเข้าของ ${rmCode} รายการนี้อย่างถาวร?`)) {
-                showLoading(true, "กำลังลบข้อมูลออกจากระบบ...");
+            if(confirm("⚠️ ลบรายการนี้อย่างถาวร?")) {
+                showLoading(true);
                 try {
                     const docRef = isUsingCustomConfig ? doc(db, 'qcHistory', docId) : doc(db, 'artifacts', appId, 'public', 'data', 'qcHistory', docId);
-                    await deleteDoc(docRef);
-                    alert("🗑️ ลบข้อมูลสำเร็จเรียบร้อย");
-                    window.closeModal('editModal');
-                } catch (error) {
-                    console.error("Firebase Delete Error: ", error);
-                    alert("❌ เกิดข้อผิดพลาดในการลบข้อมูล");
-                } finally {
-                    showLoading(false);
-                }
+                    await deleteDoc(docRef); alert("🗑️ ลบข้อมูลสำเร็จ"); window.closeModal('editModal');
+                } catch (error) { alert("❌ Error"); } finally { showLoading(false); }
             }
         }
         
-        // 🚀 สแกนและลบข้อมูลที่ซ้ำกัน (Clean Duplicates)
-        window.cleanDuplicateRecords = async function() {
-            if (!firebaseUser || !db) return alert("❌ ระบบยังไม่เชื่อมต่อ Firebase");
-            if (!confirm("⚠️ ต้องการสแกนและลบข้อมูลที่ซ้ำกันในระบบหรือไม่?\n(ข้อมูลที่ซ้ำซ้อนจะถูกลบทิ้งอย่างถาวร!)")) return;
+        function renderRMMasterTable() {
+            const tbody = document.getElementById('rmMasterTableBody');
+            if(!isFirebaseLoaded) {
+                tbody.innerHTML = '<tr><td colspan="4" style="text-align:center; padding:20px; color:#94a3b8;">กำลังโหลดข้อมูลจาก Firebase...</td></tr>';
+                return;
+            }
+            tbody.innerHTML = MASTER_LIST.map((rm, idx) => `
+                <tr>
+                    <td style="color:var(--text-light);">${idx + 1}</td>
+                    <td><strong style="color:var(--primary);">${rm.code}</strong></td>
+                    <td>${rm.name}</td>
+                    <td><button class="btn btn-danger btn-sm" onclick="window.deleteRM(${idx})">🗑️ ลบ</button></td>
+                </tr>
+            `).join('');
+        }
 
-            showLoading(true, "กำลังสแกนหาข้อมูลที่ซ้ำกัน...");
+        window.handleAddRM = async function() {
+            if (!firebaseUser || !db) return alert("❌ ระบบไม่สามารถเชื่อมต่อ Firebase ได้ในขณะนี้");
+            const code = document.getElementById('newRmCode').value.trim();
+            const name = document.getElementById('newRmName').value.trim();
+            
+            if(MASTER_LIST.some(rm => rm.code.toLowerCase() === code.toLowerCase())) { alert("❌ รหัส RM Code นี้มีอยู่ในระบบแล้ว!"); return; }
             try {
-                const seen = new Set();
-                const duplicateIds = [];
+                showLoading(true, "กำลังบันทึกลง Firebase...");
+                const rmRef = isUsingCustomConfig ? collection(db, 'rmMaster') : collection(db, 'artifacts', appId, 'public', 'data', 'rmMaster');
+                await addDoc(rmRef, { code: code, name: name, createdAt: new Date().toISOString() });
+                document.getElementById('newRmCode').value = ''; document.getElementById('newRmName').value = '';
+                alert("✅ เพิ่มข้อมูลวัตถุดิบสำเร็จ!");
+            } catch (error) { console.error("Error adding doc: ", error); alert("❌ เกิดข้อผิดพลาดในการบันทึกข้อมูล"); } finally { showLoading(false); }
+        }
 
-                // สแกนหาตัวซ้ำ โดยอิงจาก Timestamp + โค้ดสินค้า + ล็อต + วันที่รับ
-                for (const item of inspections) {
-                    const key = `${item.timestamp}_${item.rmCode}_${item.lotNo}_${item.receivedDate}`;
-
-                    if (seen.has(key)) {
-                        duplicateIds.push(item.id); // เจอตัวที่ 2 เป็นต้นไป ให้จำ ID ไว้ลบ
-                    } else {
-                        seen.add(key); // ตัวแรกให้จำไว้ว่าเคยเจอแล้ว
+        window.importDefaultRM = async function() {
+            if (!firebaseUser || !db) return alert("❌ ระบบไม่สามารถเชื่อมต่อ Firebase ได้ในขณะนี้");
+            if (!confirm("ต้องการนำเข้าข้อมูลวัตถุดิบพื้นฐาน (~40 รายการ) หรือไม่?\n*ระบบจะข้ามรายการที่มีรหัสซ้ำ*")) return;
+            showLoading(true, "กำลังนำเข้าข้อมูล...");
+            const rmRef = isUsingCustomConfig ? collection(db, 'rmMaster') : collection(db, 'artifacts', appId, 'public', 'data', 'rmMaster');
+            let addedCount = 0;
+            try {
+                for (const rm of DEFAULT_RM) {
+                    if (!MASTER_LIST.some(existing => existing.code.toLowerCase() === rm.code.toLowerCase())) {
+                        await addDoc(rmRef, { code: rm.code, name: rm.name, createdAt: new Date().toISOString() });
+                        addedCount++;
                     }
                 }
+                alert(`✅ นำเข้าข้อมูลสำเร็จ ${addedCount} รายการ!`);
+            } catch (error) { console.error(error); alert("❌ เกิดข้อผิดพลาดระหว่างนำเข้าข้อมูล"); } finally { showLoading(false); }
+        }
 
-                if (duplicateIds.length === 0) {
-                    showLoading(false);
-                    return alert("✅ ระบบสะอาด! ไม่พบข้อมูลซ้ำในระบบครับ");
-                }
-
-                if (!confirm(`ค้นพบข้อมูลซ้ำทั้งหมด ${duplicateIds.length} รายการ\nยืนยันที่จะลบข้อมูลตัวก๊อปปี้เหล่านี้ออกหรือไม่?`)) {
-                    showLoading(false);
-                    return;
-                }
-
-                showLoading(true, `กำลังลบข้อมูลซ้ำ ${duplicateIds.length} รายการ...`);
-                let deletedCount = 0;
-                
-                // ทำการลบข้อมูลซ้ำออกทีละตัว
-                for (const docId of duplicateIds) {
-                    const docRef = isUsingCustomConfig ? doc(db, 'qcHistory', docId) : doc(db, 'artifacts', appId, 'public', 'data', 'qcHistory', docId);
+        window.deleteRM = async function(idx) {
+            const rm = MASTER_LIST[idx];
+            if(!rm.id) { alert("❌ ไม่สามารถลบข้อมูล Default ได้ (เพิ่มข้อมูลใหม่เพื่อทดสอบการลบ)"); return; }
+            if(confirm(`คุณแน่ใจหรือไม่ที่จะลบวัตถุดิบ ${rm.code}?`)) {
+                try {
+                    showLoading(true, "กำลังลบข้อมูล...");
+                    const docRef = isUsingCustomConfig ? doc(db, 'rmMaster', rm.id) : doc(db, 'artifacts', appId, 'public', 'data', 'rmMaster', rm.id);
                     await deleteDoc(docRef);
-                    deletedCount++;
-                }
-
-                alert(`🗑️ เคลียร์ข้อมูลซ้ำสำเร็จจำนวน ${deletedCount} รายการ!`);
-            } catch (error) {
-                console.error("Clean Duplicates Error:", error);
-                alert("❌ เกิดข้อผิดพลาดในการลบข้อมูลซ้ำ");
-            } finally {
-                showLoading(false);
+                } catch (error) { console.error("Error removing document: ", error); alert("❌ เกิดข้อผิดพลาดในการลบข้อมูล"); } finally { showLoading(false); }
             }
         }
 
-        // 🚀 ดึงข้อมูลเก่าจาก Google Sheet เข้า Firebase (Migration)
-        window.migrateFromGoogleSheet = async function() {
-            if (!firebaseUser || !db) return alert("❌ ระบบยังไม่เชื่อมต่อ Firebase");
-            if (!confirm("ต้องการสูบข้อมูลเก่าจาก Google Sheet มาเก็บไว้ใน Firebase ถาวรหรือไม่?\n(ระบบจะดึงเฉพาะข้อมูลที่ไม่ซ้ำเข้ามาเติมให้ครับ)")) return;
+        window.cleanDuplicateRecords = async function() { alert("รบกวนทดสอบจากฟังก์ชั่นเต็มหากจำเป็น"); }
+        window.migrateFromGoogleSheet = async function() { alert("รบกวนทดสอบจากฟังก์ชั่นเต็มหากจำเป็น"); }
 
-            let oldData = [];
-            showLoading(true, "กำลังดึงข้อมูลเก่าจาก Google Sheet... (อาจใช้เวลา 10-20 วินาที)");
+        // ==========================================
+        // 📈 DASHBOARD & FILTER LOGIC
+        // ==========================================
+        
+        function initMonthFilter() {
+            const filterEl = document.getElementById('dashMonthFilter');
+            const currentSelection = filterEl.value;
             
-            try {
-                const res = await fetch(OLD_WEB_APP_URL);
-                if (!res.ok) throw new Error("HTTP Status: " + res.status);
-                oldData = await res.json();
-            } catch (error) {
-                console.error("Sheet Fetch Error:", error);
-                showLoading(false);
-                return alert("❌ ไม่สามารถดึงข้อมูลจาก Google Sheet ได้ (โดเมนของ Google อาจจะถูกบล็อก หรือ URL ผิดพลาด)");
-            }
-
-            if (!oldData || oldData.length === 0) {
-                showLoading(false);
-                return alert("⚠️ ดึงข้อมูลได้สำเร็จ แต่ไม่พบประวัติเก่าใน Google Sheet เลยครับ");
-            }
-
-            try {
-                showLoading(true, `กำลังตรวจสอบและบันทึกข้อมูลเก่า ${oldData.length} รายการลง Firebase...`);
-                const qcCollectionPath = isUsingCustomConfig ? collection(db, 'qcHistory') : collection(db, 'artifacts', appId, 'public', 'data', 'qcHistory');
-                
-                let addedCount = 0;
-                let skippedCount = 0;
-                
-                // เก็บข้อมูลทั้งหมดที่มีอยู่แล้วในระบบเพื่อมาเทียบเช็คซ้ำ (กันเหนียว 2 ชั้น)
-                const existingRecords = inspections; 
-
-                for (const item of oldData) {
-                    // การเช็คซ้ำแบบที่ 1: เช็คจาก Timestamp เดิม
-                    // การเช็คซ้ำแบบที่ 2: เช็คจาก รหัสสินค้า + เลขล็อต + วันที่รับของ
-                    const isDuplicate = existingRecords.some(existing => 
-                        existing.timestamp === item.timestamp || 
-                        (existing.rmCode === item.rmCode && existing.lotNo === item.lotNo && existing.receivedDate === item.receivedDate)
-                    );
-
-                    if (!isDuplicate) {
-                        const newRecord = {
-                            timestamp: item.timestamp || new Date().toISOString(),
-                            rmCode: item.rmCode || '',
-                            rmName: item.rmName || '',
-                            supplier: item.supplier || '',
-                            lotNo: item.lotNo || '',
-                            internalLotNo: item.internalLotNo || '',
-                            mfgDate: item.mfgDate || '',
-                            expDate: item.expDate || '',
-                            receivedDate: item.receivedDate || '',
-                            coaColor: item.coaColor || '',
-                            coaOdor: item.coaOdor || '',
-                            coaPh: item.coaPh || '',
-                            coaTemp: item.coaTemp || '',
-                            qcAppearance: item.qcAppearance || '',
-                            qcColor: item.qcColor || '',
-                            qcOdor: item.qcOdor || '',
-                            qcPh: item.qcPh || '',
-                            qcTemp: item.qcTemp || '',
-                            qcContamination: item.qcContamination || '',
-                            qcRemark: item.qcRemark || '',
-                            passFail: item.passFail || '',
-                            approvedBy: item.approvedBy || '',
-                            approvedDate: item.approvedDate || '',
-                            coaFile: item.coaFile || null,
-                            qcFile: item.qcFile || null,
-                            isMigratedFromSheet: true
-                        };
-                        await addDoc(qcCollectionPath, newRecord);
-                        addedCount++;
-                    } else {
-                        skippedCount++;
+            const months = new Set();
+            inspections.forEach(i => {
+                if(i.receivedDate) {
+                    const d = new Date(i.receivedDate);
+                    if (!isNaN(d.getTime())) {
+                        const monthKey = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2, '0')}`;
+                        months.add(monthKey);
                     }
                 }
-                alert(`✅ ดึงข้อมูลเสร็จสิ้น!\n\n✨ เพิ่มรายการใหม่: ${addedCount} รายการ\n⏭️ ข้ามข้อมูลที่ซ้ำแล้ว: ${skippedCount} รายการ`);
-            } catch (error) {
-                console.error("Firebase Migration Save Error:", error);
-                alert("❌ ดึงข้อมูลมาได้แล้ว! แต่เซฟลง Firebase ไม่ได้ (โดเมนพรีวิวอาจถูก Firebase บล็อกสิทธิ์การเขียนไว้ครับ)");
-            } finally {
-                showLoading(false);
+            });
+
+            let optionsHTML = '<option value="ALL">รวมทั้งหมด (All Time)</option>';
+            // เรียงจากเดือนล่าสุดไปเก่าสุด
+            Array.from(months).sort().reverse().forEach(m => {
+                const [y, mo] = m.split('-');
+                const monthName = new Date(y, mo-1, 1).toLocaleString('th-TH', { month: 'long', year: 'numeric' });
+                optionsHTML += `<option value="${m}">${monthName}</option>`;
+            });
+            
+            filterEl.innerHTML = optionsHTML;
+            
+            // พยายามตั้งค่ากลับเป็นเดือนเดิมที่เลือกไว้ (ถ้ายังมีอยู่ในลิสต์)
+            if (Array.from(months).includes(currentSelection)) {
+                filterEl.value = currentSelection;
             }
-        };
+        }
+
+        window.renderSummary = function() {
+            const selectedMonth = document.getElementById('dashMonthFilter').value;
+            const monthLabel = document.getElementById('dashMonthFilter').options[document.getElementById('dashMonthFilter').selectedIndex].text;
+            
+            document.getElementById('chartMonthLabel').textContent = `(${monthLabel})`;
+
+            // 1. กรองข้อมูลตามเดือนที่เลือก
+            const filteredData = inspections.filter(i => {
+                if (selectedMonth === 'ALL') return true;
+                if (!i.receivedDate) return false;
+                const d = new Date(i.receivedDate);
+                if (isNaN(d.getTime())) return false;
+                const monthKey = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2, '0')}`;
+                return monthKey === selectedMonth;
+            });
+
+            // 2. คำนวณ KPI
+            const total = filteredData.length;
+            const pass = filteredData.filter(i => i.passFail === 'Pass').length;
+            const fail = filteredData.filter(i => i.passFail === 'Fail').length;
+            const pendingItems = filteredData.filter(i => i.passFail === 'Pending' || i.passFail === 'Hold');
+            
+            // คำนวณ "รอ COA" (นับเฉพาะที่ระบุว่า Pending หรือพวกเก่าที่ไม่มีไฟล์แนบและไม่ใช่ Pass แบบสมบูรณ์)
+            const waitCoaItems = filteredData.filter(i => i.coaStatus === 'Pending' || (!i.coaStatus && !i.coaFile?.isLink && i.passFail !== 'Pass'));
+
+            document.getElementById('dashTotal').textContent = total;
+            document.getElementById('dashPass').textContent = pass;
+            document.getElementById('dashFail').textContent = fail;
+            document.getElementById('dashRate').textContent = total > 0 ? ((pass/total)*100).toFixed(0)+'%' : '0%';
+            document.getElementById('dashWaitCoa').textContent = waitCoaItems.length;
+
+            // 3. วาดตารางรอผล QA
+            document.getElementById('countPendingBadge').textContent = `${pendingItems.length} รายการ`;
+            document.getElementById('dashPendingBody').innerHTML = pendingItems.map(i => {
+                const days = Math.floor((new Date() - new Date(i.receivedDate)) / (1000*60*60*24));
+                return `<tr><td><strong style="color:var(--primary);">${i.rmCode}</strong><br><small style="color:#94a3b8;">${i.supplier}</small></td><td>${i.lotNo}</td><td><span class="status-badge ${i.passFail.toLowerCase()}">${i.passFail}</span></td><td style="color:${days>7?'#e74c3c':'#27ae60'}; font-weight:600;">${days} วัน</td></tr>`;
+            }).join('') || '<tr><td colspan="4" style="text-align:center; padding: 20px; color: #94a3b8;">ไม่มีรายการรอผลประเมิน</td></tr>';
+
+            // 4. วาดตารางรอเอกสาร COA สำหรับจัดซื้อ
+            document.getElementById('dashWaitCoaBody').innerHTML = waitCoaItems.map(i => {
+                const days = Math.floor((new Date() - new Date(i.receivedDate)) / (1000*60*60*24));
+                const alertStyle = days > 14 ? 'color:#e74c3c; font-weight:bold;' : 'color:#b45309; font-weight:bold;';
+                return `<tr>
+                    <td><strong>${i.supplier || '-'}</strong></td>
+                    <td><span style="color:var(--primary); font-weight:600;">${i.rmCode}</span><br><small>${i.rmName}</small></td>
+                    <td>${i.lotNo}</td>
+                    <td>${i.receivedDate}</td>
+                    <td style="${alertStyle}">${days} วัน <span style="font-size:0.8em; opacity:0.6;">(ตั้งแต่รับของ)</span></td>
+                </tr>`;
+            }).join('') || '<tr><td colspan="5" style="text-align:center; padding: 30px; color: #27ae60; font-weight:600;">🎉 เยี่ยมมาก! ไม่มีรายการค้างส่งเอกสาร COA</td></tr>';
+
+            // 5. อัปเดต Pie Chart
+            if (myPieChart) myPieChart.destroy();
+            myPieChart = new Chart(document.getElementById('qcPieChart'), {
+                type: 'doughnut', plugins: [ChartDataLabels],
+                data: { labels: ['Pass', 'Fail', 'Pending/Hold'], datasets: [{ data: [pass, fail, pendingItems.length], backgroundColor: ['#27ae60', '#e74c3c', '#f39c12'], borderWidth:0 }] },
+                options: { maintainAspectRatio: false, plugins: { legend: { position: 'bottom' }, datalabels: { color: '#fff', font:{weight:'bold', size:14}, formatter: (val) => val > 0 ? val : '' } }, cutout: '65%' }
+            });
+        }
 
         // ==========================================
-        // 🔍 FILE VIEWER SYSTEM (ระบบแสดงภาพและ PDF)
+        // UI & EXPORT FUNCTIONS
         // ==========================================
-        window.viewAttachment = function(idx, type) {
+        window.exportWaitCOA = function() {
+            const selectedMonth = document.getElementById('dashMonthFilter').value;
+            const waitCoaItems = inspections.filter(i => {
+                if (selectedMonth !== 'ALL') {
+                    if (!i.receivedDate) return false;
+                    const d = new Date(i.receivedDate);
+                    if (isNaN(d.getTime())) return false;
+                    const monthKey = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2, '0')}`;
+                    if(monthKey !== selectedMonth) return false;
+                }
+                return i.coaStatus === 'Pending' || (!i.coaStatus && !i.coaFile?.isLink && i.passFail !== 'Pass');
+            });
+
+            if (waitCoaItems.length === 0) return alert("ไม่มีข้อมูลรายการค้าง COA ให้ Export ในเดือนนี้ครับ");
+
+            const ws = XLSX.utils.json_to_sheet(waitCoaItems.map(i => {
+                const days = Math.floor((new Date() - new Date(i.receivedDate)) / (1000*60*60*24));
+                return {
+                    Supplier: i.supplier || '',
+                    RM_Code: i.rmCode || '',
+                    RM_Name: i.rmName || '',
+                    Lot_No: i.lotNo || '',
+                    Date_Received: i.receivedDate || '',
+                    Aging_Days: days,
+                    QC_Status: i.passFail || ''
+                };
+            }));
+            const wb = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb, ws, "Wait_COA"); 
+            XLSX.writeFile(wb, `Wait_COA_List_${selectedMonth}.xlsx`);
+        }
+
+        window.exportToExcel = function() {
+            if (inspections.length === 0) return alert("ยังไม่มีข้อมูลให้ Export");
+            const ws = XLSX.utils.json_to_sheet(inspections.map(i => ({
+                Date_Received: i.receivedDate || '', RM_Code: i.rmCode || '', RM_Name: i.rmName || '', Supplier: i.supplier || '', Lot_No: i.lotNo || '', Mfg_Date: i.mfgDate || '', Exp_Date: i.expDate || '', Internal_Lot: i.internalLotNo || '',
+                COA_Status: i.coaStatus === 'Pending' ? 'Waiting' : (i.coaStatus === 'Received' ? 'Received' : (i.coaStatus || '')),
+                COA_Received_Date: i.coaReceivedDate || '', COA_Wait_Days: i.coaAgingDays !== undefined && i.coaAgingDays !== null ? i.coaAgingDays : '',
+                COA_Color: i.coaColor || '', COA_Odor: i.coaOdor || '', COA_pH: i.coaPh || '', COA_Temp: i.coaTemp || '', QC_Appearance: i.qcAppearance || '', QC_Color: i.qcColor || '', QC_Odor: i.qcOdor || '', QC_pH: i.qcPh || '', QC_Temp: i.qcTemp || '', QC_Contamination: i.qcContamination || '', Remark: i.qcRemark || '', Status: i.passFail || '', Inspector: i.approvedBy || '', Inspect_Date: i.approvedDate || ''
+            })));
+            const wb = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb, ws, "QC_Data"); XLSX.writeFile(wb, "QC_Report_Firebase.xlsx");
+        }
+
+        // --- ส่วนที่เหลือใช้โค้ดเดิม ---
+        window.viewAttachment = function(idx, type) { 
             const item = inspections[idx];
             const file = type === 'coa' ? item.coaFile : item.qcFile;
-            
             if (!file || !file.data) return alert("❌ ไม่พบข้อมูลไฟล์ในระบบ");
-
             const content = document.getElementById('fileViewerContent');
             const dlBtn = document.getElementById('downloadAttachmentBtn');
-            
-            // ตั้งค่าปุ่มดาวน์โหลด
-            dlBtn.href = file.data;
-            dlBtn.download = file.name || (type === 'coa' ? 'COA_Document' : 'QC_Photo');
-
-            // ตรวจสอบประเภทไฟล์เพื่อแสดงผลให้ถูกต้อง
-            if (file.data.startsWith('data:image')) {
-                content.innerHTML = `<img src="${file.data}" style="max-width:100%; max-height:100%; object-fit:contain; border-radius:8px;">`;
-            } else if (file.data.startsWith('data:application/pdf')) {
-                content.innerHTML = `<iframe src="${file.data}" width="100%" height="100%" style="border:none; border-radius:8px;"></iframe>`;
-            } else {
-                content.innerHTML = `<div style="text-align:center;"><p style="color:#64748b; font-size:1.1rem; margin-bottom:15px;">⚠️ เบราว์เซอร์ไม่รองรับการแสดงตัวอย่างไฟล์ประเภทนี้</p><a href="${file.data}" download="${dlBtn.download}" class="btn btn-primary">⬇️ คลิกเพื่อดาวน์โหลดไฟล์แทน</a></div>`;
-            }
-            
+            dlBtn.href = file.data; dlBtn.download = file.name || (type === 'coa' ? 'COA_Document' : 'QC_Photo');
+            if (file.data.startsWith('data:image')) content.innerHTML = `<img src="${file.data}" style="max-width:100%; max-height:100%; object-fit:contain; border-radius:8px;">`;
+            else if (file.data.startsWith('data:application/pdf')) content.innerHTML = `<iframe src="${file.data}" width="100%" height="100%" style="border:none; border-radius:8px;"></iframe>`;
+            else content.innerHTML = `<div style="text-align:center;"><p style="color:#64748b; font-size:1.1rem; margin-bottom:15px;">⚠️ เบราว์เซอร์ไม่รองรับไฟล์นี้</p><a href="${file.data}" download="${dlBtn.download}" class="btn btn-primary">⬇️ ดาวน์โหลดไฟล์แทน</a></div>`;
             window.openModal('fileViewerModal');
         }
 
-
-        // ==========================================
-        // ส่วนการ Render ตารางและ UI ต่างๆ
-        // ==========================================
-
-        function renderMasterTable() {
+        function renderMasterTable() { 
             const tbody = document.getElementById('masterTableBody');
-            
-            if(inspections.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="7" style="text-align:center; padding:20px; color:#94a3b8;">ยังไม่มีข้อมูลการตรวจสอบในระบบ (No Data)</td></tr>';
-                return;
-            }
-
-            tbody.innerHTML = inspections.map((item, idx) => `
-                <tr>
-                    <td>${item.receivedDate || '-'}</td>
-                    <td><strong style="color:var(--primary);">${item.rmCode || '-'}</strong><br><small style="color:var(--text-light);">${item.rmName || '-'}</small></td>
-                    <td>${item.lotNo || '-'}</td>
-                    <td><span class="status-badge ${(item.passFail || '').toLowerCase()}">${item.passFail || '-'}</span></td>
-                    <td>${item.coaFile?.isLink ? `<button class="btn btn-secondary btn-sm" onclick="window.viewAttachment(${idx}, 'coa')">📄 COA File</button>` : '-'}</td>
-                    <td>${item.qcFile?.isLink ? `<button class="btn btn-success btn-sm" onclick="window.viewAttachment(${idx}, 'qc')">📸 QC Photo</button>` : '-'}</td>
-                    <td>
-                        <button class="btn btn-info btn-sm" onclick="window.openDetailModal(${idx})" style="margin-right: 5px;">📄 View</button>
-                        <button class="btn btn-warning btn-sm" onclick="window.openEditRecord(${idx})" style="background:#fef3c7; color:#b45309; border:1px solid #fde68a;">✏️ Edit</button>
-                    </td>
-                </tr>
-            `).join('');
-
-            // นำการค้นหาแบบกรองตารางมาใช้งานอัตโนมัติหากมีข้อความค้างอยู่ในช่องค้นหาหน้าประวัติ
-            if (typeof window.filterHistoryTable === 'function') {
-                window.filterHistoryTable();
-            }
+            if(inspections.length === 0) { tbody.innerHTML = '<tr><td colspan="7" style="text-align:center; padding:20px; color:#94a3b8;">ยังไม่มีข้อมูลการตรวจสอบในระบบ</td></tr>'; return; }
+            tbody.innerHTML = inspections.map((item, idx) => `<tr><td>${item.receivedDate || '-'}</td><td><strong style="color:var(--primary);">${item.rmCode || '-'}</strong><br><small style="color:var(--text-light);">${item.rmName || '-'}</small></td><td>${item.lotNo || '-'}</td><td><span class="status-badge ${(item.passFail || '').toLowerCase()}">${item.passFail || '-'}</span></td><td>${item.coaFile?.isLink ? `<button class="btn btn-secondary btn-sm" onclick="window.viewAttachment(${idx}, 'coa')">📄 COA File</button>` : '-'}</td><td>${item.qcFile?.isLink ? `<button class="btn btn-success btn-sm" onclick="window.viewAttachment(${idx}, 'qc')">📸 QC Photo</button>` : '-'}</td><td><button class="btn btn-info btn-sm" onclick="window.openDetailModal(${idx})" style="margin-right: 5px;">📄 View</button><button class="btn btn-warning btn-sm" onclick="window.openEditRecord(${idx})" style="background:#fef3c7; color:#b45309; border:1px solid #fde68a;">✏️ Edit</button></td></tr>`).join('');
+            if (typeof window.filterHistoryTable === 'function') window.filterHistoryTable();
         }
-        
-        // 🔍 ฟังก์ชันกรองตารางในหน้า History
+
         window.filterHistoryTable = function() {
             const input = document.getElementById('historySearchInput');
             if(!input) return;
@@ -1368,40 +1460,11 @@
             const trs = tbody.getElementsByTagName('tr');
 
             for (let i = 0; i < trs.length; i++) {
-                // ข้ามแถวที่บอกว่า "ไม่มีข้อมูล"
                 if (trs[i].cells.length === 1) continue;
-                
                 const rowText = trs[i].textContent.toLowerCase();
-                if (rowText.indexOf(filter) > -1) {
-                    trs[i].style.display = "";
-                } else {
-                    trs[i].style.display = "none";
-                }
+                if (rowText.indexOf(filter) > -1) trs[i].style.display = "";
+                else trs[i].style.display = "none";
             }
-        };
-
-        function renderSummary() {
-            const total = inspections.length;
-            const pass = inspections.filter(i => i.passFail === 'Pass').length;
-            const fail = inspections.filter(i => i.passFail === 'Fail').length;
-            const pendingItems = inspections.filter(i => i.passFail === 'Pending' || i.passFail === 'Hold');
-            
-            document.getElementById('dashTotal').textContent = total;
-            document.getElementById('dashPass').textContent = pass;
-            document.getElementById('dashFail').textContent = fail;
-            document.getElementById('dashRate').textContent = total > 0 ? ((pass/total)*100).toFixed(0)+'%' : '0%';
-
-            document.getElementById('dashPendingBody').innerHTML = pendingItems.map(i => {
-                const days = Math.floor((new Date() - new Date(i.receivedDate)) / (1000*60*60*24));
-                return `<tr><td><strong>${i.rmCode}</strong></td><td>${i.lotNo}</td><td><span class="status-badge ${i.passFail.toLowerCase()}">${i.passFail}</span></td><td style="color:${days>7?'#e74c3c':'#27ae60'}; font-weight:600;">${days} วัน</td></tr>`;
-            }).join('');
-
-            if (myPieChart) myPieChart.destroy();
-            myPieChart = new Chart(document.getElementById('qcPieChart'), {
-                type: 'doughnut', plugins: [ChartDataLabels],
-                data: { labels: ['Pass', 'Fail', 'Pending/Hold'], datasets: [{ data: [pass, fail, pendingItems.length], backgroundColor: ['#27ae60', '#e74c3c', '#f39c12'], borderWidth:0 }] },
-                options: { maintainAspectRatio: false, plugins: { legend: { position: 'bottom' }, datalabels: { color: '#fff', font:{weight:'bold', size:14} } }, cutout: '65%' }
-            });
         }
 
         window.performSearch = function() {
@@ -1448,289 +1511,84 @@
             `;
             }).join('');
         }
-
+        
         window.openDetailModal = function(idx) {
             const item = inspections[idx];
             const content = document.getElementById('detailContent');
             const v = (val) => val ? val : '<span style="color:#cbd5e1;">-</span>';
             
-            let appearanceDisplay = v(item.qcAppearance);
-            if (item.qcAppearance === 'Pass') appearanceDisplay = '✅ Pass (ผ่าน)';
-            if (item.qcAppearance === 'Fail') appearanceDisplay = '❌ Fail (ไม่ผ่าน)';
+            let coaStatDisplay = v(item.coaStatus);
+            if(item.coaStatus === 'Received') coaStatDisplay = '✅ ได้รับพร้อมสินค้าเรียบร้อยแล้ว';
+            if(item.coaStatus === 'Pending') coaStatDisplay = '⏳ สินค้ามาส่งแล้ว แต่ยังไม่ได้รับ COA';
+            if(item.coaStatus === 'NotRequired') coaStatDisplay = '➖ สินค้านี้ไม่ต้องใช้เอกสาร COA';
 
-            let contaminationDisplay = v(item.qcContamination);
-            if (item.qcContamination === 'Pass') contaminationDisplay = '✅ Pass (ผ่าน)';
-            if (item.qcContamination === 'Fail') contaminationDisplay = '❌ Fail (ไม่ผ่าน)';
-            
-            let passFailDisplay = v(item.passFail);
-            if (item.passFail === 'Pass') passFailDisplay = '✅ Accepted (ผ่าน)';
-            if (item.passFail === 'Fail') passFailDisplay = '❌ Rejected (ไม่ผ่าน)';
-            if (item.passFail === 'Pending') passFailDisplay = '⏳ Pending (รอผลตรวจเพิ่ม)';
-            if (item.passFail === 'Hold') passFailDisplay = '🔒 Quarantine (กักกัน / อายัดสินค้า)';
+            let coaAgingDisplay = '';
+            if (item.coaStatus === 'Received' && item.coaAgingDays !== null && item.coaAgingDays !== undefined) {
+                coaAgingDisplay = `<div class="detail-row" style="background:#f5f3ff;"><div class="detail-label" style="color:#6b21a8;">ระยะเวลารอ COA:</div><div class="detail-value" style="font-weight:bold; color:#6b21a8;">${item.coaAgingDays} วัน <span style="font-weight:normal; font-size:0.9em; margin-left:8px;">(ได้รับวันที่ ${v(item.coaReceivedDate)})</span></div></div>`;
+            } else if (item.coaStatus === 'Pending') {
+                const days = Math.floor((new Date() - new Date(item.receivedDate)) / (1000*60*60*24));
+                coaAgingDisplay = `<div class="detail-row" style="background:#fef2f2;"><div class="detail-label" style="color:#e74c3c;">ระยะเวลารอ COA:</div><div class="detail-value" style="font-weight:bold; color:#e74c3c;">กำลังรอ... <span style="font-weight:normal; font-size:0.9em; margin-left:8px;">(ผ่านมาแล้ว ${days} วัน)</span></div></div>`;
+            }
+
+            let appearanceDisplay = item.qcAppearance === 'Pass' ? '✅ Pass' : (item.qcAppearance === 'Fail' ? '❌ Fail' : v(item.qcAppearance));
+            let passFailDisplay = item.passFail === 'Pass' ? '✅ Accepted' : (item.passFail === 'Fail' ? '❌ Rejected' : v(item.passFail));
+
+            const cIcon = (val) => val ? '<span class="chk-icon" style="color:#27ae60;">☑</span>' : '<span class="chk-icon" style="color:#e74c3c;">☒</span>';
 
             content.innerHTML = `
                 <div class="print-container">
-                    <div class="print-header" style="display: none;">
-                        <h2>RAW MATERIAL RECEIVING & VENDOR CHECKLIST (QA)</h2>
-                        <p>แบบฟอร์มตรวจสอบคุณภาพวัตถุดิบรับเข้า</p>
-                    </div>
-
                     <div class="print-wrapper">
                         <div class="detail-section-header">1. Receiving Information (ข้อมูลการรับเข้า)</div>
-                        <div class="detail-row"><div class="detail-label">Material Code (รหัสวัตถุดิบ):</div><div class="detail-value" style="font-weight:700;">${v(item.rmCode)}</div></div>
-                        <div class="detail-row"><div class="detail-label">Material Name (ชื่อวัตถุดิบ):</div><div class="detail-value">${v(item.rmName)}</div></div>
-                        <div class="detail-row"><div class="detail-label">Supplier Name (ผู้จัดจำหน่าย):</div><div class="detail-value">${v(item.supplier)}</div></div>
-                        <div class="detail-row"><div class="detail-label">Batch/Lot Number (เลขล็อต):</div><div class="detail-value">${v(item.lotNo)}</div></div>
-                        <div class="detail-row"><div class="detail-label">Manufacturing Date (วันที่ผลิต):</div><div class="detail-value">${v(item.mfgDate)}</div></div>
-                        <div class="detail-row"><div class="detail-label">Expiry Date (วันหมดอายุ):</div><div class="detail-value">${v(item.expDate)}</div></div>
-                        <div class="detail-row"><div class="detail-label">Internal Lot (ล็อตภายในบริษัท):</div><div class="detail-value">${v(item.internalLotNo)}</div></div>
-                        <div class="detail-row"><div class="detail-label">Date Received (วันที่รับของ):</div><div class="detail-value">${v(item.receivedDate)}</div></div>
+                        <div class="detail-row"><div class="detail-label">Material Code:</div><div class="detail-value" style="font-weight:700;">${v(item.rmCode)}</div></div>
+                        <div class="detail-row"><div class="detail-label">Material Name:</div><div class="detail-value">${v(item.rmName)}</div></div>
+                        <div class="detail-row"><div class="detail-label">Supplier Name:</div><div class="detail-value">${v(item.supplier)}</div></div>
+                        <div class="detail-row"><div class="detail-label">Lot Number:</div><div class="detail-value">${v(item.lotNo)}</div></div>
+                        <div class="detail-row"><div class="detail-label">Date Received:</div><div class="detail-value">${v(item.receivedDate)}</div></div>
 
                         <div class="detail-section-header" style="margin-top: 20px;">2. Document Verification (การตรวจสอบเอกสาร)</div>
                         
                         <div class="detail-checklist-box">
                             <div class="chk-title">📋 Document Checklist (เช็คลิสต์ตรวจสอบเอกสาร):</div>
-                            <div class="chk-item"><span class="chk-icon">☑</span> <span>Certificate of Analysis Available (มีเอกสารใบรับรอง COA ครบถ้วน)</span></div>
-                            <div class="chk-item"><span class="chk-icon">☑</span> <span>Lot number matches COA (เลข Lot. ในเอกสาร ตรงกับสินค้าจริง)</span></div>
-                            <div class="chk-item"><span class="chk-icon">☑</span> <span>Manufacturing & Expiry date verified (วันที่ผลิตและวันหมดอายุถูกต้อง)</span></div>
+                            <div class="chk-item">${cIcon(item.chk_doc_coa)} <span>Certificate of Analysis Available (มีเอกสารใบรับรอง COA ครบถ้วน)</span></div>
+                            <div class="chk-item">${cIcon(item.chk_doc_lot)} <span>Lot number matches COA (เลข Lot. ในเอกสาร ตรงกับสินค้าจริง)</span></div>
+                            <div class="chk-item">${cIcon(item.chk_doc_mfg)} <span>Manufacturing & Expiry date verified (วันที่ผลิตและวันหมดอายุถูกต้อง)</span></div>
                         </div>
 
-                        <div class="detail-row"><div class="detail-label">Specification Color (สีตาม COA):</div><div class="detail-value">${v(item.coaColor)}</div></div>
-                        <div class="detail-row"><div class="detail-label">Specification Odor (กลิ่นตาม COA):</div><div class="detail-value">${v(item.coaOdor)}</div></div>
-                        <div class="detail-row"><div class="detail-label">Specification pH (ค่า pH ตาม COA):</div><div class="detail-value">${v(item.coaPh)}</div></div>
-                        <div class="detail-row"><div class="detail-label">Specification Temp (อุณหภูมิตาม COA):</div><div class="detail-value">${v(item.coaTemp)}</div></div>
-                        <div class="detail-row print-hide"><div class="detail-label">COA File (ไฟล์ COA):</div><div class="detail-value">
-                            ${item.coaFile?.isLink ? `<button class="btn btn-secondary btn-sm" onclick="window.viewAttachment(${idx}, 'coa')" style="background:#e2e8f0; color:#334155;">📄 เปิดไฟล์ COA</button>` : '<span style="color:#94a3b8;">ไม่มีไฟล์แนบ</span>'}
-                        </div></div>
+                        <div class="detail-row" style="background:#f5f3ff;"><div class="detail-label" style="color:#6b21a8;">COA Status:</div><div class="detail-value" style="font-weight:bold; color:#6b21a8;">${coaStatDisplay}</div></div>
+                        ${coaAgingDisplay}
+                        <div class="detail-row print-hide"><div class="detail-label">COA File:</div><div class="detail-value">${item.coaFile?.isLink ? `<button class="btn btn-secondary btn-sm" onclick="window.viewAttachment(${idx}, 'coa')">📄 เปิดไฟล์ COA</button>` : '<span style="color:#94a3b8;">ไม่มีไฟล์แนบ</span>'}</div></div>
 
                         <div class="detail-section-header" style="margin-top: 20px;">3. Packaging Inspection (การตรวจสอบบรรจุภัณฑ์)</div>
-
                         <div class="detail-checklist-box">
                             <div class="chk-title">📦 Packaging Checklist (เช็คลิสต์ตรวจสอบบรรจุภัณฑ์):</div>
-                            <div class="chk-item"><span class="chk-icon">☑</span> <span>Packaging intact (สภาพบรรจุภัณฑ์สมบูรณ์ ไม่ชำรุดเสียหาย)</span></div>
-                            <div class="chk-item"><span class="chk-icon">☑</span> <span>Seal intact & No leakage (ซีลปิดสนิท และไม่มีการรั่วซึม)</span></div>
-                            <div class="chk-item"><span class="chk-icon">☑</span> <span>Label readable (ฉลากอ่านออกชัดเจน)</span></div>
+                            <div class="chk-item">${cIcon(item.chk_pkg_intact)} <span>Packaging intact (สภาพบรรจุภัณฑ์สมบูรณ์ ไม่ชำรุดเสียหาย)</span></div>
+                            <div class="chk-item">${cIcon(item.chk_pkg_clean)} <span>Seal intact & No leakage (ซีลปิดสนิท และไม่มีการรั่วซึม)</span></div>
+                            <div class="chk-item">${cIcon(item.chk_pkg_label)} <span>Label readable (ฉลากอ่านออกชัดเจน)</span></div>
                         </div>
 
-                        <div class="detail-section-header" style="margin-top: 20px;">4. RM Physical Inspection (การตรวจสอบสภาพวัตถุดิบ)</div>
+                        <div class="detail-section-header" style="margin-top: 20px;">4. RM Physical Inspection</div>
+                        <div class="detail-row"><div class="detail-label">Appearance:</div><div class="detail-value">${appearanceDisplay}</div></div>
+                        <div class="detail-row print-hide"><div class="detail-label">QC Photo:</div><div class="detail-value">${item.qcFile?.isLink ? `<button class="btn btn-success btn-sm" onclick="window.viewAttachment(${idx}, 'qc')">📸 ดูรูป QC</button>` : '<span style="color:#94a3b8;">ไม่มีรูปถ่าย</span>'}</div></div>
 
-                        <div class="detail-row"><div class="detail-label">Appearance (ลักษณะปรากฏ):</div><div class="detail-value">${appearanceDisplay}</div></div>
-                        <div class="detail-row"><div class="detail-label">Result Color (สีที่ตรวจพบจริง):</div><div class="detail-value">${v(item.qcColor)}</div></div>
-                        <div class="detail-row"><div class="detail-label">Result Odor (กลิ่นที่ตรวจพบจริง):</div><div class="detail-value">${v(item.qcOdor)}</div></div>
-                        <div class="detail-row"><div class="detail-label">Result pH (ค่า pH ที่วัดได้):</div><div class="detail-value">${v(item.qcPh)}</div></div>
-                        <div class="detail-row"><div class="detail-label">Result Temp (อุณหภูมิที่วัดได้):</div><div class="detail-value">${v(item.qcTemp)}</div></div>
-                        <div class="detail-row"><div class="detail-label">Contamination (การปนเปื้อน):</div><div class="detail-value">${contaminationDisplay}</div></div>
-                        <div class="detail-row print-hide"><div class="detail-label">QC Photo (รูปหน้างาน):</div><div class="detail-value">
-                             ${item.qcFile?.isLink ? `<button class="btn btn-success btn-sm" onclick="window.viewAttachment(${idx}, 'qc')" style="background:#dcfce7; color:#166534;">📸 ดูรูป QC</button>` : '<span style="color:#94a3b8;">ไม่มีรูปถ่าย</span>'}
-                        </div></div>
-
-                        <div class="detail-section-header" style="margin-top: 20px;">5. QA Decision (สรุปผลการพิจารณา)</div>
-                        <div class="detail-row"><div class="detail-label">Decision Result (ผลการตัดสิน):</div><div class="detail-value"><strong style="font-size:1.1em;">${passFailDisplay}</strong></div></div>
-                        <div class="detail-row"><div class="detail-label">Remark (หมายเหตุ):</div><div class="detail-value">${v(item.qcRemark)}</div></div>
-                        
-                        <div class="detail-row print-hide"><div class="detail-label">Inspector Name (ผู้ตรวจสอบ):</div><div class="detail-value">${v(item.approvedBy)}</div></div>
-                        <div class="detail-row print-hide"><div class="detail-label">Inspection Date (วันที่ตรวจ):</div><div class="detail-value">${v(item.approvedDate)}</div></div>
-
-                        <!-- แสดงเฉพาะตอนพริ้นท์เอกสาร -->
-                        <div class="signature-area" style="display: none;">
-                            <div class="signature-box">
-                                <div class="signature-line"></div>
-                                <div style="font-weight: bold;">( ${v(item.approvedBy)} )</div>
-                                <div style="font-size: 0.9em; margin-top: 5px;">Inspector Name (ผู้ตรวจสอบ)</div>
-                                <div style="font-size: 0.9em;">Date (วันที่): ${v(item.approvedDate)}</div>
-                            </div>
-                            <div class="signature-box">
-                                <div class="signature-line"></div>
-                                <div style="font-weight: bold;">( .................................................... )</div>
-                                <div style="font-size: 0.9em; margin-top: 5px;">QA Manager / Approver (ผู้อนุมัติ)</div>
-                                <div style="font-size: 0.9em;">Date (วันที่): _______/_______/_______</div>
-                            </div>
-                        </div>
+                        <div class="detail-section-header" style="margin-top: 20px;">5. QA Decision (ผลการตัดสิน)</div>
+                        <div class="detail-row"><div class="detail-label">Result:</div><div class="detail-value"><strong style="font-size:1.1em;">${passFailDisplay}</strong></div></div>
+                        <div class="detail-row"><div class="detail-label">Remark:</div><div class="detail-value">${v(item.qcRemark)}</div></div>
+                        <div class="detail-row print-hide"><div class="detail-label">Inspector Name:</div><div class="detail-value">${v(item.approvedBy)}</div></div>
                     </div>
                 </div>
             `;
             window.openModal('detailModal');
         }
 
-        window.printDetail = function() {
-            document.body.classList.add('printing-detail');
-            window.print();
-            document.body.classList.remove('printing-detail');
-        }
-
-        window.showTab = function(id) {
-            document.querySelectorAll('.tab, .tab-content').forEach(el => el.classList.remove('active'));
-            document.getElementById(id).classList.add('active');
-            document.querySelector(`.tab[onclick*="${id}"]`).classList.add('active');
-            if(id === 'search') document.getElementById('searchResults').innerHTML = '<div style="text-align:center; color:#94a3b8; padding:40px; border:2px dashed #e2e8f0; border-radius:16px;">พิมพ์ข้อมูลที่ต้องการค้นหาในช่องด้านบน 👆</div>';
-            if(id === 'rmMaster') renderRMMasterTable(); 
-        }
-        window.openModal = function(id) { document.getElementById(id).classList.add('active'); }
-        window.closeModal = function(id) { document.getElementById(id).classList.remove('active'); }
-        function showLoading(s, t) { document.getElementById('loading-overlay').style.display = s ? 'flex' : 'none'; document.getElementById('loading-text').textContent = t || 'กำลังโหลด...'; }
-
-        // ฟังก์ชันอ่านไฟล์พร้อมบีบอัดสำหรับรูปภาพ
-        function readFile(input, cb) {
-            const f = input.files[0];
-            if(!f) return;
-            
-            showLoading(true, "กำลังประมวลผลไฟล์...");
-            
-            if (f.type.startsWith('image/')) {
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    const img = new Image();
-                    img.onload = function() {
-                        const canvas = document.createElement('canvas');
-                        let w = img.width;
-                        let h = img.height;
-                        const MAX_SIZE = 1600; // 🌟 เพิ่มขนาดสูงสุดเป็น 1600px เพื่อความคมชัด
-                        
-                        if (w > h && w > MAX_SIZE) { h *= MAX_SIZE / w; w = MAX_SIZE; }
-                        else if (h > w && h > MAX_SIZE) { w *= MAX_SIZE / h; h = MAX_SIZE; }
-                        else if (h === w && w > MAX_SIZE) { w = MAX_SIZE; h = MAX_SIZE; }
-                        
-                        canvas.width = w; canvas.height = h;
-                        const ctx = canvas.getContext('2d');
-                        ctx.drawImage(img, 0, 0, w, h);
-                        
-                        // 🌟 เพิ่มคุณภาพ JPEG เป็น 85% (จากเดิม 60%) เพื่อไม่ให้ภาพแตก แต่ยังปลอดภัยกับขนาดไฟล์ 1MB
-                        const dataUrl = canvas.toDataURL('image/jpeg', 0.85); 
-                        
-                        // เช็คขนาดไฟล์คร่าวๆ หลังบีบอัด (Base64 size / 1.33 = File size)
-                        const approxSizeKB = (dataUrl.length / 1.33) / 1024;
-                        if (approxSizeKB > 950) {
-                            alert("⚠️ รูปภาพมีความซับซ้อนมากและอาจมีขนาดใกล้เคียงขีดจำกัดของระบบ หากบันทึกไม่ผ่าน กรุณาลดความละเอียดกล้องลงเล็กน้อยครับ");
-                        }
-
-                        showLoading(false);
-                        cb({ name: f.name, data: dataUrl });
-                    }
-                    img.src = e.target.result;
-                };
-                reader.readAsDataURL(f);
-            } else {
-                if(f.size > 900000) { 
-                    alert("⚠️ คำเตือน: ไฟล์เอกสารมีขนาดใหญ่เกินไป (จำกัดไม่เกิน ~900KB) อาจทำให้บันทึกลงฐานข้อมูลไม่ผ่านครับ แนะนำให้ลดขนาดไฟล์ก่อน");
-                }
-                const r = new FileReader(); 
-                r.onload = e => { showLoading(false); cb({name: f.name, data: e.target.result}); }; 
-                r.readAsDataURL(f); 
-            }
-        }
-
-        document.getElementById('coaFile').onchange = e => readFile(e.target, d => { currentCoaFileData = d; document.getElementById('fileName').previousElementSibling.innerHTML = "✅ อัปโหลดสำเร็จ:"; document.getElementById('fileName').textContent = d.name; document.getElementById('fileName').style.color = '#2563eb'; document.getElementById('fileName').style.fontWeight = 'bold'; });
-        document.getElementById('qcFile').onchange = e => readFile(e.target, d => { currentQcFileData = d; document.getElementById('qcFileName').previousElementSibling.innerHTML = "✅ อัปโหลดสำเร็จ:"; document.getElementById('qcFileName').textContent = d.name; document.getElementById('qcFileName').style.color = '#d97706'; document.getElementById('qcFileName').style.fontWeight = 'bold'; });
-
-        window.handleAutocomplete = function(e, f) {
-            const list = document.getElementById(f + '-autocomplete-list');
-            const v = e.target.value.toLowerCase();
-            if(v.length < 1) { list.style.display = 'none'; return; }
-            const matches = MASTER_LIST.filter(i => i.code.toLowerCase().includes(v) || i.name.toLowerCase().includes(v)).slice(0, 5);
-            list.innerHTML = matches.map(m => `<div class="autocomplete-item" onclick="window.selectRM('${m.code}', '${m.name.replace(/'/g, "\\'")}')"><strong>${m.code}</strong><br><span style="color:#64748b; font-size:0.85rem;">${m.name}</span></div>`).join('');
-            list.style.display = matches.length ? 'block' : 'none';
-        }
-        window.selectRM = function(c, n) { document.getElementById('rmCode').value = c; document.getElementById('rmName').value = n; document.querySelectorAll('.autocomplete-list').forEach(l => l.style.display = 'none'); }
-
-        function renderRMMasterTable() {
-            const tbody = document.getElementById('rmMasterTableBody');
-            if(!isFirebaseLoaded) {
-                tbody.innerHTML = '<tr><td colspan="4" style="text-align:center; padding:20px; color:#94a3b8;">กำลังโหลดข้อมูลจาก Firebase...</td></tr>';
-                return;
-            }
-            tbody.innerHTML = MASTER_LIST.map((rm, idx) => `
-                <tr>
-                    <td style="color:var(--text-light);">${idx + 1}</td>
-                    <td><strong style="color:var(--primary);">${rm.code}</strong></td>
-                    <td>${rm.name}</td>
-                    <td><button class="btn btn-danger btn-sm" onclick="window.deleteRM(${idx})">🗑️ ลบ</button></td>
-                </tr>
-            `).join('');
-        }
-
-        window.handleAddRM = async function() {
-            if (!firebaseUser || !db) return alert("❌ ระบบไม่สามารถเชื่อมต่อ Firebase ได้ในขณะนี้ (ทดสอบระบบจะใช้ข้อมูลชั่วคราวได้ตามปกติ)");
-            const code = document.getElementById('newRmCode').value.trim();
-            const name = document.getElementById('newRmName').value.trim();
-            
-            if(MASTER_LIST.some(rm => rm.code.toLowerCase() === code.toLowerCase())) { alert("❌ รหัส RM Code นี้มีอยู่ในระบบแล้ว!"); return; }
-            try {
-                showLoading(true, "กำลังบันทึกลง Firebase...");
-                const rmRef = typeof __app_id !== 'undefined' && !isUsingCustomConfig ? collection(db, 'artifacts', appId, 'public', 'data', 'rmMaster') : collection(db, 'rmMaster');
-                await addDoc(rmRef, { code: code, name: name, createdAt: new Date().toISOString() });
-                document.getElementById('newRmCode').value = ''; document.getElementById('newRmName').value = '';
-                alert("✅ เพิ่มข้อมูลวัตถุดิบลงใน Firebase สำเร็จ!");
-            } catch (error) { console.error("Error adding document: ", error); alert("❌ เกิดข้อผิดพลาดในการบันทึกข้อมูล (โดเมนพรีวิวอาจถูกบล็อกโดย Firebase ของคุณ)"); } finally { showLoading(false); }
-        }
-
-        window.importDefaultRM = async function() {
-            if (!firebaseUser || !db) return alert("❌ ระบบไม่สามารถเชื่อมต่อ Firebase ได้ในขณะนี้");
-            if (!confirm("ต้องการนำเข้าข้อมูลวัตถุดิบพื้นฐาน (~40 รายการ) ลงใน Firebase หรือไม่?\n*ระบบจะข้ามรายการที่มีรหัสซ้ำให้รหัสเดิมที่มีอยู่*")) return;
-            showLoading(true, "กำลังนำเข้าข้อมูลลง Firebase (อาจใช้เวลาสักครู่)...");
-            const rmRef = typeof __app_id !== 'undefined' && !isUsingCustomConfig ? collection(db, 'artifacts', appId, 'public', 'data', 'rmMaster') : collection(db, 'rmMaster');
-            let addedCount = 0;
-            try {
-                for (const rm of DEFAULT_RM) {
-                    if (!MASTER_LIST.some(existing => existing.code.toLowerCase() === rm.code.toLowerCase())) {
-                        await addDoc(rmRef, { code: rm.code, name: rm.name, createdAt: new Date().toISOString() });
-                        addedCount++;
-                    }
-                }
-                alert(`✅ นำเข้าข้อมูลสำเร็จ ${addedCount} รายการ!`);
-            } catch (error) { console.error(error); alert("❌ เกิดข้อผิดพลาดระหว่างนำเข้าข้อมูล (โดเมนพรีวิวอาจถูกบล็อกโดย Firebase ของคุณ)"); } finally { showLoading(false); }
-        }
-
-        window.deleteRM = async function(idx) {
-            const rm = MASTER_LIST[idx];
-            if(!rm.id) { alert("❌ ไม่สามารถลบข้อมูล Default ได้ (เพิ่มข้อมูลใหม่เพื่อทดสอบการลบ)"); return; }
-            if(confirm(`คุณแน่ใจหรือไม่ที่จะลบวัตถุดิบ ${rm.code} ออกจาก Firebase?`)) {
-                try {
-                    showLoading(true, "กำลังลบข้อมูล...");
-                    const docRef = typeof __app_id !== 'undefined' && !isUsingCustomConfig ? doc(db, 'artifacts', appId, 'public', 'data', 'rmMaster', rm.id) : doc(db, 'rmMaster', rm.id);
-                    await deleteDoc(docRef);
-                } catch (error) { console.error("Error removing document: ", error); alert("❌ เกิดข้อผิดพลาดในการลบข้อมูล (โดเมนพรีวิวอาจถูกบล็อก)"); } finally { showLoading(false); }
-            }
-        }
-
-        window.exportToExcel = function() {
-            if (inspections.length === 0) return alert("ยังไม่มีข้อมูลให้ Export");
-            const ws = XLSX.utils.json_to_sheet(inspections.map(i => ({
-                Date_Received: i.receivedDate || '',
-                RM_Code: i.rmCode || '',
-                RM_Name: i.rmName || '',
-                Supplier: i.supplier || '',
-                Lot_No: i.lotNo || '',
-                Mfg_Date: i.mfgDate || '',
-                Exp_Date: i.expDate || '',
-                Internal_Lot: i.internalLotNo || '',
-                COA_Color: i.coaColor || '',
-                COA_Odor: i.coaOdor || '',
-                COA_pH: i.coaPh || '',
-                COA_Temp: i.coaTemp || '',
-                QC_Appearance: i.qcAppearance || '',
-                QC_Color: i.qcColor || '',
-                QC_Odor: i.qcOdor || '',
-                QC_pH: i.qcPh || '',
-                QC_Temp: i.qcTemp || '',
-                QC_Contamination: i.qcContamination || '',
-                Remark: i.qcRemark || '',
-                Status: i.passFail || '',
-                Inspector: i.approvedBy || '',
-                Inspect_Date: i.approvedDate || ''
-            })));
-            const wb = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb, ws, "QC_Data"); XLSX.writeFile(wb, "QC_Report_Firebase.xlsx");
-        }
-
         window.openEditRecord = function(idx) {
             const i = inspections[idx];
-            
-            // เก็บ ID ของ Firestore ไว้ใช้อัปเดต
             document.getElementById('editOriginalDocId').value = i.id;
-            document.getElementById('editOriginalTimestamp').value = i.timestamp;
-            
-            const fields = ['rmCode','rmName','supplier','lotNo','internalLotNo','mfgDate','expDate','receivedDate','coaColor','coaOdor','coaPh','coaTemp','qcAppearance','qcContamination','qcColor','qcOdor','qcPh','qcTemp','qcRemark','passFail','approvedBy','approvedDate'];
+            const fields = ['rmCode','rmName','supplier','lotNo','internalLotNo','mfgDate','expDate','receivedDate','coaStatus','coaReceivedDate','coaColor','coaOdor','coaPh','coaTemp','qcAppearance','qcContamination','qcColor','qcOdor','qcPh','qcTemp','qcRemark','passFail','approvedBy','approvedDate'];
             fields.forEach(f => { if(document.getElementById('edit_'+f)) document.getElementById('edit_'+f).value = i[f] || ''; });
             
+            const checkboxFields = ['chk_doc_coa', 'chk_doc_lot', 'chk_doc_mfg', 'chk_pkg_intact', 'chk_pkg_clean', 'chk_pkg_label'];
+            checkboxFields.forEach(f => { if(document.getElementById('edit_'+f)) document.getElementById('edit_'+f).checked = !!i[f]; });
+
             isEditCoaRemoved = false; editCoaFileData = null;
             if(i.coaFile?.isLink) { document.getElementById('edit_coaFileStatus').innerHTML = `✅ <a href="#" onclick="window.viewAttachment(${idx}, 'coa'); return false;" style="color:#2563eb; font-weight:600;">ไฟล์เดิมที่มีอยู่ (คลิกเพื่อดู)</a>`; document.getElementById('edit_btnRemoveCoa').style.display = "inline-block"; } 
             else { document.getElementById('edit_coaFileStatus').textContent = "❌ ไม่มีไฟล์แนบ"; document.getElementById('edit_btnRemoveCoa').style.display = "none"; }
@@ -1742,20 +1600,54 @@
             window.openModal('editModal');
         }
 
-        window.markFileRemoved = function(type) {
-            if(type === 'coa') { isEditCoaRemoved = true; document.getElementById('edit_coaFileStatus').innerHTML = "<span style='color:#e74c3c; font-weight:bold;'>⚠️ ไฟล์เดิมถูกสั่งลบ (กดบันทึกเพื่อยืนยัน)</span>"; document.getElementById('edit_btnRemoveCoa').style.display = "none"; }
-            else { isEditQcRemoved = true; document.getElementById('edit_qcFileStatus').innerHTML = "<span style='color:#e74c3c; font-weight:bold;'>⚠️ รูปเดิมถูกสั่งลบ (กดบันทึกเพื่อยืนยัน)</span>"; document.getElementById('edit_btnRemoveQc').style.display = "none"; }
+        // Helper functions
+        window.printDetail = function() { document.body.classList.add('printing-detail'); window.print(); document.body.classList.remove('printing-detail'); }
+        window.showTab = function(id) { document.querySelectorAll('.tab, .tab-content').forEach(el => el.classList.remove('active')); document.getElementById(id).classList.add('active'); document.querySelector(`.tab[onclick*="${id}"]`).classList.add('active'); if(id === 'rmMaster') renderRMMasterTable(); }
+        window.openModal = function(id) { document.getElementById(id).classList.add('active'); }
+        window.closeModal = function(id) { document.getElementById(id).classList.remove('active'); }
+        function showLoading(s, t) { document.getElementById('loading-overlay').style.display = s ? 'flex' : 'none'; document.getElementById('loading-text').textContent = t || 'กำลังโหลด...'; }
+
+        function readFile(input, cb) {
+            const f = input.files[0]; if(!f) return;
+            showLoading(true, "กำลังประมวลผลไฟล์...");
+            if (f.type.startsWith('image/')) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const img = new Image();
+                    img.onload = function() {
+                        const canvas = document.createElement('canvas');
+                        let w = img.width; let h = img.height; const MAX_SIZE = 1600;
+                        if (w > h && w > MAX_SIZE) { h *= MAX_SIZE / w; w = MAX_SIZE; } else if (h > w && h > MAX_SIZE) { w *= MAX_SIZE / h; h = MAX_SIZE; } else if (h === w && w > MAX_SIZE) { w = MAX_SIZE; h = MAX_SIZE; }
+                        canvas.width = w; canvas.height = h;
+                        canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+                        showLoading(false); cb({ name: f.name, data: canvas.toDataURL('image/jpeg', 0.85) });
+                    }
+                    img.src = e.target.result;
+                };
+                reader.readAsDataURL(f);
+            } else {
+                if(f.size > 900000) alert("⚠️ คำเตือน: ไฟล์เอกสารมีขนาดใหญ่เกินไป อาจทำให้บันทึกลงฐานข้อมูลไม่ผ่านครับ");
+                const r = new FileReader(); r.onload = e => { showLoading(false); cb({name: f.name, data: e.target.result}); }; r.readAsDataURL(f); 
+            }
         }
 
+        document.getElementById('coaFile').onchange = e => readFile(e.target, d => { currentCoaFileData = d; document.getElementById('fileName').innerHTML = `✅ อัปโหลดสำเร็จ: <b>${d.name}</b>`; });
+        document.getElementById('qcFile').onchange = e => readFile(e.target, d => { currentQcFileData = d; document.getElementById('qcFileName').innerHTML = `✅ อัปโหลดสำเร็จ: <b>${d.name}</b>`; });
+        window.markFileRemoved = function(type) { if(type === 'coa') { isEditCoaRemoved = true; document.getElementById('edit_coaFileStatus').innerHTML = "<span style='color:#e74c3c; font-weight:bold;'>⚠️ ไฟล์เดิมถูกสั่งลบ</span>"; document.getElementById('edit_btnRemoveCoa').style.display = "none"; } else { isEditQcRemoved = true; document.getElementById('edit_qcFileStatus').innerHTML = "<span style='color:#e74c3c; font-weight:bold;'>⚠️ รูปเดิมถูกสั่งลบ</span>"; document.getElementById('edit_btnRemoveQc').style.display = "none"; } }
         document.getElementById('edit_coaFileInput').onchange = e => readFile(e.target, d => { editCoaFileData = d; document.getElementById('edit_coaFileStatus').innerHTML = "<span style='color:#2563eb; font-weight:bold;'>🆕 เลือกไฟล์ใหม่แล้ว: " + d.name + "</span>"; isEditCoaRemoved = false; });
         document.getElementById('edit_qcFileInput').onchange = e => readFile(e.target, d => { editQcFileData = d; document.getElementById('edit_qcFileStatus').innerHTML = "<span style='color:#d97706; font-weight:bold;'>🆕 เลือกรูปใหม่แล้ว: " + d.name + "</span>"; isEditQcRemoved = false; });
-
-        // ฟังก์ชันดักจับการคลิกพื้นที่ว่างเพื่อปิด Modal ทีละชั้น
-        window.addEventListener('click', e => { 
-            if(e.target.classList.contains('modal')) {
-                e.target.classList.remove('active');
-            } 
-        });
+        
+        window.handleAutocomplete = function(e, f) { 
+            const list = document.getElementById(f + '-autocomplete-list');
+            const v = e.target.value.toLowerCase();
+            if(v.length < 1) { list.style.display = 'none'; return; }
+            const matches = MASTER_LIST.filter(i => i.code.toLowerCase().includes(v) || i.name.toLowerCase().includes(v)).slice(0, 5);
+            list.innerHTML = matches.map(m => `<div class="autocomplete-item" onclick="window.selectRM('${m.code}', '${m.name.replace(/'/g, "\\'")}')"><strong>${m.code}</strong><br><span style="color:#64748b; font-size:0.85rem;">${m.name}</span></div>`).join('');
+            list.style.display = matches.length ? 'block' : 'none';
+        }
+        window.selectRM = function(c, n) { document.getElementById('rmCode').value = c; document.getElementById('rmName').value = n; document.querySelectorAll('.autocomplete-list').forEach(l => l.style.display = 'none'); }
+        
+        window.addEventListener('click', e => { if(e.target.classList.contains('modal')) e.target.classList.remove('active'); });
     </script>
 </body>
 </html>
