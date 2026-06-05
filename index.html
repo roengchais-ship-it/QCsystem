@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>QC System v6.23 (Dashboard Filter & COA Tracking)</title>
+    <title>QC System v6.22 (Dashboard Filter & COA Tracking)</title>
     
     <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
@@ -24,7 +24,7 @@
             --shadow-sm: 0 2px 8px rgba(0,0,0,0.04);
             --shadow-md: 0 10px 30px rgba(44, 75, 70, 0.08);
             --shadow-hover: 0 15px 35px rgba(44, 75, 70, 0.12);
-            --coa-color: #8b5cf6;
+            --coa-color: #8b5cf6; /* Purple for COA pending */
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -71,6 +71,7 @@
         .tab-content.active { display: block; animation: fadeIn 0.4s ease-out; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
         
+        /* General content box */
         .content-box { background: white; padding: 30px; border-radius: 20px; box-shadow: var(--shadow-md); }
 
         /* --- MODERN FORM ELEMENTS --- */
@@ -99,17 +100,20 @@
 
         select[name="passFail"], select[name="qcAppearance"], select[name="qcContamination"], select[name="coaStatus"] { font-weight: 600; cursor: pointer; }
 
+        /* Custom Checklist UI */
         .checklist-container { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 20px; margin-bottom: 20px; }
         .checklist-item { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; padding-bottom: 12px; border-bottom: 1px dashed #cbd5e1; }
         .checklist-item:last-child { margin-bottom: 0; padding-bottom: 0; border-bottom: none; }
         .checklist-item input[type="checkbox"] { width: 24px; height: 24px; accent-color: var(--active-green); cursor: pointer; }
         .checklist-item label { margin-bottom: 0 !important; cursor: pointer; font-size: 1rem; color: #475569; }
 
+        /* Detail Modal specific styling */
         .detail-checklist-box { display: flex; flex-direction: column; background: #f8fafc; border-radius: 8px; margin-bottom: 15px; border: 1px solid #e2e8f0; padding: 15px; }
         .detail-checklist-box .chk-title { font-weight: 600; color: #3b82f6; margin-bottom: 10px; }
         .detail-checklist-box .chk-item { display: flex; gap: 8px; align-items: center; margin-bottom: 6px; font-size: 0.95rem; }
         .chk-icon { color: var(--active-green); font-size: 1.2rem; }
 
+        /* Autocomplete */
         .autocomplete-list { position: absolute; z-index: 1000; top: 100%; left: 0; right: 0; background: white; border: 1px solid #e2e8f0; border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); max-height: 220px; overflow-y: auto; display: none; margin-top: 5px; }
         .autocomplete-item { padding: 12px 16px; cursor: pointer; border-bottom: 1px solid #f8fafc; font-size: 0.95rem; transition: background 0.2s; }
         .autocomplete-item:hover { background: #f0fdfa; color: var(--primary); font-weight: 500; }
@@ -118,11 +122,6 @@
         .file-upload:hover { border-color: var(--primary); background: #f0fdfa; transform: scale(1.01); }
         .file-upload .upload-icon { font-size: 2.5rem; margin-bottom: 5px; transition: transform 0.3s; }
         .file-upload:hover .upload-icon { transform: translateY(-5px); }
-        
-        /* Multi File Upload styles */
-        .multi-file-preview { display: flex; flex-direction: column; gap: 8px; margin-top: 10px; }
-        .file-item { display: flex; justify-content: space-between; align-items: center; background: white; padding: 10px 15px; border: 1px solid #e2e8f0; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.02); }
-        .file-item-name { font-size: 0.9rem; color: #475569; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 75%; font-weight: 500;}
 
         .btn { padding: 12px 24px; border: none; border-radius: 12px; font-size: 0.95rem; font-weight: 600; cursor: pointer; transition: all 0.3s; display: inline-flex; align-items: center; justify-content: center; gap: 8px; font-family: 'Prompt'; text-decoration: none; }
         .btn-primary { background: var(--primary); color: white; }
@@ -163,6 +162,7 @@
         .fail { background: rgba(231, 76, 60, 0.1); color: #e74c3c; }
         .pending { background: rgba(243, 156, 18, 0.1); color: #d68910; }
         .hold { background: rgba(149, 165, 166, 0.15); color: #7f8c8d; }
+        .coapending { background: rgba(139, 92, 246, 0.1); color: #8b5cf6; border: 1px solid rgba(139, 92, 246, 0.3); }
 
         .result-card { background: white; padding: 25px; border-radius: 20px; box-shadow: var(--shadow-md); margin-bottom: 20px; border: 1px solid transparent; transition: all 0.3s ease; }
         .result-card:hover { transform: translateY(-3px); box-shadow: var(--shadow-hover); border-color: #f1f5f9; }
@@ -184,38 +184,133 @@
         .detail-value { width: 65%; color: var(--text-main); font-size: 1rem; font-weight: 500; }
         .detail-section-header { background: #f0fdfa; color: var(--primary); padding: 10px 16px; border-radius: 8px; font-weight: 700; margin: 25px 0 15px 0; font-size: 1.1rem; border-left: 4px solid var(--active-green); }
 
-        .dashboard-filter { background-color: white; border: 2px solid #e2e8f0; border-radius: 12px; padding: 10px 16px; font-family: 'Prompt'; font-size: 1rem; color: var(--primary); font-weight: 600; cursor: pointer; outline: none; box-shadow: var(--shadow-sm); transition: all 0.3s; }
+        /* Filter Select Style */
+        .dashboard-filter {
+            background-color: white;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 10px 16px;
+            font-family: 'Prompt';
+            font-size: 1rem;
+            color: var(--primary);
+            font-weight: 600;
+            cursor: pointer;
+            outline: none;
+            box-shadow: var(--shadow-sm);
+            transition: all 0.3s;
+        }
         .dashboard-filter:hover { border-color: var(--primary-soft); }
         .dashboard-filter:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(44, 75, 70, 0.1); }
 
         /* =========================================
-            🖨️ PRINT STYLES
-            ========================================= */
+           🖨️ PRINT STYLES
+           ========================================= */
         @media print {
             @page { size: A4 portrait; margin: 10mm; } 
-            html, body { background: white !important; color: black !important; font-size: 8.5pt !important; line-height: 1.3 !important; height: auto !important; margin: 0 !important; padding: 0 !important; overflow: hidden !important; font-family: 'Prompt', sans-serif !important; }
-            body.printing-detail > *:not(#detailModal) { display: none !important; }
-            body.printing-detail #detailModal { position: static !important; display: block !important; background: transparent !important; backdrop-filter: none !important; width: 100% !important; height: auto !important; min-height: 0 !important; margin: 0 !important; padding: 0 !important; }
-            body.printing-detail .modal-content { box-shadow: none !important; width: 100% !important; max-width: 100% !important; padding: 0 !important; margin: 0 !important; border-radius: 0 !important; height: auto !important; max-height: none !important; overflow: visible !important; }
-            body.printing-detail .print-container { border: 2px solid #000 !important; width: 100% !important; box-sizing: border-box !important; margin: 0 !important; page-break-inside: avoid !important; }
-            body.printing-detail .print-header { display: block !important; margin-bottom: 0 !important; border-bottom: 2px solid #000 !important; padding: 12px 10px !important; text-align: center !important; background-color: #fff !important; }
+            
+            html, body { 
+                background: white !important; 
+                color: black !important; 
+                font-size: 8.5pt !important; 
+                line-height: 1.3 !important; 
+                height: auto !important; 
+                margin: 0 !important; 
+                padding: 0 !important;
+                overflow: hidden !important; 
+                font-family: 'Prompt', sans-serif !important;
+            }
+            
+            body.printing-detail > *:not(#detailModal) {
+                display: none !important;
+            }
+
+            body.printing-detail #detailModal { 
+                position: static !important; 
+                display: block !important; 
+                background: transparent !important; 
+                backdrop-filter: none !important; 
+                width: 100% !important; 
+                height: auto !important; 
+                min-height: 0 !important; 
+                margin: 0 !important; 
+                padding: 0 !important;
+            }
+            
+            body.printing-detail .modal-content { 
+                box-shadow: none !important; width: 100% !important; max-width: 100% !important; 
+                padding: 0 !important; margin: 0 !important; border-radius: 0 !important; height: auto !important; 
+                max-height: none !important; overflow: visible !important;
+            }
+
+            body.printing-detail .print-container {
+                border: 2px solid #000 !important;
+                width: 100% !important;
+                box-sizing: border-box !important;
+                margin: 0 !important;
+                page-break-inside: avoid !important;
+            }
+            
+            body.printing-detail .print-header { 
+                display: block !important; margin-bottom: 0 !important; 
+                border-bottom: 2px solid #000 !important; padding: 12px 10px !important; 
+                text-align: center !important; background-color: #fff !important;
+            }
             body.printing-detail .print-header h2 { font-size: 13pt !important; margin: 0 0 4px 0 !important; font-weight: bold !important; }
             body.printing-detail .print-header p { font-size: 9pt !important; margin: 0 !important; }
+            
             body.printing-detail .print-wrapper { border: none !important; }
-            body.printing-detail .detail-section-header { background-color: #f1f5f9 !important; color: #000 !important; border-bottom: 1px solid #000 !important; border-top: none !important; padding: 5px 8px !important; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; margin: 0 !important; font-size: 9.5pt !important; font-weight: bold !important; border-left: none !important; border-radius: 0 !important; }
+            
+            body.printing-detail .detail-section-header { 
+                background-color: #f1f5f9 !important; color: #000 !important; 
+                border-bottom: 1px solid #000 !important; border-top: none !important;
+                padding: 5px 8px !important; 
+                -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; 
+                margin: 0 !important; font-size: 9.5pt !important; font-weight: bold !important;
+                border-left: none !important; border-radius: 0 !important;
+            }
+            /* จัดการเส้นตารางให้เนียนกริบ ไม่เบิ้ล */
             body.printing-detail .detail-row:last-of-type { border-bottom: 1px solid #000 !important; }
             body.printing-detail .detail-section-header + .detail-row { border-top: none !important; }
-            body.printing-detail .detail-row { border-bottom: 1px solid #000 !important; page-break-inside: avoid !important; margin: 0 !important; padding: 0 !important; border-radius: 0 !important; background: #fff !important; align-items: stretch !important; display: flex !important; }
-            body.printing-detail .detail-label { border-right: 1px solid #000 !important; color: #000 !important; background-color: #fff !important; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; width: 35% !important; padding: 4px 8px !important; display: flex; align-items: center; font-weight: bold !important; }
-            body.printing-detail .detail-value { color: #000 !important; width: 65% !important; padding: 4px 8px !important; display: flex; align-items: center; }
-            body.printing-detail .detail-checklist-box { padding: 8px 12px !important; display: block !important; border-bottom: 1px solid #000 !important; border-radius: 0 !important; border-top: none !important; border-left: none !important; border-right: none !important; margin: 0 !important; background: #fff !important; }
+            
+            body.printing-detail .detail-row { 
+                border-bottom: 1px solid #000 !important; page-break-inside: avoid !important; 
+                margin: 0 !important; padding: 0 !important; border-radius: 0 !important; 
+                background: #fff !important; align-items: stretch !important; display: flex !important;
+            }
+            
+            body.printing-detail .detail-label {
+                border-right: 1px solid #000 !important; color: #000 !important; background-color: #fff !important;
+                -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; 
+                width: 35% !important; padding: 4px 8px !important; 
+                display: flex; align-items: center; font-weight: bold !important;
+            }
+            
+            body.printing-detail .detail-value {
+                color: #000 !important; width: 65% !important;
+                padding: 4px 8px !important; display: flex; align-items: center;
+            }
+            
+            body.printing-detail .detail-checklist-box { 
+                padding: 8px 12px !important; display: block !important; 
+                border-bottom: 1px solid #000 !important; border-radius: 0 !important; 
+                border-top: none !important; border-left: none !important; border-right: none !important;
+                margin: 0 !important; background: #fff !important;
+            }
             body.printing-detail .chk-title { color: #000 !important; font-weight: bold !important; margin-bottom: 4px !important; text-decoration: underline !important; font-size: 8.5pt !important; }
             body.printing-detail .chk-item { margin-bottom: 2px !important; display: flex !important; align-items: center !important; gap: 4px !important; }
             body.printing-detail .chk-item span { color: #000 !important; font-size: 8.5pt !important; }
             body.printing-detail .chk-icon { font-size: 10pt !important; margin-right: 4px !important; }
-            body.printing-detail .signature-area { display: flex !important; justify-content: space-around !important; margin-top: 0 !important; padding: 25px 0 10px 0 !important; border-bottom: none !important; border-left: none !important; border-right: none !important; page-break-inside: avoid !important; background: white !important; }
+
+            body.printing-detail .signature-area {
+                display: flex !important; justify-content: space-around !important;
+                margin-top: 0 !important;
+                padding: 25px 0 10px 0 !important; 
+                border-bottom: none !important; border-left: none !important; border-right: none !important;
+                page-break-inside: avoid !important; background: white !important;
+            }
             body.printing-detail .signature-box { width: 40% !important; text-align: center !important; }
             body.printing-detail .signature-line { border-bottom: 1px dashed #000 !important; height: 15px !important; margin-bottom: 8px !important; }
+            
             body.printing-detail .print-hide { display: none !important; }
         }
 
@@ -238,7 +333,7 @@
     <div id="login-overlay">
         <div class="login-card">
             <h2>🔐 QC System</h2>
-            <p class="version">v6.23 (MSDS, Specs, CAS Update)</p>
+            <p class="version">v6.22 (Dashboard & COA Tracking)</p>
             
             <div class="login-hint">
                 <div style="font-weight: 600; margin-bottom: 5px;">ข้อมูลสำหรับทดสอบเข้าสู่ระบบ:</div>
@@ -267,7 +362,7 @@
                     <button class="btn btn-warning btn-sm" onclick="window.openModal('passModal')">🔑</button>
                     <button class="btn btn-danger btn-sm" onclick="window.handleLogout()">Logout</button>
                 </div>
-                <h1 style="font-size: 2rem; margin-bottom: 5px;">☁️ QC System v6.23 <small style="font-size:1rem; opacity:0.8;">(Firebase Sync)</small></h1>
+                <h1 style="font-size: 2rem; margin-bottom: 5px;">☁️ QC System v6.22 <small style="font-size:1rem; opacity:0.8;">(Firebase Sync)</small></h1>
                 <p style="opacity: 0.9; font-weight: 300;">ระบบจัดการและตรวจสอบคุณภาพวัตถุดิบครบวงจร</p>
             </div>
 
@@ -323,12 +418,6 @@
                                 <input type="text" name="internalLotNo" placeholder="ระบุเลขลอตภายใน (ถ้ามี)...">
                             </div>
                             <div class="form-group">
-                                <label>CAS Number <span class="en-label">(รหัสสารเคมี)</span></label>
-                                <input type="text" name="casNumber" placeholder="เช่น 7732-18-5...">
-                            </div>
-                        </div>
-                        <div class="form-row" style="margin-bottom:0;">
-                            <div class="form-group" style="grid-column: span 2;">
                                 <label>Date Received <span class="en-label">(วันที่รับของ)</span> <span class="required">*</span></label>
                                 <input type="date" name="receivedDate" required>
                             </div>
@@ -355,6 +444,7 @@
                             </div>
                         </div>
                         
+                        <!-- เพิ่มฟิลด์สถานะ COA ให้ชัดเจนสำหรับจัดซื้อ -->
                         <div class="form-row" style="background: #e0e7ff; padding: 15px; border-radius: 12px; border: 1px solid #c7d2fe; margin-bottom: 20px;">
                             <div class="form-group">
                                 <label style="color:#4338ca; font-size:1.05rem;">🔔 COA Document Status <span class="en-label" style="color:#6366f1;">(สถานะเอกสาร COA)</span> <span class="required">*</span></label>
@@ -370,39 +460,14 @@
                             </div>
                         </div>
 
-                        <!-- COA Upload -->
                         <div class="form-group" style="margin-bottom:20px;">
                             <label>📄 Upload COA PDF/Image <span class="en-label">(แนบไฟล์เอกสาร COA)</span></label>
                             <div class="file-upload" style="border-color:#bfdbfe; background:#eff6ff;" onclick="document.getElementById('coaFile').click()">
                                 <input type="file" id="coaFile" accept=".pdf,.jpg,.jpeg,.png" style="display:none">
                                 <span class="upload-icon">📄</span>
                                 <span style="font-weight:600; color:#2563eb;">คลิกเพื่ออัปโหลดไฟล์ COA</span>
-                                <span id="fileName" style="color:#64748b; font-size:0.9rem; margin-top:5px;">รองรับไฟล์ PDF, JPG, PNG (1 ไฟล์)</span>
+                                <span id="fileName" style="color:#64748b; font-size:0.9rem; margin-top:5px;">รองรับไฟล์ PDF, JPG, PNG</span>
                             </div>
-                        </div>
-
-                        <!-- NEW: MSDS Upload -->
-                        <div class="form-group" style="margin-bottom:20px;">
-                            <label>📄 Upload MSDS <span class="en-label">(แนบไฟล์เอกสาร MSDS - เลือกได้หลายไฟล์)</span></label>
-                            <div class="file-upload" style="border-color:#bfdbfe; background:#eff6ff;" onclick="document.getElementById('msdsFileInput').click()">
-                                <input type="file" id="msdsFileInput" accept=".pdf,.jpg,.jpeg,.png" multiple style="display:none" onchange="window.handleMultiUpload(event, 'msds')">
-                                <span class="upload-icon">📑</span>
-                                <span style="font-weight:600; color:#2563eb;">คลิกเพื่ออัปโหลดไฟล์ MSDS</span>
-                                <span style="color:#64748b; font-size:0.9rem; margin-top:5px;">รองรับไฟล์ PDF, JPG, PNG (รองรับเอกสารหลายหน้า)</span>
-                            </div>
-                            <div id="msdsPreviewList" class="multi-file-preview"></div>
-                        </div>
-
-                        <!-- NEW: Product Spec Upload -->
-                        <div class="form-group" style="margin-bottom:20px;">
-                            <label>📄 Upload Product Spec <span class="en-label">(แนบไฟล์เอกสาร Spec - เลือกได้หลายไฟล์)</span></label>
-                            <div class="file-upload" style="border-color:#bfdbfe; background:#eff6ff;" onclick="document.getElementById('specFileInput').click()">
-                                <input type="file" id="specFileInput" accept=".pdf,.jpg,.jpeg,.png" multiple style="display:none" onchange="window.handleMultiUpload(event, 'spec')">
-                                <span class="upload-icon">📋</span>
-                                <span style="font-weight:600; color:#2563eb;">คลิกเพื่ออัปโหลดไฟล์ Product Spec</span>
-                                <span style="color:#64748b; font-size:0.9rem; margin-top:5px;">รองรับไฟล์ PDF, JPG, PNG (รองรับเอกสารหลายหน้า)</span>
-                            </div>
-                            <div id="specPreviewList" class="multi-file-preview"></div>
                         </div>
 
                         <div style="padding: 15px; background: #f8fafc; border-left: 4px solid #3b82f6; border-radius: 8px;">
@@ -444,7 +509,7 @@
                         <div class="section-title"><div class="section-icon" style="background: #f59e0b;">4</div> RM Physical Inspection <span class="en-text">(การตรวจสอบสภาพวัตถุดิบ)</span></div>
 
                         <div class="form-group" style="margin-bottom:25px;">
-                            <label>📸 QC Photo <span class="en-label">(แนบรูปถ่ายหน้างาน - รองรับ 1 รูป)</span></label>
+                            <label>📸 QC Photo <span class="en-label">(แนบรูปถ่ายหน้างาน)</span></label>
                             <div class="file-upload" style="border-color:#fde68a; background:#fffbeb;" onclick="document.getElementById('qcFile').click()">
                                 <input type="file" id="qcFile" accept=".jpg,.jpeg,.png" style="display:none">
                                 <span class="upload-icon">📸</span>
@@ -530,18 +595,21 @@
                 <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px; flex-wrap: wrap; gap: 10px;">
                     <h2 style="color:var(--primary); font-size:1.5rem; margin:0;">📊 ประวัติการตรวจสอบ (History)</h2>
                     <div style="display:flex; gap:10px; flex-wrap: wrap;">
+                        <button class="btn btn-danger btn-sm" onclick="window.cleanDuplicateRecords()">🧹 เคลียร์ข้อมูลซ้ำ</button>
+                        <button class="btn btn-warning btn-sm" onclick="window.migrateFromGoogleSheet()">🔄 ดึงข้อมูลเก่าจาก Sheet</button>
                         <button class="btn btn-success btn-sm" onclick="window.exportToExcel()">📥 Export Excel</button>
                     </div>
                 </div>
                 
+                <!-- ช่องค้นหาเฉพาะในตารางประวัติ -->
                 <div style="margin-bottom: 15px;">
-                    <input type="text" id="historySearchInput" placeholder="🔍 ค้นหาในประวัติ: รหัส, ชื่อ, เลขล็อต, CAS Number, ผลประเมิน..." style="width:100%; padding:12px 16px; border-radius:12px; border:1.5px solid var(--border-input); font-family:'Prompt'; font-size: 1rem; transition:0.3s; outline:none;" onkeyup="window.filterHistoryTable()" onfocus="this.style.borderColor='var(--primary)'" onblur="this.style.borderColor='var(--border-input)'">
+                    <input type="text" id="historySearchInput" placeholder="🔍 ค้นหาในประวัติ: รหัส, ชื่อ, เลขล็อต, ผลการประเมิน..." style="width:100%; padding:12px 16px; border-radius:12px; border:1.5px solid var(--border-input); font-family:'Prompt'; font-size: 1rem; transition:0.3s; outline:none;" onkeyup="window.filterHistoryTable()" onfocus="this.style.borderColor='var(--primary)'" onblur="this.style.borderColor='var(--border-input)'">
                 </div>
 
                 <div class="table-container-scroll">
                     <table>
                         <thead>
-                            <tr><th>Date</th><th>RM Code & Name</th><th>Lot No.</th><th>Status</th><th>Documents</th><th>QC Pic</th><th>Action</th></tr>
+                            <tr><th>Date</th><th>RM Code & Name</th><th>Lot No.</th><th>Status</th><th>COA</th><th>QC Pic</th><th>Action</th></tr>
                         </thead>
                         <tbody id="masterTableBody"></tbody>
                     </table>
@@ -550,6 +618,7 @@
 
             <!-- Tab: Dashboard -->
             <div id="summary" class="tab-content content-box" style="background: transparent; box-shadow: none; padding: 0;">
+                
                 <!-- Header & Filter -->
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; background: white; padding: 20px 25px; border-radius: 20px; box-shadow: var(--shadow-sm); flex-wrap: wrap; gap: 15px;">
                     <h2 style="color:var(--primary); font-size:1.5rem; margin:0;">📈 แดชบอร์ดสรุปผล (Dashboard)</h2>
@@ -595,14 +664,14 @@
                     </div>
                 </div>
 
-                <!-- 🚀 รายการรอทวง COA -->
+                <!-- 🚀 รายการรอทวง COA สำหรับจัดซื้อ -->
                 <div class="content-box" style="border: 2px solid #ede9fe;">
                     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom:20px;">
                         <div>
                             <h3 style="font-size:1.25rem; color:#6b21a8; margin:0; display:flex; align-items:center; gap:8px;">
                                 <span style="font-size:1.5rem;">🚨</span> รายการสินค้าที่ซัพพลายเออร์ยังไม่ส่ง COA
                             </h3>
-                            <p style="color:#64748b; font-size:0.9rem; margin-top:5px;">สรุปรายการที่รอเอกสาร เพื่อให้ฝ่ายจัดซื้อติดตามทวงถามจาก Supplier</p>
+                            <p style="color:#64748b; font-size:0.9rem; margin-top:5px;">สรุปรายการที่รอเอกสาร เพื่อให้ฝ่ายจัดซื้อติดตามทวงถามจาก Supplier (กรองตามเดือนที่เลือกด้านบน)</p>
                         </div>
                         <button class="btn btn-purple btn-sm" onclick="window.exportWaitCOA()">📥 โหลดลิสต์ (Excel)</button>
                     </div>
@@ -618,17 +687,20 @@
                                     <th style="color:#6b21a8;">Aging (รอมากี่วัน)</th>
                                 </tr>
                             </thead>
-                            <tbody id="dashWaitCoaBody"></tbody>
+                            <tbody id="dashWaitCoaBody">
+                                <!-- Data injected via JS -->
+                            </tbody>
                         </table>
                     </div>
                 </div>
+
             </div>
 
             <!-- Tab: Search -->
             <div id="search" class="tab-content content-box">
                 <h2 style="color:var(--primary); font-size:1.5rem; margin-bottom:20px;">🔍 ค้นหาข้อมูล (Search & Track)</h2>
                 <div style="position:relative; margin-bottom:30px;">
-                    <input type="text" id="searchInput" placeholder="พิมพ์คำค้นหา: RM Code, RM Name, Lot No. หรือ CAS Number..." style="width:100%; padding:18px 20px 18px 60px; border-radius:16px; border:2px solid #e2e8f0; font-size:1.05rem; box-shadow: var(--shadow-sm); outline:none; transition:0.3s;" onkeyup="window.performSearch()" onfocus="this.style.borderColor='var(--primary)'" onblur="this.style.borderColor='#e2e8f0'">
+                    <input type="text" id="searchInput" placeholder="พิมพ์คำค้นหา: RM Code, RM Name, หรือ Lot No..." style="width:100%; padding:18px 20px 18px 60px; border-radius:16px; border:2px solid #e2e8f0; font-size:1.05rem; box-shadow: var(--shadow-sm); outline:none; transition:0.3s;" onkeyup="window.performSearch()" onfocus="this.style.borderColor='var(--primary)'" onblur="this.style.borderColor='#e2e8f0'">
                     <span style="position:absolute; left:22px; top:18px; font-size:1.3rem; opacity:0.5;">🔍</span>
                 </div>
                 <div id="searchResults"></div>
@@ -661,7 +733,12 @@
                 <div class="table-container-scroll">
                     <table>
                         <thead>
-                            <tr><th style="width: 10%;">ลำดับ</th><th style="width: 30%;">RM Code</th><th style="width: 45%;">RM Name</th><th style="width: 15%;">จัดการ</th></tr>
+                            <tr>
+                                <th style="width: 10%;">ลำดับ</th>
+                                <th style="width: 30%;">RM Code</th>
+                                <th style="width: 45%;">RM Name</th>
+                                <th style="width: 15%;">จัดการ</th>
+                            </tr>
                         </thead>
                         <tbody id="rmMasterTableBody"></tbody>
                     </table>
@@ -693,7 +770,11 @@
                     <button onclick="window.closeModal('detailModal')" style="background:var(--input-bg); border:none; border-radius:50%; width:36px; height:36px; font-size:1.2rem; cursor:pointer; color:#64748b; display:flex; justify-content:center; align-items:center; transition:0.2s;">&times;</button>
                 </div>
             </div>
-            <div id="detailContent"></div>
+            
+            <div id="detailContent">
+                <!-- Content will be injected here -->
+            </div>
+
             <div class="print-hide" style="margin-top:25px; text-align:right; border-top: 2px solid #f1f5f9; padding-top: 20px;">
                 <button class="btn btn-secondary" onclick="window.closeModal('detailModal')">ปิดหน้าต่าง</button>
             </div>
@@ -727,12 +808,9 @@
                         <div class="form-group"><label>Mfg. Date (วันที่ผลิต)</label><input type="date" id="edit_mfgDate"></div>
                         <div class="form-group"><label>Exp. Date (วันหมดอายุ)</label><input type="date" id="edit_expDate"></div>
                     </div>
-                    <div class="form-row" style="margin-bottom:15px;">
-                        <div class="form-group"><label>Internal Lot (ล็อตภายใน)</label><input type="text" id="edit_internalLotNo"></div>
-                        <div class="form-group"><label>CAS Number (รหัสสารเคมี)</label><input type="text" id="edit_casNumber"></div>
-                    </div>
                     <div class="form-row" style="margin-bottom:0;">
-                        <div class="form-group" style="grid-column: span 2;"><label>Date Received (วันที่รับของ)</label><input type="date" id="edit_receivedDate" required></div>
+                        <div class="form-group"><label>Internal Lot (ล็อตภายใน)</label><input type="text" id="edit_internalLotNo"></div>
+                        <div class="form-group"><label>Date Received (วันที่รับของ)</label><input type="date" id="edit_receivedDate" required></div>
                     </div>
                 </div>
 
@@ -749,7 +827,7 @@
 
                     <div class="form-row" style="background: #e0e7ff; padding: 10px 15px; border-radius: 8px; margin-bottom: 15px;">
                         <div class="form-group">
-                            <label style="color:#4338ca;">COA Document Status</label>
+                            <label style="color:#4338ca;">COA Document Status (สถานะการส่งมอบ COA)</label>
                             <select id="edit_coaStatus" required style="border-color:#818cf8;">
                                 <option value="Received">✅ ได้รับพร้อมสินค้าเรียบร้อยแล้ว</option>
                                 <option value="Pending">⏳ สินค้ามาส่งแล้ว แต่ยังไม่ได้รับ COA (รอทวงจัดซื้อ)</option>
@@ -757,7 +835,7 @@
                             </select>
                         </div>
                         <div class="form-group">
-                            <label style="color:#4338ca;">Date COA Received</label>
+                            <label style="color:#4338ca;">Date COA Received (วันที่ได้รับ COA)</label>
                             <input type="date" id="edit_coaReceivedDate" style="border-color:#818cf8;">
                         </div>
                     </div>
@@ -770,31 +848,15 @@
                         <div class="form-group"><label>Specification pH (pH ตาม COA)</label><input type="text" id="edit_coaPh"></div>
                         <div class="form-group"><label>Specification Temp (อุณหภูมิตาม COA)</label><input type="text" id="edit_coaTemp"></div>
                     </div>
-                    
-                    <!-- Single File: COA -->
-                    <div style="background:white; padding:15px; border-radius:12px; border:1px solid #e2e8f0; margin-bottom:15px;">
-                        <label style="font-weight:600; font-size:0.9rem; color:#4a5568;">COA File (ไฟล์เอกสาร COA 1 หน้า):</label>
-                        <div id="edit_coaFileStatus" style="font-size:0.9rem; margin:8px 0; color:#64748b;"></div>
-                        <input type="file" id="edit_coaFileInput" accept=".pdf,.jpg,.jpeg,.png" style="font-size:0.9rem; padding:8px 0;">
-                        <button type="button" id="edit_btnRemoveCoa" class="btn btn-danger btn-sm" onclick="window.markFileRemoved('coa')" style="display:none; margin-top:5px;">🗑️ ลบไฟล์เดิมทิ้ง</button>
-                    </div>
-
-                    <!-- Multi File: MSDS -->
-                    <div style="background:white; padding:15px; border-radius:12px; border:1px solid #e2e8f0; margin-bottom:15px;">
-                        <label style="font-weight:600; font-size:0.9rem; color:#4a5568;">MSDS Files (เพิ่มไฟล์ MSDS หลายหน้า):</label>
-                        <input type="file" id="edit_msdsFileInput" multiple accept=".pdf,.jpg,.jpeg,.png" style="font-size:0.9rem; padding:8px 0; display:block; margin-bottom:10px;" onchange="window.handleMultiUpload(event, 'msds', true)">
-                        <div id="edit_msdsPreviewList" class="multi-file-preview"></div>
-                    </div>
-
-                    <!-- Multi File: Spec -->
                     <div style="background:white; padding:15px; border-radius:12px; border:1px solid #e2e8f0;">
-                        <label style="font-weight:600; font-size:0.9rem; color:#4a5568;">Product Spec Files (เพิ่มไฟล์ Spec หลายหน้า):</label>
-                        <input type="file" id="edit_specFileInput" multiple accept=".pdf,.jpg,.jpeg,.png" style="font-size:0.9rem; padding:8px 0; display:block; margin-bottom:10px;" onchange="window.handleMultiUpload(event, 'spec', true)">
-                        <div id="edit_specPreviewList" class="multi-file-preview"></div>
+                        <label style="font-weight:600; font-size:0.9rem; color:#4a5568;">COA File (ไฟล์เอกสาร COA):</label>
+                        <div id="edit_coaFileStatus" style="font-size:0.9rem; margin:8px 0; color:#64748b;"></div>
+                        <input type="file" id="edit_coaFileInput" style="font-size:0.9rem; padding:8px 0;">
+                        <button type="button" id="edit_btnRemoveCoa" class="btn btn-danger btn-sm" onclick="window.markFileRemoved('coa')" style="display:none; margin-top:5px;">🗑️ ลบไฟล์เดิมทิ้ง</button>
                     </div>
                 </div>
 
-                <!-- Section 3 & 4 -->
+                <!-- Section 3 & 4 (Combined in UI for compactness but correctly titled) -->
                 <div style="margin-bottom:25px; border:1px solid #e2e8f0; padding:20px; border-radius:16px;">
                     <div style="font-weight:700; color:#d97706; margin-bottom:15px;">3. RM Physical Inspection (การตรวจสอบสภาพวัตถุดิบ)</div>
                     
@@ -832,9 +894,9 @@
                         </div>
                     </div>
                     <div style="background:#fffbeb; padding:15px; border-radius:12px; border:1px solid #fde68a; margin-bottom:20px;">
-                        <label style="font-weight:600; font-size:0.9rem; color:#b45309;">QC Photo (รูปถ่ายหน้างาน 1 รูป):</label>
+                        <label style="font-weight:600; font-size:0.9rem; color:#b45309;">QC Photo (รูปถ่ายหน้างาน):</label>
                         <div id="edit_qcFileStatus" style="font-size:0.9rem; margin:8px 0; color:#d97706;"></div>
-                        <input type="file" id="edit_qcFileInput" accept=".jpg,.jpeg,.png" style="font-size:0.9rem; padding:8px 0;">
+                        <input type="file" id="edit_qcFileInput" style="font-size:0.9rem; padding:8px 0;">
                         <button type="button" id="edit_btnRemoveQc" class="btn btn-danger btn-sm" onclick="window.markFileRemoved('qc')" style="display:none; margin-top:5px;">🗑️ ลบรูปเดิมทิ้ง</button>
                     </div>
                     
@@ -924,8 +986,9 @@
         // ==========================================
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, collection, onSnapshot, addDoc, updateDoc, deleteDoc, doc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { getFirestore, collection, onSnapshot, addDoc, updateDoc, deleteDoc, doc, query, orderBy } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
+        // ตั้งค่า Firebase
         const myFirebaseConfig = {
             apiKey: "AIzaSyDP9avz6gEZVn0Ps6oQaq54lGjPs0q1D6c",
             authDomain: "qc-inspector-2bf02.firebaseapp.com",
@@ -936,6 +999,8 @@
             measurementId: "G-Y1ZZYDQKZS"
         };
 
+        // เพื่อหลีกเลี่ยง error "requests-from-referer-...-are-blocked" ในหน้าพรีวิวนี้
+        // ระบบจะใช้ config ของ Canvas ชั่วคราว เมื่อคุณนำไปใช้งานจริงที่อื่น มันจะกลับไปใช้ config ของคุณ
         const isCanvasEnv = typeof __firebase_config !== 'undefined';
         let firebaseConfig = isCanvasEnv ? JSON.parse(__firebase_config) : myFirebaseConfig;
         const isUsingCustomConfig = !isCanvasEnv;
@@ -949,6 +1014,7 @@
 
         const appId = isUsingCustomConfig ? null : (typeof __app_id !== 'undefined' ? __app_id : 'default-app-id');
         let firebaseUser = null;
+        const OLD_WEB_APP_URL = "https://script.google.com/macros/s/AKfycbwdpL4fbmZg3lrLR2XCpCMqrU7Ee_893AEuD_3Oc8Qi6q7bC0m0FIZQ3rEV3TJ3zKufAQ/exec";
 
         let MASTER_LIST = []; 
         let inspections = [];
@@ -956,14 +1022,9 @@
         let isFirebaseLoaded = false;
         let isFilterInitialized = false;
 
-        // Variables for Single Files (COA & QC Photo)
         let currentCoaFileData = null; let currentQcFileData = null;
         let editCoaFileData = null; let editQcFileData = null;
         let isEditCoaRemoved = false; let isEditQcRemoved = false;
-
-        // Variables for Multiple Files (MSDS & Spec)
-        let currentMsdsFiles = []; let currentSpecFiles = [];
-        let editMsdsFiles = []; let editSpecFiles = [];
 
         const DEFAULT_RM = [
             { code: "RM1-SV-WT", name: "Water" }, { code: "RM2-CA-LRGS", name: "Plantacare 1200 UP" },
@@ -1066,7 +1127,7 @@
             let coaAgingDays = null;
             
             if (coaStatus === 'Received') {
-                if (!coaReceivedDate) coaReceivedDate = receivedDate;
+                if (!coaReceivedDate) coaReceivedDate = receivedDate; // Default to receivedDate if left blank
                 const diff = new Date(coaReceivedDate) - new Date(receivedDate);
                 coaAgingDays = Math.max(0, Math.floor(diff / (1000*60*60*24)));
             } else {
@@ -1077,9 +1138,10 @@
                 timestamp: new Date().toISOString(),
                 rmCode: fd.get('rmCode'), rmName: fd.get('rmName'), supplier: fd.get('supplier'), 
                 lotNo: fd.get('lotNo'), internalLotNo: fd.get('internalLotNo'),
-                casNumber: fd.get('casNumber') || '', // 🌟 เพิ่มฟิลด์ CAS Number
                 mfgDate: fd.get('mfgDate'), expDate: fd.get('expDate'), receivedDate: receivedDate, 
-                coaStatus: coaStatus, coaReceivedDate: coaReceivedDate, coaAgingDays: coaAgingDays,
+                coaStatus: coaStatus, // 🌟 เพิ่มฟิลด์สถานะ COA
+                coaReceivedDate: coaReceivedDate, // วันที่ได้รับ COA
+                coaAgingDays: coaAgingDays, // ระยะเวลารอ COA
                 chk_doc_coa: document.getElementById('chk_doc_coa').checked,
                 chk_doc_lot: document.getElementById('chk_doc_lot').checked,
                 chk_doc_mfg: document.getElementById('chk_doc_mfg').checked,
@@ -1089,12 +1151,8 @@
                 coaColor: fd.get('coaColor'), coaOdor: fd.get('coaOdor'), coaPh: fd.get('coaPh'), coaTemp: fd.get('coaTemp'),
                 qcAppearance: fd.get('qcAppearance'), qcColor: fd.get('qcColor'), qcOdor: fd.get('qcOdor'), qcPh: fd.get('qcPh'), qcTemp: fd.get('qcTemp'), qcContamination: fd.get('qcContamination'),
                 qcRemark: fd.get('qcRemark') || '', passFail: fd.get('passFail'), approvedBy: fd.get('approvedBy'), approvedDate: fd.get('approvedDate'),
-                
-                // Files
                 coaFile: currentCoaFileData ? { isLink: true, data: currentCoaFileData.data, name: currentCoaFileData.name } : null,
-                qcFile: currentQcFileData ? { isLink: true, data: currentQcFileData.data, name: currentQcFileData.name } : null,
-                msdsFiles: currentMsdsFiles, // 🌟 อาเรย์ไฟล์ MSDS
-                specFiles: currentSpecFiles  // 🌟 อาเรย์ไฟล์ Spec
+                qcFile: currentQcFileData ? { isLink: true, data: currentQcFileData.data, name: currentQcFileData.name } : null
             };
 
             try {
@@ -1103,18 +1161,12 @@
                 
                 alert("✅ บันทึกข้อมูลสำเร็จ!"); 
                 this.reset(); 
-                
-                // Reset Files
                 currentCoaFileData = null; currentQcFileData = null;
-                currentMsdsFiles = []; currentSpecFiles = [];
-                renderMultiFileList('msds'); renderMultiFileList('spec');
-                
-                document.getElementById('fileName').innerHTML = "รองรับไฟล์ PDF, JPG, PNG (1 ไฟล์)";
+                document.getElementById('fileName').innerHTML = "รองรับไฟล์ PDF, JPG, PNG";
                 document.getElementById('qcFileName').innerHTML = "รองรับไฟล์ JPG, PNG";
-                
-                initMonthFilter(); 
+                initMonthFilter(); // Update filter dropdown just in case it's a new month
                 showTab('master');
-            } catch (error) { console.error(error); alert("❌ เกิดข้อผิดพลาดในการบันทึกข้อมูล ขนาดไฟล์อาจใหญ่เกินไป (จำกัด 1MB)"); } 
+            } catch (error) { console.error(error); alert("❌ เกิดข้อผิดพลาดในการบันทึกข้อมูล"); } 
             finally { showLoading(false); }
         });
 
@@ -1143,31 +1195,35 @@
                 if (!coaReceivedDate) coaReceivedDate = receivedDate;
                 const diff = new Date(coaReceivedDate) - new Date(receivedDate);
                 coaAgingDays = Math.max(0, Math.floor(diff / (1000*60*60*24)));
-            } else { coaReceivedDate = ''; }
+            } else {
+                coaReceivedDate = '';
+            }
 
             const updateData = {
                 rmCode: document.getElementById('edit_rmCode').value, rmName: document.getElementById('edit_rmName').value,
                 supplier: document.getElementById('edit_supplier').value, lotNo: document.getElementById('edit_lotNo').value,
                 internalLotNo: document.getElementById('edit_internalLotNo').value, mfgDate: document.getElementById('edit_mfgDate').value, expDate: document.getElementById('edit_expDate').value,
-                casNumber: document.getElementById('edit_casNumber').value, // 🌟 อัปเดต CAS
-                receivedDate: receivedDate, coaStatus: coaStatus, coaReceivedDate: coaReceivedDate, coaAgingDays: coaAgingDays,
-                chk_doc_coa: document.getElementById('edit_chk_doc_coa').checked, chk_doc_lot: document.getElementById('edit_chk_doc_lot').checked, chk_doc_mfg: document.getElementById('edit_chk_doc_mfg').checked,
-                chk_pkg_intact: document.getElementById('edit_chk_pkg_intact').checked, chk_pkg_clean: document.getElementById('edit_chk_pkg_clean').checked, chk_pkg_label: document.getElementById('edit_chk_pkg_label').checked,
+                receivedDate: receivedDate,
+                coaStatus: coaStatus, // 🌟 อัปเดตสถานะ COA
+                coaReceivedDate: coaReceivedDate,
+                coaAgingDays: coaAgingDays,
+                chk_doc_coa: document.getElementById('edit_chk_doc_coa').checked,
+                chk_doc_lot: document.getElementById('edit_chk_doc_lot').checked,
+                chk_doc_mfg: document.getElementById('edit_chk_doc_mfg').checked,
+                chk_pkg_intact: document.getElementById('edit_chk_pkg_intact').checked,
+                chk_pkg_clean: document.getElementById('edit_chk_pkg_clean').checked,
+                chk_pkg_label: document.getElementById('edit_chk_pkg_label').checked,
                 coaColor: document.getElementById('edit_coaColor').value, coaOdor: document.getElementById('edit_coaOdor').value, coaPh: document.getElementById('edit_coaPh').value, coaTemp: document.getElementById('edit_coaTemp').value,
                 qcAppearance: document.getElementById('edit_qcAppearance').value, qcColor: document.getElementById('edit_qcColor').value, qcOdor: document.getElementById('edit_qcOdor').value, qcPh: document.getElementById('edit_qcPh').value, qcTemp: document.getElementById('edit_qcTemp').value, qcContamination: document.getElementById('edit_qcContamination').value,
                 qcRemark: document.getElementById('edit_qcRemark').value, passFail: document.getElementById('edit_passFail').value, approvedBy: document.getElementById('edit_approvedBy').value, approvedDate: document.getElementById('edit_approvedDate').value,
-                
-                coaFile: finalCoaFile, qcFile: finalQcFile,
-                msdsFiles: editMsdsFiles, // 🌟 อัปเดต MSDS
-                specFiles: editSpecFiles, // 🌟 อัปเดต Spec
-                lastUpdated: new Date().toISOString()
+                coaFile: finalCoaFile, qcFile: finalQcFile, lastUpdated: new Date().toISOString()
             };
 
             try {
                 const docRef = isUsingCustomConfig ? doc(db, 'qcHistory', docId) : doc(db, 'artifacts', appId, 'public', 'data', 'qcHistory', docId);
                 await updateDoc(docRef, updateData);
                 alert("✅ อัปเดตข้อมูลสำเร็จ!"); window.closeModal('editModal');
-            } catch (error) { console.error(error); alert("❌ เกิดข้อผิดพลาด ขนาดไฟล์อาจใหญ่เกินไป"); } 
+            } catch (error) { console.error(error); alert("❌ เกิดข้อผิดพลาด"); } 
             finally { showLoading(false); }
         });
 
@@ -1183,119 +1239,40 @@
             }
         }
         
-        // --- MULTI FILE UPLOAD LOGIC ---
-        function readFileAsync(f) {
-            return new Promise((resolve) => {
-                if (f.type.startsWith('image/')) {
-                    const reader = new FileReader();
-                    reader.onload = function(e) {
-                        const img = new Image();
-                        img.onload = function() {
-                            const canvas = document.createElement('canvas');
-                            let w = img.width; let h = img.height; const MAX_SIZE = 1024; // Compress more for multi-files
-                            if (w > h && w > MAX_SIZE) { h *= MAX_SIZE / w; w = MAX_SIZE; } else if (h > w && h > MAX_SIZE) { w *= MAX_SIZE / h; h = MAX_SIZE; } else if (h === w && w > MAX_SIZE) { w = MAX_SIZE; h = MAX_SIZE; }
-                            canvas.width = w; canvas.height = h;
-                            canvas.getContext('2d').drawImage(img, 0, 0, w, h);
-                            resolve({ name: f.name, data: canvas.toDataURL('image/jpeg', 0.75) }); // 75% quality
-                        }
-                        img.src = e.target.result;
-                    };
-                    reader.readAsDataURL(f);
-                } else {
-                    if(f.size > 1500000) alert("⚠️ คำเตือน: ไฟล์ PDF มีขนาดใหญ่ อาจทำให้บันทึกไม่ผ่านเนื่องจากเกิน Limit ของ Database");
-                    const r = new FileReader();
-                    r.onload = e => resolve({name: f.name, data: e.target.result});
-                    r.readAsDataURL(f);
-                }
-            });
-        }
-
-        window.handleMultiUpload = async function(event, type, isEdit = false) {
-            const files = event.target.files;
-            if (!files.length) return;
-            showLoading(true, "กำลังประมวลผลไฟล์แนบ...");
-            
-            let targetArray = type === 'msds' ? 
-                              (isEdit ? editMsdsFiles : currentMsdsFiles) : 
-                              (isEdit ? editSpecFiles : currentSpecFiles);
-
-            for (let i = 0; i < files.length; i++) {
-                const fileData = await readFileAsync(files[i]);
-                fileData.id = Date.now() + '_' + Math.floor(Math.random() * 1000); // Unique ID for removal
-                targetArray.push(fileData);
-            }
-            
-            event.target.value = ''; // Reset input so same files can be re-selected if needed
-            renderMultiFileList(type, isEdit);
-            showLoading(false);
-        }
-
-        window.renderMultiFileList = function(type, isEdit = false) {
-            const arr = type === 'msds' ? 
-                        (isEdit ? editMsdsFiles : currentMsdsFiles) : 
-                        (isEdit ? editSpecFiles : currentSpecFiles);
-            const prefix = isEdit ? 'edit_' : '';
-            const container = document.getElementById(prefix + type + 'PreviewList');
-            if (!container) return;
-
-            container.innerHTML = arr.map(f => `
-                <div class="file-item">
-                    <span class="file-item-name" title="${f.name}">📄 ${f.name}</span>
-                    <button type="button" class="btn btn-danger btn-sm" onclick="window.removeMultiFile('${type}', '${f.id}', ${isEdit})">🗑️ ลบ</button>
-                </div>
-            `).join('');
-        }
-
-        window.removeMultiFile = function(type, id, isEdit) {
-            if (isEdit) {
-                if (type === 'msds') editMsdsFiles = editMsdsFiles.filter(f => f.id !== id);
-                if (type === 'spec') editSpecFiles = editSpecFiles.filter(f => f.id !== id);
-            } else {
-                if (type === 'msds') currentMsdsFiles = currentMsdsFiles.filter(f => f.id !== id);
-                if (type === 'spec') currentSpecFiles = currentSpecFiles.filter(f => f.id !== id);
-            }
-            renderMultiFileList(type, isEdit);
-        }
-
-        window.viewSpecificFile = function(itemIdx, type, fileIdx) {
-            const item = inspections[itemIdx];
-            let fileArray = type === 'msds' ? item.msdsFiles : item.specFiles;
-            if (!fileArray || !fileArray[fileIdx]) return alert("ไม่พบข้อมูลไฟล์");
-            const file = fileArray[fileIdx];
-
-            const content = document.getElementById('fileViewerContent');
-            const dlBtn = document.getElementById('downloadAttachmentBtn');
-            dlBtn.href = file.data; dlBtn.download = file.name || 'document';
-            
-            if (file.data.startsWith('data:image')) content.innerHTML = `<img src="${file.data}" style="max-width:100%; max-height:100%; object-fit:contain; border-radius:8px;">`;
-            else if (file.data.startsWith('data:application/pdf')) content.innerHTML = `<iframe src="${file.data}" width="100%" height="100%" style="border:none; border-radius:8px;"></iframe>`;
-            else content.innerHTML = `<div style="text-align:center;"><p style="color:#64748b; margin-bottom:15px;">⚠️ ไม่สามารถพรีวิวไฟล์นี้ได้</p><a href="${file.data}" download="${dlBtn.download}" class="btn btn-primary">⬇️ ดาวน์โหลดไฟล์แทน</a></div>`;
-            window.openModal('fileViewerModal');
-        }
-
-        // --- RM MASTER LOGIC ---
         function renderRMMasterTable() {
             const tbody = document.getElementById('rmMasterTableBody');
             if(!isFirebaseLoaded) {
-                tbody.innerHTML = '<tr><td colspan="4" style="text-align:center; padding:20px; color:#94a3b8;">กำลังโหลดข้อมูล...</td></tr>'; return;
+                tbody.innerHTML = '<tr><td colspan="4" style="text-align:center; padding:20px; color:#94a3b8;">กำลังโหลดข้อมูลจาก Firebase...</td></tr>';
+                return;
             }
-            tbody.innerHTML = MASTER_LIST.map((rm, idx) => `<tr><td style="color:var(--text-light);">${idx + 1}</td><td><strong style="color:var(--primary);">${rm.code}</strong></td><td>${rm.name}</td><td><button class="btn btn-danger btn-sm" onclick="window.deleteRM(${idx})">🗑️ ลบ</button></td></tr>`).join('');
+            tbody.innerHTML = MASTER_LIST.map((rm, idx) => `
+                <tr>
+                    <td style="color:var(--text-light);">${idx + 1}</td>
+                    <td><strong style="color:var(--primary);">${rm.code}</strong></td>
+                    <td>${rm.name}</td>
+                    <td><button class="btn btn-danger btn-sm" onclick="window.deleteRM(${idx})">🗑️ ลบ</button></td>
+                </tr>
+            `).join('');
         }
 
         window.handleAddRM = async function() {
-            if (!firebaseUser || !db) return alert("❌ ระบบไม่เชื่อมต่อ");
-            const code = document.getElementById('newRmCode').value.trim(); const name = document.getElementById('newRmName').value.trim();
-            if(MASTER_LIST.some(rm => rm.code.toLowerCase() === code.toLowerCase())) return alert("❌ รหัส RM Code นี้มีอยู่แล้ว!");
+            if (!firebaseUser || !db) return alert("❌ ระบบไม่สามารถเชื่อมต่อ Firebase ได้ในขณะนี้");
+            const code = document.getElementById('newRmCode').value.trim();
+            const name = document.getElementById('newRmName').value.trim();
+            
+            if(MASTER_LIST.some(rm => rm.code.toLowerCase() === code.toLowerCase())) { alert("❌ รหัส RM Code นี้มีอยู่ในระบบแล้ว!"); return; }
             try {
-                showLoading(true); const rmRef = isUsingCustomConfig ? collection(db, 'rmMaster') : collection(db, 'artifacts', appId, 'public', 'data', 'rmMaster');
+                showLoading(true, "กำลังบันทึกลง Firebase...");
+                const rmRef = isUsingCustomConfig ? collection(db, 'rmMaster') : collection(db, 'artifacts', appId, 'public', 'data', 'rmMaster');
                 await addDoc(rmRef, { code: code, name: name, createdAt: new Date().toISOString() });
-                document.getElementById('newRmCode').value = ''; document.getElementById('newRmName').value = ''; alert("✅ เพิ่มสำเร็จ!");
-            } catch (error) { alert("❌ Error"); } finally { showLoading(false); }
+                document.getElementById('newRmCode').value = ''; document.getElementById('newRmName').value = '';
+                alert("✅ เพิ่มข้อมูลวัตถุดิบสำเร็จ!");
+            } catch (error) { console.error("Error adding doc: ", error); alert("❌ เกิดข้อผิดพลาดในการบันทึกข้อมูล"); } finally { showLoading(false); }
         }
 
         window.importDefaultRM = async function() {
-            if (!firebaseUser || !db) return alert("❌ ระบบไม่เชื่อมต่อ");
-            if (!confirm("ต้องการนำเข้าข้อมูลวัตถุดิบพื้นฐานหรือไม่?")) return;
+            if (!firebaseUser || !db) return alert("❌ ระบบไม่สามารถเชื่อมต่อ Firebase ได้ในขณะนี้");
+            if (!confirm("ต้องการนำเข้าข้อมูลวัตถุดิบพื้นฐาน (~40 รายการ) หรือไม่?\n*ระบบจะข้ามรายการที่มีรหัสซ้ำ*")) return;
             showLoading(true, "กำลังนำเข้าข้อมูล...");
             const rmRef = isUsingCustomConfig ? collection(db, 'rmMaster') : collection(db, 'artifacts', appId, 'public', 'data', 'rmMaster');
             let addedCount = 0;
@@ -1307,69 +1284,111 @@
                     }
                 }
                 alert(`✅ นำเข้าข้อมูลสำเร็จ ${addedCount} รายการ!`);
-            } catch (error) { alert("❌ Error"); } finally { showLoading(false); }
+            } catch (error) { console.error(error); alert("❌ เกิดข้อผิดพลาดระหว่างนำเข้าข้อมูล"); } finally { showLoading(false); }
         }
 
         window.deleteRM = async function(idx) {
             const rm = MASTER_LIST[idx];
-            if(!rm.id) return alert("❌ ไม่สามารถลบ Default ได้");
-            if(confirm(`ลบวัตถุดิบ ${rm.code}?`)) {
-                try { showLoading(true); const docRef = isUsingCustomConfig ? doc(db, 'rmMaster', rm.id) : doc(db, 'artifacts', appId, 'public', 'data', 'rmMaster', rm.id); await deleteDoc(docRef); } 
-                catch (error) { alert("❌ Error"); } finally { showLoading(false); }
+            if(!rm.id) { alert("❌ ไม่สามารถลบข้อมูล Default ได้ (เพิ่มข้อมูลใหม่เพื่อทดสอบการลบ)"); return; }
+            if(confirm(`คุณแน่ใจหรือไม่ที่จะลบวัตถุดิบ ${rm.code}?`)) {
+                try {
+                    showLoading(true, "กำลังลบข้อมูล...");
+                    const docRef = isUsingCustomConfig ? doc(db, 'rmMaster', rm.id) : doc(db, 'artifacts', appId, 'public', 'data', 'rmMaster', rm.id);
+                    await deleteDoc(docRef);
+                } catch (error) { console.error("Error removing document: ", error); alert("❌ เกิดข้อผิดพลาดในการลบข้อมูล"); } finally { showLoading(false); }
             }
         }
 
-        // --- DASHBOARD & FILTER ---
+        window.cleanDuplicateRecords = async function() { alert("รบกวนทดสอบจากฟังก์ชั่นเต็มหากจำเป็น"); }
+        window.migrateFromGoogleSheet = async function() { alert("รบกวนทดสอบจากฟังก์ชั่นเต็มหากจำเป็น"); }
+
+        // ==========================================
+        // 📈 DASHBOARD & FILTER LOGIC
+        // ==========================================
+        
         function initMonthFilter() {
             const filterEl = document.getElementById('dashMonthFilter');
             const currentSelection = filterEl.value;
+            
             const months = new Set();
             inspections.forEach(i => {
                 if(i.receivedDate) {
                     const d = new Date(i.receivedDate);
-                    if (!isNaN(d.getTime())) months.add(`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2, '0')}`);
+                    if (!isNaN(d.getTime())) {
+                        const monthKey = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2, '0')}`;
+                        months.add(monthKey);
+                    }
                 }
             });
+
             let optionsHTML = '<option value="ALL">รวมทั้งหมด (All Time)</option>';
+            // เรียงจากเดือนล่าสุดไปเก่าสุด
             Array.from(months).sort().reverse().forEach(m => {
                 const [y, mo] = m.split('-');
-                optionsHTML += `<option value="${m}">${new Date(y, mo-1, 1).toLocaleString('th-TH', { month: 'long', year: 'numeric' })}</option>`;
+                const monthName = new Date(y, mo-1, 1).toLocaleString('th-TH', { month: 'long', year: 'numeric' });
+                optionsHTML += `<option value="${m}">${monthName}</option>`;
             });
+            
             filterEl.innerHTML = optionsHTML;
-            if (Array.from(months).includes(currentSelection)) filterEl.value = currentSelection;
+            
+            // พยายามตั้งค่ากลับเป็นเดือนเดิมที่เลือกไว้ (ถ้ายังมีอยู่ในลิสต์)
+            if (Array.from(months).includes(currentSelection)) {
+                filterEl.value = currentSelection;
+            }
         }
 
         window.renderSummary = function() {
             const selectedMonth = document.getElementById('dashMonthFilter').value;
             const monthLabel = document.getElementById('dashMonthFilter').options[document.getElementById('dashMonthFilter').selectedIndex].text;
+            
             document.getElementById('chartMonthLabel').textContent = `(${monthLabel})`;
 
+            // 1. กรองข้อมูลตามเดือนที่เลือก
             const filteredData = inspections.filter(i => {
                 if (selectedMonth === 'ALL') return true;
                 if (!i.receivedDate) return false;
                 const d = new Date(i.receivedDate);
                 if (isNaN(d.getTime())) return false;
-                return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2, '0')}` === selectedMonth;
+                const monthKey = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2, '0')}`;
+                return monthKey === selectedMonth;
             });
 
-            const total = filteredData.length; const pass = filteredData.filter(i => i.passFail === 'Pass').length; const fail = filteredData.filter(i => i.passFail === 'Fail').length;
+            // 2. คำนวณ KPI
+            const total = filteredData.length;
+            const pass = filteredData.filter(i => i.passFail === 'Pass').length;
+            const fail = filteredData.filter(i => i.passFail === 'Fail').length;
             const pendingItems = filteredData.filter(i => i.passFail === 'Pending' || i.passFail === 'Hold');
+            
+            // คำนวณ "รอ COA" (นับเฉพาะที่ระบุว่า Pending หรือพวกเก่าที่ไม่มีไฟล์แนบและไม่ใช่ Pass แบบสมบูรณ์)
             const waitCoaItems = filteredData.filter(i => i.coaStatus === 'Pending' || (!i.coaStatus && !i.coaFile?.isLink && i.passFail !== 'Pass'));
 
-            document.getElementById('dashTotal').textContent = total; document.getElementById('dashPass').textContent = pass; document.getElementById('dashFail').textContent = fail;
-            document.getElementById('dashRate').textContent = total > 0 ? ((pass/total)*100).toFixed(0)+'%' : '0%'; document.getElementById('dashWaitCoa').textContent = waitCoaItems.length;
+            document.getElementById('dashTotal').textContent = total;
+            document.getElementById('dashPass').textContent = pass;
+            document.getElementById('dashFail').textContent = fail;
+            document.getElementById('dashRate').textContent = total > 0 ? ((pass/total)*100).toFixed(0)+'%' : '0%';
+            document.getElementById('dashWaitCoa').textContent = waitCoaItems.length;
 
+            // 3. วาดตารางรอผล QA
             document.getElementById('countPendingBadge').textContent = `${pendingItems.length} รายการ`;
             document.getElementById('dashPendingBody').innerHTML = pendingItems.map(i => {
                 const days = Math.floor((new Date() - new Date(i.receivedDate)) / (1000*60*60*24));
                 return `<tr><td><strong style="color:var(--primary);">${i.rmCode}</strong><br><small style="color:#94a3b8;">${i.supplier}</small></td><td>${i.lotNo}</td><td><span class="status-badge ${i.passFail.toLowerCase()}">${i.passFail}</span></td><td style="color:${days>7?'#e74c3c':'#27ae60'}; font-weight:600;">${days} วัน</td></tr>`;
-            }).join('') || '<tr><td colspan="4" style="text-align:center; padding: 20px;">ไม่มีรายการรอผล</td></tr>';
+            }).join('') || '<tr><td colspan="4" style="text-align:center; padding: 20px; color: #94a3b8;">ไม่มีรายการรอผลประเมิน</td></tr>';
 
+            // 4. วาดตารางรอเอกสาร COA สำหรับจัดซื้อ
             document.getElementById('dashWaitCoaBody').innerHTML = waitCoaItems.map(i => {
                 const days = Math.floor((new Date() - new Date(i.receivedDate)) / (1000*60*60*24));
-                return `<tr><td><strong>${i.supplier || '-'}</strong></td><td><span style="color:var(--primary); font-weight:600;">${i.rmCode}</span><br><small>${i.rmName}</small></td><td>${i.lotNo}</td><td>${i.receivedDate}</td><td style="${days>14?'color:#e74c3c;':'color:#b45309;'} font-weight:bold;">${days} วัน</td></tr>`;
-            }).join('') || '<tr><td colspan="5" style="text-align:center; padding: 30px; color: #27ae60; font-weight:600;">ไม่มีค้างส่งเอกสาร COA</td></tr>';
+                const alertStyle = days > 14 ? 'color:#e74c3c; font-weight:bold;' : 'color:#b45309; font-weight:bold;';
+                return `<tr>
+                    <td><strong>${i.supplier || '-'}</strong></td>
+                    <td><span style="color:var(--primary); font-weight:600;">${i.rmCode}</span><br><small>${i.rmName}</small></td>
+                    <td>${i.lotNo}</td>
+                    <td>${i.receivedDate}</td>
+                    <td style="${alertStyle}">${days} วัน <span style="font-size:0.8em; opacity:0.6;">(ตั้งแต่รับของ)</span></td>
+                </tr>`;
+            }).join('') || '<tr><td colspan="5" style="text-align:center; padding: 30px; color: #27ae60; font-weight:600;">🎉 เยี่ยมมาก! ไม่มีรายการค้างส่งเอกสาร COA</td></tr>';
 
+            // 5. อัปเดต Pie Chart
             if (myPieChart) myPieChart.destroy();
             myPieChart = new Chart(document.getElementById('qcPieChart'), {
                 type: 'doughnut', plugins: [ChartDataLabels],
@@ -1378,29 +1397,47 @@
             });
         }
 
+        // ==========================================
+        // UI & EXPORT FUNCTIONS
+        // ==========================================
         window.exportWaitCOA = function() {
-            const sm = document.getElementById('dashMonthFilter').value;
-            const wItems = inspections.filter(i => {
-                if (sm !== 'ALL') {
+            const selectedMonth = document.getElementById('dashMonthFilter').value;
+            const waitCoaItems = inspections.filter(i => {
+                if (selectedMonth !== 'ALL') {
                     if (!i.receivedDate) return false;
                     const d = new Date(i.receivedDate);
                     if (isNaN(d.getTime())) return false;
-                    if (`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2, '0')}` !== sm) return false;
+                    const monthKey = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2, '0')}`;
+                    if(monthKey !== selectedMonth) return false;
                 }
                 return i.coaStatus === 'Pending' || (!i.coaStatus && !i.coaFile?.isLink && i.passFail !== 'Pass');
             });
-            if (wItems.length === 0) return alert("ไม่มีข้อมูลรายการค้าง COA ให้ Export ในเดือนนี้ครับ");
-            const ws = XLSX.utils.json_to_sheet(wItems.map(i => ({ Supplier: i.supplier||'', RM_Code: i.rmCode||'', RM_Name: i.rmName||'', Lot_No: i.lotNo||'', Date_Received: i.receivedDate||'', Aging_Days: Math.floor((new Date() - new Date(i.receivedDate)) / (1000*60*60*24)), QC_Status: i.passFail||'' })));
-            const wb = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb, ws, "Wait_COA"); XLSX.writeFile(wb, `Wait_COA_List_${sm}.xlsx`);
+
+            if (waitCoaItems.length === 0) return alert("ไม่มีข้อมูลรายการค้าง COA ให้ Export ในเดือนนี้ครับ");
+
+            const ws = XLSX.utils.json_to_sheet(waitCoaItems.map(i => {
+                const days = Math.floor((new Date() - new Date(i.receivedDate)) / (1000*60*60*24));
+                return {
+                    Supplier: i.supplier || '',
+                    RM_Code: i.rmCode || '',
+                    RM_Name: i.rmName || '',
+                    Lot_No: i.lotNo || '',
+                    Date_Received: i.receivedDate || '',
+                    Aging_Days: days,
+                    QC_Status: i.passFail || ''
+                };
+            }));
+            const wb = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb, ws, "Wait_COA"); 
+            XLSX.writeFile(wb, `Wait_COA_List_${selectedMonth}.xlsx`);
         }
 
         window.exportToExcel = function() {
             if (inspections.length === 0) return alert("ยังไม่มีข้อมูลให้ Export");
             const ws = XLSX.utils.json_to_sheet(inspections.map(i => ({
-                Date_Received: i.receivedDate||'', RM_Code: i.rmCode||'', RM_Name: i.rmName||'', CAS_Number: i.casNumber||'', Supplier: i.supplier||'', Lot_No: i.lotNo||'', Mfg_Date: i.mfgDate||'', Exp_Date: i.expDate||'', Internal_Lot: i.internalLotNo||'',
-                COA_Status: i.coaStatus === 'Pending' ? 'Waiting' : (i.coaStatus === 'Received' ? 'Received' : (i.coaStatus||'')),
-                COA_Wait_Days: i.coaAgingDays !== undefined && i.coaAgingDays !== null ? i.coaAgingDays : '',
-                COA_Color: i.coaColor||'', COA_Odor: i.coaOdor||'', COA_pH: i.coaPh||'', COA_Temp: i.coaTemp||'', QC_Appearance: i.qcAppearance||'', QC_Color: i.qcColor||'', QC_Odor: i.qcOdor||'', QC_pH: i.qcPh||'', QC_Temp: i.qcTemp||'', QC_Contamination: i.qcContamination||'', Remark: i.qcRemark||'', Status: i.passFail||'', Inspector: i.approvedBy||''
+                Date_Received: i.receivedDate || '', RM_Code: i.rmCode || '', RM_Name: i.rmName || '', Supplier: i.supplier || '', Lot_No: i.lotNo || '', Mfg_Date: i.mfgDate || '', Exp_Date: i.expDate || '', Internal_Lot: i.internalLotNo || '',
+                COA_Status: i.coaStatus === 'Pending' ? 'Waiting' : (i.coaStatus === 'Received' ? 'Received' : (i.coaStatus || '')),
+                COA_Received_Date: i.coaReceivedDate || '', COA_Wait_Days: i.coaAgingDays !== undefined && i.coaAgingDays !== null ? i.coaAgingDays : '',
+                COA_Color: i.coaColor || '', COA_Odor: i.coaOdor || '', COA_pH: i.coaPh || '', COA_Temp: i.coaTemp || '', QC_Appearance: i.qcAppearance || '', QC_Color: i.qcColor || '', QC_Odor: i.qcOdor || '', QC_pH: i.qcPh || '', QC_Temp: i.qcTemp || '', QC_Contamination: i.qcContamination || '', Remark: i.qcRemark || '', Status: i.passFail || '', Inspector: i.approvedBy || '', Inspect_Date: i.approvedDate || ''
             })));
             const wb = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb, ws, "QC_Data"); XLSX.writeFile(wb, "QC_Report_Firebase.xlsx");
         }
@@ -1408,58 +1445,80 @@
         window.viewAttachment = function(idx, type) { 
             const item = inspections[idx];
             const file = type === 'coa' ? item.coaFile : item.qcFile;
-            if (!file || !file.data) return alert("❌ ไม่พบข้อมูลไฟล์");
+            if (!file || !file.data) return alert("❌ ไม่พบข้อมูลไฟล์ในระบบ");
             const content = document.getElementById('fileViewerContent');
             const dlBtn = document.getElementById('downloadAttachmentBtn');
-            dlBtn.href = file.data; dlBtn.download = file.name || 'File';
+            dlBtn.href = file.data; dlBtn.download = file.name || (type === 'coa' ? 'COA_Document' : 'QC_Photo');
             if (file.data.startsWith('data:image')) content.innerHTML = `<img src="${file.data}" style="max-width:100%; max-height:100%; object-fit:contain; border-radius:8px;">`;
             else if (file.data.startsWith('data:application/pdf')) content.innerHTML = `<iframe src="${file.data}" width="100%" height="100%" style="border:none; border-radius:8px;"></iframe>`;
-            else content.innerHTML = `<div style="text-align:center;"><a href="${file.data}" download="${dlBtn.download}" class="btn btn-primary">⬇️ ดาวน์โหลดไฟล์แทน</a></div>`;
+            else content.innerHTML = `<div style="text-align:center;"><p style="color:#64748b; font-size:1.1rem; margin-bottom:15px;">⚠️ เบราว์เซอร์ไม่รองรับไฟล์นี้</p><a href="${file.data}" download="${dlBtn.download}" class="btn btn-primary">⬇️ ดาวน์โหลดไฟล์แทน</a></div>`;
             window.openModal('fileViewerModal');
         }
 
         function renderMasterTable() { 
             const tbody = document.getElementById('masterTableBody');
-            if(inspections.length === 0) { tbody.innerHTML = '<tr><td colspan="7" style="text-align:center; padding:20px; color:#94a3b8;">ยังไม่มีข้อมูลการตรวจสอบ</td></tr>'; return; }
-            tbody.innerHTML = inspections.map((item, idx) => {
-                let docIcons = [];
-                if(item.coaFile?.isLink) docIcons.push('<span title="COA" style="background:#e0e7ff; color:#4338ca; padding:2px 6px; border-radius:4px; font-size:0.8em;">📄 COA</span>');
-                if(item.msdsFiles?.length > 0) docIcons.push(`<span title="MSDS" style="background:#dcfce7; color:#166534; padding:2px 6px; border-radius:4px; font-size:0.8em;">📑 MSDS (${item.msdsFiles.length})</span>`);
-                if(item.specFiles?.length > 0) docIcons.push(`<span title="Spec" style="background:#fef9c3; color:#854d0e; padding:2px 6px; border-radius:4px; font-size:0.8em;">📋 Spec (${item.specFiles.length})</span>`);
-                
-                return `<tr><td>${item.receivedDate || '-'}</td><td><strong style="color:var(--primary);">${item.rmCode || '-'}</strong><br><small style="color:var(--text-light);">${item.rmName || '-'}</small></td><td>${item.lotNo || '-'}</td><td><span class="status-badge ${(item.passFail || '').toLowerCase()}">${item.passFail || '-'}</span></td><td><div style="display:flex; flex-direction:column; gap:4px;">${docIcons.length ? docIcons.join('') : '-'}</div></td><td>${item.qcFile?.isLink ? `<button class="btn btn-success btn-sm" onclick="window.viewAttachment(${idx}, 'qc')">📸 รูป</button>` : '-'}</td><td><button class="btn btn-info btn-sm" onclick="window.openDetailModal(${idx})" style="margin-right: 5px;">📄 View</button><button class="btn btn-warning btn-sm" onclick="window.openEditRecord(${idx})" style="background:#fef3c7; color:#b45309; border:1px solid #fde68a;">✏️ Edit</button></td></tr>`;
-            }).join('');
+            if(inspections.length === 0) { tbody.innerHTML = '<tr><td colspan="7" style="text-align:center; padding:20px; color:#94a3b8;">ยังไม่มีข้อมูลการตรวจสอบในระบบ</td></tr>'; return; }
+            tbody.innerHTML = inspections.map((item, idx) => `<tr><td>${item.receivedDate || '-'}</td><td><strong style="color:var(--primary);">${item.rmCode || '-'}</strong><br><small style="color:var(--text-light);">${item.rmName || '-'}</small></td><td>${item.lotNo || '-'}</td><td><span class="status-badge ${(item.passFail || '').toLowerCase()}">${item.passFail || '-'}</span></td><td>${item.coaFile?.isLink ? `<button class="btn btn-secondary btn-sm" onclick="window.viewAttachment(${idx}, 'coa')">📄 COA File</button>` : '-'}</td><td>${item.qcFile?.isLink ? `<button class="btn btn-success btn-sm" onclick="window.viewAttachment(${idx}, 'qc')">📸 QC Photo</button>` : '-'}</td><td><button class="btn btn-info btn-sm" onclick="window.openDetailModal(${idx})" style="margin-right: 5px;">📄 View</button><button class="btn btn-warning btn-sm" onclick="window.openEditRecord(${idx})" style="background:#fef3c7; color:#b45309; border:1px solid #fde68a;">✏️ Edit</button></td></tr>`).join('');
             if (typeof window.filterHistoryTable === 'function') window.filterHistoryTable();
         }
 
         window.filterHistoryTable = function() {
-            const input = document.getElementById('historySearchInput'); if(!input) return;
+            const input = document.getElementById('historySearchInput');
+            if(!input) return;
             const filter = input.value.toLowerCase();
-            const trs = document.getElementById('masterTableBody').getElementsByTagName('tr');
+            const tbody = document.getElementById('masterTableBody');
+            const trs = tbody.getElementsByTagName('tr');
+
             for (let i = 0; i < trs.length; i++) {
                 if (trs[i].cells.length === 1) continue;
-                trs[i].style.display = trs[i].textContent.toLowerCase().indexOf(filter) > -1 ? "" : "none";
+                const rowText = trs[i].textContent.toLowerCase();
+                if (rowText.indexOf(filter) > -1) trs[i].style.display = "";
+                else trs[i].style.display = "none";
             }
         }
 
         window.performSearch = function() {
             const q = document.getElementById('searchInput').value.toLowerCase();
-            const rContainer = document.getElementById('searchResults');
-            if (q.length === 0) { rContainer.innerHTML = '<div style="text-align:center; color:#94a3b8; padding:40px; border:2px dashed #e2e8f0; border-radius:16px;">พิมพ์ข้อมูลที่ต้องการค้นหาในช่องด้านบน 👆</div>'; return; }
+            const resultsContainer = document.getElementById('searchResults');
+            
+            if (q.length === 0) { resultsContainer.innerHTML = '<div style="text-align:center; color:#94a3b8; padding:40px; border:2px dashed #e2e8f0; border-radius:16px;">พิมพ์ข้อมูลที่ต้องการค้นหาในช่องด้านบน 👆</div>'; return; }
 
-            const matches = inspections.map((item, index) => ({ item, index })).filter(({ item }) => 
-                (item.rmCode && item.rmCode.toLowerCase().includes(q)) || (item.rmName && item.rmName.toLowerCase().includes(q)) || 
-                (item.lotNo && item.lotNo.toLowerCase().includes(q)) || (item.casNumber && item.casNumber.toLowerCase().includes(q))
-            );
+            const matches = inspections.map((item, index) => ({ item, index }))
+                .filter(({ item }) => 
+                    (item.rmCode && item.rmCode.toLowerCase().includes(q)) || 
+                    (item.rmName && item.rmName.toLowerCase().includes(q)) || 
+                    (item.lotNo && item.lotNo.toLowerCase().includes(q))
+                );
 
-            if (matches.length === 0) { rContainer.innerHTML = '<div style="text-align:center; color:#ef4444; padding:40px; border:2px dashed #fecaca; border-radius:16px; background:#fef2f2;">❌ ไม่พบข้อมูลที่ตรงกับคำค้นหา</div>'; return; }
+            if (matches.length === 0) {
+                resultsContainer.innerHTML = '<div style="text-align:center; color:#ef4444; padding:40px; border:2px dashed #fecaca; border-radius:16px; background:#fef2f2;">❌ ไม่พบข้อมูลที่ตรงกับคำค้นหา</div>';
+                return;
+            }
 
-            rContainer.innerHTML = matches.map(({ item, index }) => {
-                let sColor = '#94a3b8'; let bgL = '#f8fafc';
-                if(item.passFail === 'Pass') { sColor = '#27ae60'; bgL = '#f0fdf4'; }
-                else if(item.passFail === 'Fail') { sColor = '#e74c3c'; bgL = '#fef2f2'; }
-                else if(item.passFail === 'Pending') { sColor = '#f39c12'; bgL = '#fefce8'; }
-                return `<div class="result-card" style="border-left: 6px solid ${sColor};"><div class="result-header"><div><div class="result-title">${item.rmCode}</div><div class="result-lot">Lot: ${item.lotNo}</div></div><span class="status-badge ${(item.passFail||'').toLowerCase()}">${item.passFail}</span></div><div class="result-grid" style="background:${bgL};"><div><span class="result-label">Name:</span><br><strong style="color:var(--text-main);">${item.rmName}</strong></div><div><span class="result-label">Date:</span><br><strong style="color:var(--text-main);">${item.receivedDate}</strong></div></div><button class="btn btn-primary" style="width:100%; font-size:1rem;" onclick="window.openDetailModal(${index})">📄 ดูรายละเอียดฉบับเต็ม</button></div>`;
+            resultsContainer.innerHTML = matches.map(({ item, index }) => {
+                let statusColor = '#94a3b8'; let bgL = '#f8fafc';
+                if(item.passFail === 'Pass') { statusColor = '#27ae60'; bgL = '#f0fdf4'; }
+                else if(item.passFail === 'Fail') { statusColor = '#e74c3c'; bgL = '#fef2f2'; }
+                else if(item.passFail === 'Pending') { statusColor = '#f39c12'; bgL = '#fefce8'; }
+
+                return `
+                <div class="result-card" style="border-left: 6px solid ${statusColor};">
+                    <div class="result-header">
+                        <div>
+                            <div class="result-title">${item.rmCode}</div>
+                            <div class="result-lot">Lot: ${item.lotNo}</div>
+                        </div>
+                        <span class="status-badge ${(item.passFail||'').toLowerCase()}">${item.passFail}</span>
+                    </div>
+                    <div class="result-grid" style="background:${bgL};">
+                        <div><span class="result-label">Name:</span><br><strong style="color:var(--text-main);">${item.rmName}</strong></div>
+                        <div><span class="result-label">Date:</span><br><strong style="color:var(--text-main);">${item.receivedDate}</strong></div>
+                    </div>
+                    <button class="btn btn-primary" style="width:100%; font-size:1rem;" onclick="window.openDetailModal(${index})">
+                        📄 ดูรายละเอียดฉบับเต็ม
+                    </button>
+                </div>
+            `;
             }).join('');
         }
         
@@ -1467,61 +1526,103 @@
             const item = inspections[idx];
             const content = document.getElementById('detailContent');
             const v = (val) => val ? val : '<span style="color:#cbd5e1;">-</span>';
+            
+            let coaStatDisplay = v(item.coaStatus);
+            if(item.coaStatus === 'Received') coaStatDisplay = '✅ ได้รับพร้อมสินค้าเรียบร้อยแล้ว';
+            if(item.coaStatus === 'Pending') coaStatDisplay = '⏳ สินค้ามาส่งแล้ว แต่ยังไม่ได้รับ COA';
+            if(item.coaStatus === 'NotRequired') coaStatDisplay = '➖ สินค้านี้ไม่ต้องใช้เอกสาร COA';
+
+            let coaAgingDisplay = '';
+            if (item.coaStatus === 'Received' && item.coaAgingDays !== null && item.coaAgingDays !== undefined) {
+                coaAgingDisplay = `<div class="detail-row" style="background:#f5f3ff;"><div class="detail-label" style="color:#6b21a8;">ระยะเวลารอ COA:</div><div class="detail-value" style="font-weight:bold; color:#6b21a8;">${item.coaAgingDays} วัน <span style="font-weight:normal; font-size:0.9em; margin-left:8px;">(ได้รับวันที่ ${v(item.coaReceivedDate)})</span></div></div>`;
+            } else if (item.coaStatus === 'Pending') {
+                const days = Math.floor((new Date() - new Date(item.receivedDate)) / (1000*60*60*24));
+                coaAgingDisplay = `<div class="detail-row" style="background:#fef2f2;"><div class="detail-label" style="color:#e74c3c;">ระยะเวลารอ COA:</div><div class="detail-value" style="font-weight:bold; color:#e74c3c;">กำลังรอ... <span style="font-weight:normal; font-size:0.9em; margin-left:8px;">(ผ่านมาแล้ว ${days} วัน)</span></div></div>`;
+            }
+
+            let appearanceDisplay = item.qcAppearance === 'Pass' ? '✅ Pass' : (item.qcAppearance === 'Fail' ? '❌ Fail' : v(item.qcAppearance));
+            
+            let contaminationDisplay = v(item.qcContamination);
+            if (item.qcContamination === 'Pass') contaminationDisplay = '✅ Pass (ผ่าน)';
+            if (item.qcContamination === 'Fail') contaminationDisplay = '❌ Fail (ไม่ผ่าน)';
+
+            let passFailDisplay = item.passFail === 'Pass' ? '✅ Accepted' : (item.passFail === 'Fail' ? '❌ Rejected' : v(item.passFail));
+
             const cIcon = (val) => val ? '<span class="chk-icon" style="color:#27ae60;">☑</span>' : '<span class="chk-icon" style="color:#e74c3c;">☒</span>';
-
-            let msdsHtml = '';
-            if (item.msdsFiles && item.msdsFiles.length > 0) {
-                msdsHtml = item.msdsFiles.map((f, fIdx) => `<button class="btn btn-sm" style="background:#e2e8f0; color:#334155; margin:2px;" onclick="window.viewSpecificFile(${idx}, 'msds', ${fIdx})">📑 ${f.name}</button>`).join('');
-            } else { msdsHtml = '<span style="color:#94a3b8;">ไม่มีแนบ</span>'; }
-
-            let specHtml = '';
-            if (item.specFiles && item.specFiles.length > 0) {
-                specHtml = item.specFiles.map((f, fIdx) => `<button class="btn btn-sm" style="background:#e2e8f0; color:#334155; margin:2px;" onclick="window.viewSpecificFile(${idx}, 'spec', ${fIdx})">📋 ${f.name}</button>`).join('');
-            } else { specHtml = '<span style="color:#94a3b8;">ไม่มีแนบ</span>'; }
 
             content.innerHTML = `
                 <div class="print-container">
+                    <div class="print-header" style="display: none;">
+                        <h2>RAW MATERIAL RECEIVING & VENDOR CHECKLIST (QA)</h2>
+                        <p>แบบฟอร์มตรวจสอบคุณภาพวัตถุดิบรับเข้า</p>
+                    </div>
                     <div class="print-wrapper">
                         <div class="detail-section-header">1. Receiving Information (ข้อมูลการรับเข้า)</div>
                         <div class="detail-row"><div class="detail-label">Material Code:</div><div class="detail-value" style="font-weight:700;">${v(item.rmCode)}</div></div>
                         <div class="detail-row"><div class="detail-label">Material Name:</div><div class="detail-value">${v(item.rmName)}</div></div>
                         <div class="detail-row"><div class="detail-label">Supplier Name:</div><div class="detail-value">${v(item.supplier)}</div></div>
                         <div class="detail-row"><div class="detail-label">Lot Number:</div><div class="detail-value">${v(item.lotNo)}</div></div>
+                        <div class="detail-row"><div class="detail-label">Manufacturing Date:</div><div class="detail-value">${v(item.mfgDate)}</div></div>
+                        <div class="detail-row"><div class="detail-label">Expiry Date:</div><div class="detail-value">${v(item.expDate)}</div></div>
                         <div class="detail-row"><div class="detail-label">Internal Lot:</div><div class="detail-value">${v(item.internalLotNo)}</div></div>
-                        <div class="detail-row"><div class="detail-label">CAS Number:</div><div class="detail-value" style="color:#2563eb; font-weight:600;">${v(item.casNumber)}</div></div>
-                        <div class="detail-row"><div class="detail-label">Mfg / Exp Date:</div><div class="detail-value">${v(item.mfgDate)} / ${v(item.expDate)}</div></div>
                         <div class="detail-row"><div class="detail-label">Date Received:</div><div class="detail-value">${v(item.receivedDate)}</div></div>
 
                         <div class="detail-section-header" style="margin-top: 20px;">2. Document Verification (การตรวจสอบเอกสาร)</div>
-                        <div class="detail-checklist-box">
-                            <div class="chk-item">${cIcon(item.chk_doc_coa)} <span>COA Available (มีใบรับรอง COA)</span></div>
-                            <div class="chk-item">${cIcon(item.chk_doc_lot)} <span>Lot matches COA (เลข Lot. ตรงกับเอกสาร)</span></div>
-                            <div class="chk-item">${cIcon(item.chk_doc_mfg)} <span>Mfg & Exp verified (วันที่ผลิตและหมดอายุถูกต้อง)</span></div>
-                        </div>
-
-                        <div class="detail-row"><div class="detail-label">Spec Color / Odor:</div><div class="detail-value">${v(item.coaColor)} / ${v(item.coaOdor)}</div></div>
-                        <div class="detail-row"><div class="detail-label">Spec pH / Temp:</div><div class="detail-value">${v(item.coaPh)} / ${v(item.coaTemp)}</div></div>
                         
-                        <div class="detail-row print-hide"><div class="detail-label">COA Document:</div><div class="detail-value">${item.coaFile?.isLink ? `<button class="btn btn-info btn-sm" onclick="window.viewAttachment(${idx}, 'coa')">📄 ดูไฟล์ COA</button>` : '<span style="color:#94a3b8;">ไม่มีแนบ</span>'}</div></div>
-                        <div class="detail-row print-hide"><div class="detail-label">MSDS Document:</div><div class="detail-value" style="display:flex; flex-wrap:wrap; gap:4px;">${msdsHtml}</div></div>
-                        <div class="detail-row print-hide"><div class="detail-label">Product Spec Doc:</div><div class="detail-value" style="display:flex; flex-wrap:wrap; gap:4px;">${specHtml}</div></div>
-
-                        <div class="detail-section-header" style="margin-top: 20px;">3. RM Physical Inspection</div>
                         <div class="detail-checklist-box">
-                            <div class="chk-item">${cIcon(item.chk_pkg_intact)} <span>Packaging intact (สภาพบรรจุภัณฑ์สมบูรณ์)</span></div>
-                            <div class="chk-item">${cIcon(item.chk_pkg_clean)} <span>Seal intact & No leakage (ซีลปิดสนิท ไม่มีรั่วซึม)</span></div>
+                            <div class="chk-title">📋 Document Checklist (เช็คลิสต์ตรวจสอบเอกสาร):</div>
+                            <div class="chk-item">${cIcon(item.chk_doc_coa)} <span>Certificate of Analysis Available (มีเอกสารใบรับรอง COA ครบถ้วน)</span></div>
+                            <div class="chk-item">${cIcon(item.chk_doc_lot)} <span>Lot number matches COA (เลข Lot. ในเอกสาร ตรงกับสินค้าจริง)</span></div>
+                            <div class="chk-item">${cIcon(item.chk_doc_mfg)} <span>Manufacturing & Expiry date verified (วันที่ผลิตและวันหมดอายุถูกต้อง)</span></div>
                         </div>
-                        <div class="detail-row"><div class="detail-label">Appearance:</div><div class="detail-value">${v(item.qcAppearance)}</div></div>
-                        <div class="detail-row"><div class="detail-label">Result Color / Odor:</div><div class="detail-value">${v(item.qcColor)} / ${v(item.qcOdor)}</div></div>
-                        <div class="detail-row"><div class="detail-label">Result pH / Temp:</div><div class="detail-value">${v(item.qcPh)} / ${v(item.qcTemp)}</div></div>
-                        <div class="detail-row"><div class="detail-label">Contamination:</div><div class="detail-value">${v(item.qcContamination)}</div></div>
-                        <div class="detail-row print-hide"><div class="detail-label">QC Photo:</div><div class="detail-value">${item.qcFile?.isLink ? `<button class="btn btn-success btn-sm" onclick="window.viewAttachment(${idx}, 'qc')">📸 ดูรูปภาพหน้างาน</button>` : '<span style="color:#94a3b8;">ไม่มีแนบ</span>'}</div></div>
 
-                        <div class="detail-section-header" style="margin-top: 20px;">4. QA Decision (ผลการตัดสิน)</div>
-                        <div class="detail-row"><div class="detail-label">Result:</div><div class="detail-value"><strong style="font-size:1.1em; color:${item.passFail==='Pass'?'#27ae60':'#e74c3c'}">${v(item.passFail)}</strong></div></div>
+                        <div class="detail-row"><div class="detail-label">Specification Color:</div><div class="detail-value">${v(item.coaColor)}</div></div>
+                        <div class="detail-row"><div class="detail-label">Specification Odor:</div><div class="detail-value">${v(item.coaOdor)}</div></div>
+                        <div class="detail-row"><div class="detail-label">Specification pH:</div><div class="detail-value">${v(item.coaPh)}</div></div>
+                        <div class="detail-row"><div class="detail-label">Specification Temp:</div><div class="detail-value">${v(item.coaTemp)}</div></div>
+
+                        <div class="detail-row" style="background:#f5f3ff;"><div class="detail-label" style="color:#6b21a8;">COA Status:</div><div class="detail-value" style="font-weight:bold; color:#6b21a8;">${coaStatDisplay}</div></div>
+                        ${coaAgingDisplay}
+                        <div class="detail-row print-hide"><div class="detail-label">COA File:</div><div class="detail-value">${item.coaFile?.isLink ? `<button class="btn btn-secondary btn-sm" onclick="window.viewAttachment(${idx}, 'coa')">📄 เปิดไฟล์ COA</button>` : '<span style="color:#94a3b8;">ไม่มีไฟล์แนบ</span>'}</div></div>
+
+                        <div class="detail-section-header" style="margin-top: 20px;">3. Packaging Inspection (การตรวจสอบบรรจุภัณฑ์)</div>
+                        <div class="detail-checklist-box">
+                            <div class="chk-title">📦 Packaging Checklist (เช็คลิสต์ตรวจสอบบรรจุภัณฑ์):</div>
+                            <div class="chk-item">${cIcon(item.chk_pkg_intact)} <span>Packaging intact (สภาพบรรจุภัณฑ์สมบูรณ์ ไม่ชำรุดเสียหาย)</span></div>
+                            <div class="chk-item">${cIcon(item.chk_pkg_clean)} <span>Seal intact & No leakage (ซีลปิดสนิท และไม่มีการรั่วซึม)</span></div>
+                            <div class="chk-item">${cIcon(item.chk_pkg_label)} <span>Label readable (ฉลากอ่านออกชัดเจน)</span></div>
+                        </div>
+
+                        <div class="detail-section-header" style="margin-top: 20px;">4. RM Physical Inspection</div>
+                        <div class="detail-row"><div class="detail-label">Appearance:</div><div class="detail-value">${appearanceDisplay}</div></div>
+                        <div class="detail-row"><div class="detail-label">Result Color:</div><div class="detail-value">${v(item.qcColor)}</div></div>
+                        <div class="detail-row"><div class="detail-label">Result Odor:</div><div class="detail-value">${v(item.qcOdor)}</div></div>
+                        <div class="detail-row"><div class="detail-label">Result pH:</div><div class="detail-value">${v(item.qcPh)}</div></div>
+                        <div class="detail-row"><div class="detail-label">Result Temp:</div><div class="detail-value">${v(item.qcTemp)}</div></div>
+                        <div class="detail-row"><div class="detail-label">Contamination:</div><div class="detail-value">${contaminationDisplay}</div></div>
+
+                        <div class="detail-row print-hide"><div class="detail-label">QC Photo:</div><div class="detail-value">${item.qcFile?.isLink ? `<button class="btn btn-success btn-sm" onclick="window.viewAttachment(${idx}, 'qc')">📸 ดูรูป QC</button>` : '<span style="color:#94a3b8;">ไม่มีรูปถ่าย</span>'}</div></div>
+
+                        <div class="detail-section-header" style="margin-top: 20px;">5. QA Decision (ผลการตัดสิน)</div>
+                        <div class="detail-row"><div class="detail-label">Result:</div><div class="detail-value"><strong style="font-size:1.1em;">${passFailDisplay}</strong></div></div>
                         <div class="detail-row"><div class="detail-label">Remark:</div><div class="detail-value">${v(item.qcRemark)}</div></div>
                         <div class="detail-row print-hide"><div class="detail-label">Inspector Name:</div><div class="detail-value">${v(item.approvedBy)}</div></div>
                         <div class="detail-row print-hide"><div class="detail-label">Inspection Date:</div><div class="detail-value">${v(item.approvedDate)}</div></div>
+
+                        <div class="signature-area" style="display: none;">
+                            <div class="signature-box">
+                                <div class="signature-line"></div>
+                                <div style="font-weight: bold;">( ${v(item.approvedBy)} )</div>
+                                <div style="font-size: 0.9em; margin-top: 5px;">Inspector Name (ผู้ตรวจสอบ)</div>
+                                <div style="font-size: 0.9em;">Date (วันที่): ${v(item.approvedDate)}</div>
+                            </div>
+                            <div class="signature-box">
+                                <div class="signature-line"></div>
+                                <div style="font-weight: bold;">( .................................................... )</div>
+                                <div style="font-size: 0.9em; margin-top: 5px;">QA Manager / Approver (ผู้อนุมัติ)</div>
+                                <div style="font-size: 0.9em;">Date (วันที่): _______/_______/_______</div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             `;
@@ -1531,32 +1632,20 @@
         window.openEditRecord = function(idx) {
             const i = inspections[idx];
             document.getElementById('editOriginalDocId').value = i.id;
-            const fields = ['rmCode','rmName','supplier','lotNo','internalLotNo','casNumber','mfgDate','expDate','receivedDate','coaStatus','coaReceivedDate','coaColor','coaOdor','coaPh','coaTemp','qcAppearance','qcContamination','qcColor','qcOdor','qcPh','qcTemp','qcRemark','passFail','approvedBy','approvedDate'];
+            const fields = ['rmCode','rmName','supplier','lotNo','internalLotNo','mfgDate','expDate','receivedDate','coaStatus','coaReceivedDate','coaColor','coaOdor','coaPh','coaTemp','qcAppearance','qcContamination','qcColor','qcOdor','qcPh','qcTemp','qcRemark','passFail','approvedBy','approvedDate'];
             fields.forEach(f => { if(document.getElementById('edit_'+f)) document.getElementById('edit_'+f).value = i[f] || ''; });
             
             const checkboxFields = ['chk_doc_coa', 'chk_doc_lot', 'chk_doc_mfg', 'chk_pkg_intact', 'chk_pkg_clean', 'chk_pkg_label'];
             checkboxFields.forEach(f => { if(document.getElementById('edit_'+f)) document.getElementById('edit_'+f).checked = !!i[f]; });
 
-            // Setup COA/QC single files
             isEditCoaRemoved = false; editCoaFileData = null;
-            if(i.coaFile?.isLink) { document.getElementById('edit_coaFileStatus').innerHTML = `✅ <a href="#" onclick="window.viewAttachment(${idx}, 'coa'); return false;">ไฟล์เดิมที่มีอยู่ (คลิก)</a>`; document.getElementById('edit_btnRemoveCoa').style.display = "inline-block"; } 
+            if(i.coaFile?.isLink) { document.getElementById('edit_coaFileStatus').innerHTML = `✅ <a href="#" onclick="window.viewAttachment(${idx}, 'coa'); return false;" style="color:#2563eb; font-weight:600;">ไฟล์เดิมที่มีอยู่ (คลิกเพื่อดู)</a>`; document.getElementById('edit_btnRemoveCoa').style.display = "inline-block"; } 
             else { document.getElementById('edit_coaFileStatus').textContent = "❌ ไม่มีไฟล์แนบ"; document.getElementById('edit_btnRemoveCoa').style.display = "none"; }
             
             isEditQcRemoved = false; editQcFileData = null;
-            if(i.qcFile?.isLink) { document.getElementById('edit_qcFileStatus').innerHTML = `✅ <a href="#" onclick="window.viewAttachment(${idx}, 'qc'); return false;">รูปเดิมที่มีอยู่ (คลิก)</a>`; document.getElementById('edit_btnRemoveQc').style.display = "inline-block"; } 
+            if(i.qcFile?.isLink) { document.getElementById('edit_qcFileStatus').innerHTML = `✅ <a href="#" onclick="window.viewAttachment(${idx}, 'qc'); return false;" style="color:#d97706; font-weight:600;">รูปเดิมที่มีอยู่ (คลิกเพื่อดู)</a>`; document.getElementById('edit_btnRemoveQc').style.display = "inline-block"; } 
             else { document.getElementById('edit_qcFileStatus').textContent = "❌ ไม่มีรูปถ่ายแนบ"; document.getElementById('edit_btnRemoveQc').style.display = "none"; }
             
-            // Setup Multi-files arrays
-            editMsdsFiles = i.msdsFiles ? JSON.parse(JSON.stringify(i.msdsFiles)) : [];
-            editSpecFiles = i.specFiles ? JSON.parse(JSON.stringify(i.specFiles)) : [];
-            
-            // Ensure old records have unique IDs for removal logic to work
-            editMsdsFiles.forEach((f, index) => { if(!f.id) f.id = 'old_m_'+index; });
-            editSpecFiles.forEach((f, index) => { if(!f.id) f.id = 'old_s_'+index; });
-
-            renderMultiFileList('msds', true);
-            renderMultiFileList('spec', true);
-
             window.openModal('editModal');
         }
 
@@ -1567,26 +1656,46 @@
         window.closeModal = function(id) { document.getElementById(id).classList.remove('active'); }
         function showLoading(s, t) { document.getElementById('loading-overlay').style.display = s ? 'flex' : 'none'; document.getElementById('loading-text').textContent = t || 'กำลังโหลด...'; }
 
-        // Single File Readers
-        function readSingleFile(input, cb) {
+        function readFile(input, cb) {
             const f = input.files[0]; if(!f) return;
-            showLoading(true, "กำลังประมวลผล...");
-            readFileAsync(f).then(data => { showLoading(false); cb(data); });
+            showLoading(true, "กำลังประมวลผลไฟล์...");
+            if (f.type.startsWith('image/')) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const img = new Image();
+                    img.onload = function() {
+                        const canvas = document.createElement('canvas');
+                        let w = img.width; let h = img.height; const MAX_SIZE = 1600;
+                        if (w > h && w > MAX_SIZE) { h *= MAX_SIZE / w; w = MAX_SIZE; } else if (h > w && h > MAX_SIZE) { w *= MAX_SIZE / h; h = MAX_SIZE; } else if (h === w && w > MAX_SIZE) { w = MAX_SIZE; h = MAX_SIZE; }
+                        canvas.width = w; canvas.height = h;
+                        canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+                        showLoading(false); cb({ name: f.name, data: canvas.toDataURL('image/jpeg', 0.85) });
+                    }
+                    img.src = e.target.result;
+                };
+                reader.readAsDataURL(f);
+            } else {
+                if(f.size > 900000) alert("⚠️ คำเตือน: ไฟล์เอกสารมีขนาดใหญ่เกินไป อาจทำให้บันทึกลงฐานข้อมูลไม่ผ่านครับ");
+                const r = new FileReader(); r.onload = e => { showLoading(false); cb({name: f.name, data: e.target.result}); }; r.readAsDataURL(f); 
+            }
         }
-        document.getElementById('coaFile').onchange = e => readSingleFile(e.target, d => { currentCoaFileData = d; document.getElementById('fileName').innerHTML = `✅ อัปโหลดสำเร็จ: <b>${d.name}</b>`; });
-        document.getElementById('qcFile').onchange = e => readSingleFile(e.target, d => { currentQcFileData = d; document.getElementById('qcFileName').innerHTML = `✅ อัปโหลดสำเร็จ: <b>${d.name}</b>`; });
+
+        document.getElementById('coaFile').onchange = e => readFile(e.target, d => { currentCoaFileData = d; document.getElementById('fileName').innerHTML = `✅ อัปโหลดสำเร็จ: <b>${d.name}</b>`; });
+        document.getElementById('qcFile').onchange = e => readFile(e.target, d => { currentQcFileData = d; document.getElementById('qcFileName').innerHTML = `✅ อัปโหลดสำเร็จ: <b>${d.name}</b>`; });
         window.markFileRemoved = function(type) { if(type === 'coa') { isEditCoaRemoved = true; document.getElementById('edit_coaFileStatus').innerHTML = "<span style='color:#e74c3c; font-weight:bold;'>⚠️ ไฟล์เดิมถูกสั่งลบ</span>"; document.getElementById('edit_btnRemoveCoa').style.display = "none"; } else { isEditQcRemoved = true; document.getElementById('edit_qcFileStatus').innerHTML = "<span style='color:#e74c3c; font-weight:bold;'>⚠️ รูปเดิมถูกสั่งลบ</span>"; document.getElementById('edit_btnRemoveQc').style.display = "none"; } }
-        document.getElementById('edit_coaFileInput').onchange = e => readSingleFile(e.target, d => { editCoaFileData = d; document.getElementById('edit_coaFileStatus').innerHTML = "<span style='color:#2563eb; font-weight:bold;'>🆕 เลือกไฟล์ใหม่แล้ว: " + d.name + "</span>"; isEditCoaRemoved = false; });
-        document.getElementById('edit_qcFileInput').onchange = e => readSingleFile(e.target, d => { editQcFileData = d; document.getElementById('edit_qcFileStatus').innerHTML = "<span style='color:#d97706; font-weight:bold;'>🆕 เลือกรูปใหม่แล้ว: " + d.name + "</span>"; isEditQcRemoved = false; });
+        document.getElementById('edit_coaFileInput').onchange = e => readFile(e.target, d => { editCoaFileData = d; document.getElementById('edit_coaFileStatus').innerHTML = "<span style='color:#2563eb; font-weight:bold;'>🆕 เลือกไฟล์ใหม่แล้ว: " + d.name + "</span>"; isEditCoaRemoved = false; });
+        document.getElementById('edit_qcFileInput').onchange = e => readFile(e.target, d => { editQcFileData = d; document.getElementById('edit_qcFileStatus').innerHTML = "<span style='color:#d97706; font-weight:bold;'>🆕 เลือกรูปใหม่แล้ว: " + d.name + "</span>"; isEditQcRemoved = false; });
         
         window.handleAutocomplete = function(e, f) { 
-            const list = document.getElementById(f + '-autocomplete-list'); const v = e.target.value.toLowerCase();
+            const list = document.getElementById(f + '-autocomplete-list');
+            const v = e.target.value.toLowerCase();
             if(v.length < 1) { list.style.display = 'none'; return; }
             const matches = MASTER_LIST.filter(i => i.code.toLowerCase().includes(v) || i.name.toLowerCase().includes(v)).slice(0, 5);
             list.innerHTML = matches.map(m => `<div class="autocomplete-item" onclick="window.selectRM('${m.code}', '${m.name.replace(/'/g, "\\'")}')"><strong>${m.code}</strong><br><span style="color:#64748b; font-size:0.85rem;">${m.name}</span></div>`).join('');
             list.style.display = matches.length ? 'block' : 'none';
         }
         window.selectRM = function(c, n) { document.getElementById('rmCode').value = c; document.getElementById('rmName').value = n; document.querySelectorAll('.autocomplete-list').forEach(l => l.style.display = 'none'); }
+        
         window.addEventListener('click', e => { if(e.target.classList.contains('modal')) e.target.classList.remove('active'); });
     </script>
 </body>
