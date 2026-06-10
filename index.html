@@ -400,7 +400,6 @@
                             </div>
                         </div>
                         
-                        <!-- [FIX: Issue 1] เพิ่มช่องรับค่า CAS Number ในหน้าสร้างเอกสาร -->
                         <div class="form-row">
                             <div class="form-group">
                                 <label>CAS Number <span class="en-label">(รหัสสารเคมี)</span></label>
@@ -408,7 +407,6 @@
                             </div>
                             <div class="form-group"></div>
                         </div>
-                        <!-- [END FIX] -->
 
                         <div class="form-row">
                             <div class="form-group">
@@ -500,17 +498,14 @@
                             </div>
                         </div>
 
-                        <!-- [NEW] ส่วนเพิ่มปุ่มถ่ายรูปเอกสาร MSDS และ Product Spec (เพิ่มใหม่ ไม่กระทบเดิม) -->
                         <div class="form-row" style="margin-top: 20px; background: #f1f5f9; padding: 15px; border-radius: 12px; border: 1px dashed #cbd5e1;">
                             <div class="form-group">
                                 <label style="color:#0f172a;">📸 ถ่ายรูป MSDS <span class="en-label">(เอกสารความปลอดภัย)</span></label>
                                 <div class="file-upload" style="padding: 15px; border-color: #94a3b8;" onclick="document.getElementById('msdsFileInput').click()">
-                                    <!-- [NEW] accept="image/*" capture="environment" สำหรับเปิดกล้องถ่ายรูปได้โดยตรงบนมือถือ และ multiple เพื่อให้เลือกได้หลายรูป -->
                                     <input type="file" id="msdsFileInput" accept="image/*" capture="environment" multiple style="display:none">
                                     <span class="upload-icon" style="font-size: 1.8rem;">📷</span>
                                     <span style="font-weight:600; color:#334155; font-size: 0.9rem;">ถ่ายรูป / แนบไฟล์ MSDS</span>
                                 </div>
-                                <!-- [NEW] พื้นที่แสดง Preview รูปภาพ -->
                                 <div id="msdsPreview" class="preview-grid"></div>
                             </div>
                             
@@ -521,12 +516,9 @@
                                     <span class="upload-icon" style="font-size: 1.8rem;">📑</span>
                                     <span style="font-weight:600; color:#334155; font-size: 0.9rem;">ถ่ายรูป / แนบไฟล์ Product Spec</span>
                                 </div>
-                                <!-- [NEW] พื้นที่แสดง Preview รูปภาพ -->
                                 <div id="specPreview" class="preview-grid"></div>
                             </div>
                         </div>
-                        <!-- [END NEW] -->
-
                     </div>
 
                     <!-- Section 3: Packaging Inspection -->
@@ -549,7 +541,6 @@
                             </div>
                         </div>
 
-                        <!-- [NEW] ส่วนเพิ่มปุ่มถ่ายรูปฉลากข้างถัง (เพิ่มใหม่ ไม่กระทบเดิม) -->
                         <div class="form-group" style="margin-top: 20px; background: #fffbeb; padding: 15px; border-radius: 12px; border: 1px dashed #fcd34d;">
                             <label style="color:#92400e;">🏷️ ถ่ายรูปฉลากข้างถัง <span class="en-label">(Label Photo)</span></label>
                             <div class="file-upload" style="padding: 15px; border-color: #f59e0b; background: white;" onclick="document.getElementById('labelFileInput').click()">
@@ -557,10 +548,8 @@
                                 <span class="upload-icon" style="font-size: 1.8rem;">📱</span>
                                 <span style="font-weight:600; color:#b45309; font-size: 0.9rem;">ถ่ายรูป / แนบไฟล์ ฉลากข้างถัง</span>
                             </div>
-                            <!-- [NEW] พื้นที่แสดง Preview รูปภาพ -->
                             <div id="labelPreview" class="preview-grid"></div>
                         </div>
-                        <!-- [END NEW] -->
                     </div>
 
                     <!-- Section 4: RM Physical Inspection -->
@@ -860,7 +849,6 @@
                         <div class="form-group"><label>Material Name (ชื่อวัตถุดิบ)</label><input type="text" id="edit_rmName" required></div>
                     </div>
                     
-                    <!-- [FIX: Issue 1] เพิ่มช่องแก้ไข CAS Number -->
                     <div class="form-row" style="margin-bottom:15px;">
                         <div class="form-group">
                             <label>CAS Number (รหัสสารเคมี)</label>
@@ -868,7 +856,6 @@
                         </div>
                         <div class="form-group"></div>
                     </div>
-                    <!-- [END FIX] -->
 
                     <div class="form-row" style="margin-bottom:15px;">
                         <div class="form-group"><label>Supplier Name (ผู้จัดจำหน่าย)</label><input type="text" id="edit_supplier" required></div>
@@ -924,6 +911,28 @@
                         <input type="file" id="edit_coaFileInput" style="font-size:0.9rem; padding:8px 0;">
                         <button type="button" id="edit_btnRemoveCoa" class="btn btn-danger btn-sm" onclick="window.markFileRemoved('coa')" style="display:none; margin-top:5px;">🗑️ ลบไฟล์เดิมทิ้ง</button>
                     </div>
+
+                    <!-- [FIX] เพิ่ม UI ส่วนอัปโหลดรูป MSDS และ Spec ในหน้า Edit Modal เพื่อแก้ปัญหาอัปโหลดรูปใหม่ในโหมด Edit ไม่ได้ -->
+                    <div class="form-row" style="margin-top: 20px; background: #f1f5f9; padding: 15px; border-radius: 12px; border: 1px dashed #cbd5e1;">
+                        <div class="form-group">
+                            <label style="color:#0f172a;">📸 แก้ไข/เพิ่มรูป MSDS</label>
+                            <div class="file-upload" style="padding: 15px; border-color: #94a3b8;" onclick="document.getElementById('edit_msdsFileInput').click()">
+                                <input type="file" id="edit_msdsFileInput" accept="image/*" capture="environment" multiple style="display:none">
+                                <span class="upload-icon" style="font-size: 1.5rem;">📷</span>
+                                <span style="font-weight:600; color:#334155; font-size: 0.8rem;">แนบรูป MSDS</span>
+                            </div>
+                            <div id="edit_msdsPreview" class="preview-grid"></div>
+                        </div>
+                        <div class="form-group">
+                            <label style="color:#0f172a;">📸 แก้ไข/เพิ่มรูป Product Spec</label>
+                            <div class="file-upload" style="padding: 15px; border-color: #94a3b8;" onclick="document.getElementById('edit_specFileInput').click()">
+                                <input type="file" id="edit_specFileInput" accept="image/*" capture="environment" multiple style="display:none">
+                                <span class="upload-icon" style="font-size: 1.5rem;">📑</span>
+                                <span style="font-weight:600; color:#334155; font-size: 0.8rem;">แนบรูป Spec</span>
+                            </div>
+                            <div id="edit_specPreview" class="preview-grid"></div>
+                        </div>
+                    </div>
                 </div>
 
                 <!-- Section 3 & 4 (Combined in UI for compactness but correctly titled) -->
@@ -935,6 +944,16 @@
                         <div class="checklist-item"><input type="checkbox" id="edit_chk_pkg_intact"><label for="edit_chk_pkg_intact">Packaging intact</label></div>
                         <div class="checklist-item"><input type="checkbox" id="edit_chk_pkg_clean"><label for="edit_chk_pkg_clean">Seal intact & No leakage</label></div>
                         <div class="checklist-item"><input type="checkbox" id="edit_chk_pkg_label"><label for="edit_chk_pkg_label">Label readable</label></div>
+                    </div>
+
+                    <!-- [FIX] เพิ่ม UI ส่วนอัปโหลดรูปฉลาก ในหน้า Edit Modal -->
+                    <div class="form-group" style="margin-bottom: 15px; background: #fffbeb; padding: 15px; border-radius: 12px; border: 1px dashed #fcd34d;">
+                        <label style="color:#92400e;">🏷️ แก้ไข/เพิ่มรูปฉลากข้างถัง</label>
+                        <div class="file-upload" style="padding: 10px; border-color: #f59e0b; background: white;" onclick="document.getElementById('edit_labelFileInput').click()">
+                            <input type="file" id="edit_labelFileInput" accept="image/*" capture="environment" multiple style="display:none">
+                            <span style="font-weight:600; color:#b45309; font-size: 0.9rem;">📷 ถ่ายรูป / แนบไฟล์ เพิ่มเติม</span>
+                        </div>
+                        <div id="edit_labelPreview" class="preview-grid"></div>
                     </div>
 
                     <div class="form-row" style="margin-bottom:15px;">
@@ -1100,6 +1119,27 @@
         let specImages = [];
         let labelImages = [];
 
+        // [FIX] เพิ่มตัวแปร Global สำหรับเก็บรูปภาพในโหมด Edit โดยเฉพาะ ป้องกัน Memory รั่วและข้อมูลตีกัน
+        let editMsdsImages = [];
+        let editSpecImages = [];
+        let editLabelImages = [];
+
+        // [FIX] ฟังก์ชันเพื่อทำความสะอาดตัวแปรเก็บรูปภาพ (Clear Cache) หลังปิด/บันทึกฟอร์ม
+        window.clearImageStates = function(mode) {
+            if (mode === 'add' || mode === 'all') {
+                msdsImages = []; specImages = []; labelImages = [];
+                if(document.getElementById('msdsPreview')) document.getElementById('msdsPreview').innerHTML = '';
+                if(document.getElementById('specPreview')) document.getElementById('specPreview').innerHTML = '';
+                if(document.getElementById('labelPreview')) document.getElementById('labelPreview').innerHTML = '';
+            }
+            if (mode === 'edit' || mode === 'all') {
+                editMsdsImages = []; editSpecImages = []; editLabelImages = [];
+                if(document.getElementById('edit_msdsPreview')) document.getElementById('edit_msdsPreview').innerHTML = '';
+                if(document.getElementById('edit_specPreview')) document.getElementById('edit_specPreview').innerHTML = '';
+                if(document.getElementById('edit_labelPreview')) document.getElementById('edit_labelPreview').innerHTML = '';
+            }
+        }
+
         const DEFAULT_RM = [
             { code: "RM1-SV-WT", name: "Water" }, { code: "RM2-CA-LRGS", name: "Plantacare 1200 UP" },
             { code: "RM2-CA-DG-DGS", name: "Plantacare 2000 UP" }, { code: "RM2-CA-CGS", name: "Plantacare 810 UP" },
@@ -1211,7 +1251,6 @@
             const newQCRecord = {
                 timestamp: new Date().toISOString(),
                 rmCode: fd.get('rmCode'), rmName: fd.get('rmName'), supplier: fd.get('supplier'), 
-                // [FIX: Issue 1] รับค่า CAS Number เข้าสู่ Database
                 casNumber: fd.get('casNumber') || '', 
                 lotNo: fd.get('lotNo'), internalLotNo: fd.get('internalLotNo'),
                 mfgDate: fd.get('mfgDate'), expDate: fd.get('expDate'), receivedDate: receivedDate, 
@@ -1245,10 +1284,8 @@
                 document.getElementById('fileName').innerHTML = "รองรับไฟล์ PDF, JPG, PNG";
                 document.getElementById('qcFileName').innerHTML = "รองรับไฟล์ JPG, PNG";
                 
-                msdsImages = []; specImages = []; labelImages = [];
-                document.getElementById('msdsPreview').innerHTML = '';
-                document.getElementById('specPreview').innerHTML = '';
-                document.getElementById('labelPreview').innerHTML = '';
+                // [FIX] เคลียร์ค่าตัวแปรอัปโหลดหลังเซฟสำเร็จ ป้องกันการแสดงรูปภาพผิดพลาดใน Record ถัดไป
+                window.clearImageStates('add');
                 
                 initMonthFilter(); // Update filter dropdown just in case it's a new month
                 showTab('master');
@@ -1287,7 +1324,6 @@
 
             const updateData = {
                 rmCode: document.getElementById('edit_rmCode').value, rmName: document.getElementById('edit_rmName').value,
-                // [FIX: Issue 1] อัปเดตค่า CAS Number ลงฐานข้อมูลตอน Edit
                 casNumber: document.getElementById('edit_casNumber').value || '',
                 supplier: document.getElementById('edit_supplier').value, lotNo: document.getElementById('edit_lotNo').value,
                 internalLotNo: document.getElementById('edit_internalLotNo').value, mfgDate: document.getElementById('edit_mfgDate').value, expDate: document.getElementById('edit_expDate').value,
@@ -1304,17 +1340,21 @@
                 coaColor: document.getElementById('edit_coaColor').value, coaOdor: document.getElementById('edit_coaOdor').value, coaPh: document.getElementById('edit_coaPh').value, coaTemp: document.getElementById('edit_coaTemp').value,
                 qcAppearance: document.getElementById('edit_qcAppearance').value, qcColor: document.getElementById('edit_qcColor').value, qcOdor: document.getElementById('edit_qcOdor').value, qcPh: document.getElementById('edit_qcPh').value, qcTemp: document.getElementById('edit_qcTemp').value, qcContamination: document.getElementById('edit_qcContamination').value,
                 qcRemark: document.getElementById('edit_qcRemark').value, passFail: document.getElementById('edit_passFail').value, approvedBy: document.getElementById('edit_approvedBy').value, approvedDate: document.getElementById('edit_approvedDate').value,
-                coaFile: finalCoaFile, qcFile: finalQcFile, lastUpdated: new Date().toISOString(),
+                coaFile: finalCoaFile, qcFile: finalQcFile, 
+                // [FIX] เพิ่มการบันทึก LastUpdated เพื่อแสดงข้อมูลล่าสุดหรือ Audit Log เบื้องต้น
+                lastUpdated: new Date().toISOString(),
                 
-                msdsImages: originalRecord.msdsImages || [],
-                specImages: originalRecord.specImages || [],
-                labelImages: originalRecord.labelImages || []
+                // [FIX] ปรับให้บันทึกภาพจากตัวแปร edit state เพื่อให้ภาพที่แก้ไขถูกบันทึก แทนที่จะเป็นค่า original เดิมๆ
+                msdsImages: editMsdsImages,
+                specImages: editSpecImages,
+                labelImages: editLabelImages
             };
 
             try {
                 const docRef = isUsingCustomConfig ? doc(db, 'qcHistory', docId) : doc(db, 'artifacts', appId, 'public', 'data', 'qcHistory', docId);
                 await updateDoc(docRef, updateData);
-                alert("✅ อัปเดตข้อมูลสำเร็จ!"); window.closeModal('editModal');
+                alert("✅ อัปเดตข้อมูลสำเร็จ!"); 
+                window.closeModal('editModal');
             } catch (error) { console.error(error); alert("❌ เกิดข้อผิดพลาด"); } 
             finally { showLoading(false); }
         });
@@ -1513,7 +1553,6 @@
                     Supplier: i.supplier || '',
                     RM_Code: i.rmCode || '',
                     RM_Name: i.rmName || '',
-                    // [FIX: Issue 2] เพิ่มการดึง CAS Number ลง Export Excel
                     CAS_Number: i.casNumber || '',
                     Lot_No: i.lotNo || '',
                     Date_Received: i.receivedDate || '',
@@ -1529,7 +1568,6 @@
             if (inspections.length === 0) return alert("ยังไม่มีข้อมูลให้ Export");
             const ws = XLSX.utils.json_to_sheet(inspections.map(i => ({
                 Date_Received: i.receivedDate || '', RM_Code: i.rmCode || '', RM_Name: i.rmName || '', 
-                // [FIX: Issue 2] ผูก Data CAS_Number ลงใน Report หลัก
                 CAS_Number: i.casNumber || '', 
                 Supplier: i.supplier || '', Lot_No: i.lotNo || '', Mfg_Date: i.mfgDate || '', Exp_Date: i.expDate || '', Internal_Lot: i.internalLotNo || '',
                 COA_Status: i.coaStatus === 'Pending' ? 'Waiting' : (i.coaStatus === 'Received' ? 'Received' : (i.coaStatus || '')),
@@ -1552,7 +1590,7 @@
             window.openModal('fileViewerModal');
         }
 
-        // [NEW] Helper สำหรับคลิกดูรูปใหญ่โดยตรง (ใช้ Modal เดิม) สำหรับภาพเสริม (MSDS, Spec, Label)
+        // Helper สำหรับคลิกดูรูปใหญ่โดยตรง (ใช้ Modal เดิม) สำหรับภาพเสริม (MSDS, Spec, Label)
         window.viewAttachmentDirect = function(dataUrl, name) {
             const content = document.getElementById('fileViewerContent');
             const dlBtn = document.getElementById('downloadAttachmentBtn');
@@ -1594,7 +1632,6 @@
                     (item.rmCode && item.rmCode.toLowerCase().includes(q)) || 
                     (item.rmName && item.rmName.toLowerCase().includes(q)) || 
                     (item.lotNo && item.lotNo.toLowerCase().includes(q)) ||
-                    // [FIX: Issue 1] ทำให้ระบบรองรับการ Search ด้วย CAS Number ได้
                     (item.casNumber && item.casNumber.toLowerCase().includes(q))
                 );
 
@@ -1630,11 +1667,9 @@
             }).join('');
         }
         
-        // [FIX: Issue 2] HTML Builder สำหรับรูปภาพเสริม นำคลาส print-hide ออก เพื่อให้รูปใหม่แสดงเวลาพิมพ์
         const renderAdditionalImagesHTML = (title, imagesArray) => {
             if (!imagesArray || imagesArray.length === 0) return '';
             const imgTags = imagesArray.map(img => `<img src="${img.data}" style="max-width:100px; max-height:100px; margin:5px; border-radius:8px; cursor:pointer; border:1px solid #e2e8f0; object-fit:cover;" onclick="window.viewAttachmentDirect('${img.data}', '${img.name}')" title="คลิกเพื่อขยาย">`).join('');
-            // นำคลาส print-hide ออก, เพิ่ม flex-wrap ป้องกันล้นขอบกระดาษ
             return `<div class="detail-row"><div class="detail-label">${title}:</div><div class="detail-value" style="flex-wrap: wrap;">${imgTags}</div></div>`;
         };
 
@@ -1666,6 +1701,13 @@
 
             const cIcon = (val) => val ? '<span class="chk-icon" style="color:#27ae60;">☑</span>' : '<span class="chk-icon" style="color:#e74c3c;">☒</span>';
 
+            // [FIX] เพิ่มการตรวจสอบสถานะ History Log (Last Updated) ว่าเคยแก้หรือไม่
+            let updateInfo = '';
+            if (item.lastUpdated) {
+                const upDate = new Date(item.lastUpdated).toLocaleString('th-TH');
+                updateInfo = `<div class="detail-row" style="background:#fff7ed;"><div class="detail-label" style="color:#b45309;">อัปเดตข้อมูลล่าสุด:</div><div class="detail-value" style="color:#b45309; font-weight:bold;">${upDate} <span style="font-size:0.85em; font-weight:normal;">(มีการแก้ไขข้อมูล)</span></div></div>`;
+            }
+
             content.innerHTML = `
                 <div class="print-container">
                     <div class="print-header" style="display: none;">
@@ -1677,9 +1719,7 @@
                         <div class="detail-row"><div class="detail-label">Material Code:</div><div class="detail-value" style="font-weight:700;">${v(item.rmCode)}</div></div>
                         <div class="detail-row"><div class="detail-label">Material Name:</div><div class="detail-value">${v(item.rmName)}</div></div>
                         
-                        <!-- [FIX: Issue 1] แสดงข้อมูล CAS Number ใน Detail Modal -->
                         <div class="detail-row"><div class="detail-label">CAS Number:</div><div class="detail-value">${v(item.casNumber)}</div></div>
-                        <!-- [END FIX] -->
 
                         <div class="detail-row"><div class="detail-label">Supplier Name:</div><div class="detail-value">${v(item.supplier)}</div></div>
                         <div class="detail-row"><div class="detail-label">Lot Number:</div><div class="detail-value">${v(item.lotNo)}</div></div>
@@ -1706,7 +1746,6 @@
                         ${coaAgingDisplay}
                         <div class="detail-row print-hide"><div class="detail-label">COA File:</div><div class="detail-value">${item.coaFile?.isLink ? `<button class="btn btn-secondary btn-sm" onclick="window.viewAttachment(${idx}, 'coa')">📄 เปิดไฟล์ COA</button>` : '<span style="color:#94a3b8;">ไม่มีไฟล์แนบ</span>'}</div></div>
                         
-                        <!-- [NEW] แทรกรูปถ่ายเอกสาร MSDS และ Spec ลงใน Section 2 -->
                         ${renderAdditionalImagesHTML('รูปถ่าย MSDS', item.msdsImages)}
                         ${renderAdditionalImagesHTML('รูปถ่าย Product Spec', item.specImages)}
 
@@ -1718,7 +1757,6 @@
                             <div class="chk-item">${cIcon(item.chk_pkg_label)} <span>Label readable (ฉลากอ่านออกชัดเจน)</span></div>
                         </div>
                         
-                        <!-- [NEW] แทรกรูปถ่ายฉลากข้างถัง ลงใน Section 3 -->
                         ${renderAdditionalImagesHTML('รูปถ่ายฉลากข้างถัง', item.labelImages)}
 
                         <div class="detail-section-header" style="margin-top: 20px;">4. RM Physical Inspection</div>
@@ -1736,6 +1774,9 @@
                         <div class="detail-row"><div class="detail-label">Remark:</div><div class="detail-value">${v(item.qcRemark)}</div></div>
                         <div class="detail-row print-hide"><div class="detail-label">Inspector Name:</div><div class="detail-value">${v(item.approvedBy)}</div></div>
                         <div class="detail-row print-hide"><div class="detail-label">Inspection Date:</div><div class="detail-value">${v(item.approvedDate)}</div></div>
+                        
+                        <!-- [FIX] นำค่า Last Updated มาแสดงผลที่ส่วนท้ายเพื่อแจ้งประวัติการแก้ไขข้อมูล -->
+                        ${updateInfo}
 
                         <div class="signature-area" style="display: none;">
                             <div class="signature-box">
@@ -1760,7 +1801,6 @@
         window.openEditRecord = function(idx) {
             const i = inspections[idx];
             document.getElementById('editOriginalDocId').value = i.id;
-            // [FIX: Issue 1] นำชื่อตัวแปร `casNumber` ใส่เข้าไปใน array เพื่อให้ Loop สามารถนำค่าไป Binding กับ Form ได้อัตโนมัติ
             const fields = ['rmCode','rmName','casNumber','supplier','lotNo','internalLotNo','mfgDate','expDate','receivedDate','coaStatus','coaReceivedDate','coaColor','coaOdor','coaPh','coaTemp','qcAppearance','qcContamination','qcColor','qcOdor','qcPh','qcTemp','qcRemark','passFail','approvedBy','approvedDate'];
             fields.forEach(f => { if(document.getElementById('edit_'+f)) document.getElementById('edit_'+f).value = i[f] || ''; });
             
@@ -1775,6 +1815,14 @@
             if(i.qcFile?.isLink) { document.getElementById('edit_qcFileStatus').innerHTML = `✅ <a href="#" onclick="window.viewAttachment(${idx}, 'qc'); return false;" style="color:#d97706; font-weight:600;">รูปเดิมที่มีอยู่ (คลิกเพื่อดู)</a>`; document.getElementById('edit_btnRemoveQc').style.display = "inline-block"; } 
             else { document.getElementById('edit_qcFileStatus').textContent = "❌ ไม่มีรูปถ่ายแนบ"; document.getElementById('edit_btnRemoveQc').style.display = "none"; }
             
+            // [FIX] โหลดข้อมูลรูปเก่าเข้าตัวแปรของโหมด Edit และสั่ง Render ให้แสดงผลใน UI
+            editMsdsImages = i.msdsImages ? JSON.parse(JSON.stringify(i.msdsImages)) : [];
+            editSpecImages = i.specImages ? JSON.parse(JSON.stringify(i.specImages)) : [];
+            editLabelImages = i.labelImages ? JSON.parse(JSON.stringify(i.labelImages)) : [];
+            renderImagePreviews(editMsdsImages, 'edit_msdsPreview');
+            renderImagePreviews(editSpecImages, 'edit_specPreview');
+            renderImagePreviews(editLabelImages, 'edit_labelPreview');
+
             window.openModal('editModal');
         }
 
@@ -1782,7 +1830,11 @@
         window.printDetail = function() { document.body.classList.add('printing-detail'); window.print(); document.body.classList.remove('printing-detail'); }
         window.showTab = function(id) { document.querySelectorAll('.tab, .tab-content').forEach(el => el.classList.remove('active')); document.getElementById(id).classList.add('active'); document.querySelector(`.tab[onclick*="${id}"]`).classList.add('active'); if(id === 'rmMaster') renderRMMasterTable(); }
         window.openModal = function(id) { document.getElementById(id).classList.add('active'); }
-        window.closeModal = function(id) { document.getElementById(id).classList.remove('active'); }
+        window.closeModal = function(id) { 
+            document.getElementById(id).classList.remove('active'); 
+            // [FIX] เคลียร์ขยะรูปภาพออกเมื่อกดยกเลิก/ปิด Modal Edit
+            if(id === 'editModal') window.clearImageStates('edit');
+        }
         function showLoading(s, t) { document.getElementById('loading-overlay').style.display = s ? 'flex' : 'none'; document.getElementById('loading-text').textContent = t || 'กำลังโหลด...'; }
 
         function readFile(input, cb) {
@@ -1815,7 +1867,6 @@
         document.getElementById('edit_coaFileInput').onchange = e => readFile(e.target, d => { editCoaFileData = d; document.getElementById('edit_coaFileStatus').innerHTML = "<span style='color:#2563eb; font-weight:bold;'>🆕 เลือกไฟล์ใหม่แล้ว: " + d.name + "</span>"; isEditCoaRemoved = false; });
         document.getElementById('edit_qcFileInput').onchange = e => readFile(e.target, d => { editQcFileData = d; document.getElementById('edit_qcFileStatus').innerHTML = "<span style='color:#d97706; font-weight:bold;'>🆕 เลือกรูปใหม่แล้ว: " + d.name + "</span>"; isEditQcRemoved = false; });
         
-        // [NEW] Logic ควบคุมระบบอัปโหลดรูปหลายรูป และย่อขนาดภาพ (Compression) สำหรับเอกสารใหม่
         function handleMultipleImageUpload(input, targetArray, previewId) {
             const files = input.files;
             if (!files || files.length === 0) return;
@@ -1824,7 +1875,6 @@
             let processedCount = 0;
 
             Array.from(files).forEach(file => {
-                // หากไม่ใช่รูปภาพให้ข้ามไป
                 if (!file.type.startsWith('image/')) {
                     processedCount++;
                     if (processedCount === files.length) { showLoading(false); input.value = ''; }
@@ -1837,7 +1887,7 @@
                     img.onload = function() {
                         const canvas = document.createElement('canvas');
                         let w = img.width; let h = img.height; 
-                        const MAX_SIZE = 800; // บีบอัดให้เล็กกว่าปกติ (800px) เพื่อให้แนบได้หลายรูปโดยไม่เกิน Limit 1MB ต่อ 1 Document
+                        const MAX_SIZE = 800;
 
                         if (w > h && w > MAX_SIZE) { h *= MAX_SIZE / w; w = MAX_SIZE; }
                         else if (h > w && h > MAX_SIZE) { w *= MAX_SIZE / h; h = MAX_SIZE; }
@@ -1848,14 +1898,14 @@
 
                         targetArray.push({
                             name: file.name,
-                            data: canvas.toDataURL('image/jpeg', 0.7) // ลด Quality ลงเหลือ 70%
+                            data: canvas.toDataURL('image/jpeg', 0.7)
                         });
 
                         processedCount++;
                         if (processedCount === files.length) {
                             showLoading(false);
                             renderImagePreviews(targetArray, previewId);
-                            input.value = ''; // เคลียร์ input ให้เลือกถ่ายรูปซ้ำได้อีก
+                            input.value = '';
                         }
                     }
                     img.src = e.target.result;
@@ -1864,7 +1914,6 @@
             });
         }
 
-        // [NEW] Function แสดงรูปภาพ Preview ที่เพิ่งถ่ายมาลงใน UI
         function renderImagePreviews(targetArray, previewId) {
             const container = document.getElementById(previewId);
             container.innerHTML = targetArray.map((img, index) => `
@@ -1875,17 +1924,24 @@
             `).join('');
         }
 
-        // [NEW] Function ลบรูปภาพที่เพิ่งถ่ายออก หากไม่พอใจ
         window.removeNewImage = function(index, previewId) {
             if (previewId === 'msdsPreview') { msdsImages.splice(index, 1); renderImagePreviews(msdsImages, previewId); }
             else if (previewId === 'specPreview') { specImages.splice(index, 1); renderImagePreviews(specImages, previewId); }
             else if (previewId === 'labelPreview') { labelImages.splice(index, 1); renderImagePreviews(labelImages, previewId); }
+            // [FIX] เพิ่มเงื่อนไขให้ปุ่มลบรูปรองรับโหมด Edit ด้วย
+            else if (previewId === 'edit_msdsPreview') { editMsdsImages.splice(index, 1); renderImagePreviews(editMsdsImages, previewId); }
+            else if (previewId === 'edit_specPreview') { editSpecImages.splice(index, 1); renderImagePreviews(editSpecImages, previewId); }
+            else if (previewId === 'edit_labelPreview') { editLabelImages.splice(index, 1); renderImagePreviews(editLabelImages, previewId); }
         }
 
-        // [NEW] กำหนด Event Listener ให้อินพุตของรูปถ่าย
         document.getElementById('msdsFileInput').onchange = e => handleMultipleImageUpload(e.target, msdsImages, 'msdsPreview');
         document.getElementById('specFileInput').onchange = e => handleMultipleImageUpload(e.target, specImages, 'specPreview');
         document.getElementById('labelFileInput').onchange = e => handleMultipleImageUpload(e.target, labelImages, 'labelPreview');
+
+        // [FIX] กำหนด Event Listener สำหรับอินพุตถ่ายรูปในโหมด Edit
+        const elEditMsds = document.getElementById('edit_msdsFileInput'); if(elEditMsds) elEditMsds.onchange = e => handleMultipleImageUpload(e.target, editMsdsImages, 'edit_msdsPreview');
+        const elEditSpec = document.getElementById('edit_specFileInput'); if(elEditSpec) elEditSpec.onchange = e => handleMultipleImageUpload(e.target, editSpecImages, 'edit_specPreview');
+        const elEditLabel = document.getElementById('edit_labelFileInput'); if(elEditLabel) elEditLabel.onchange = e => handleMultipleImageUpload(e.target, editLabelImages, 'edit_labelPreview');
 
         window.handleAutocomplete = function(e, f) { 
             const list = document.getElementById(f + '-autocomplete-list');
