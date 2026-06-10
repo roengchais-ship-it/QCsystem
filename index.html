@@ -164,6 +164,16 @@
         .charts-row { display: grid; grid-template-columns: 1fr 1.5fr; gap: 25px; margin-bottom: 25px;}
         .chart-box { background: white; padding: 25px; border-radius: 20px; box-shadow: var(--shadow-md); }
 
+        /* [NEW] Style สำหรับ Sticky Header และ Pagination */
+        #master .table-container-scroll { max-height: 65vh; overflow-y: auto; position: relative; }
+        #master table thead th { position: sticky; top: 0; z-index: 10; background: #f8fafc; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
+        
+        .pagination-container { display: flex; justify-content: space-between; align-items: center; margin-top: 15px; padding: 10px 5px; border-top: 1px solid #e2e8f0; flex-wrap: wrap; gap: 10px; }
+        .pagination-controls button { padding: 6px 12px; margin: 0 2px; border: 1px solid #cbd5e1; background: white; border-radius: 6px; cursor: pointer; transition: 0.2s; font-family: 'Prompt'; font-size: 0.9rem; }
+        .pagination-controls button:hover:not(:disabled) { background: #f1f5f9; }
+        .pagination-controls button:disabled { opacity: 0.5; cursor: not-allowed; }
+        .page-info { font-size: 0.9rem; color: var(--text-light); font-weight: 500; }
+
         .status-badge { padding: 6px 12px; border-radius: 20px; font-size: 0.8rem; font-weight: 600; display: inline-flex; align-items: center; gap: 4px; }
         .pass { background: rgba(39, 174, 96, 0.1); color: #219653; }
         .fail { background: rgba(231, 76, 60, 0.1); color: #e74c3c; }
@@ -651,7 +661,8 @@
                 </div>
                 
                 <div style="margin-bottom: 15px;">
-                    <input type="text" id="historySearchInput" placeholder="🔍 ค้นหาในประวัติ: รหัส, ชื่อ, CAS Number, เลขล็อต, ผลการประเมิน..." style="width:100%; padding:12px 16px; border-radius:12px; border:1.5px solid var(--border-input); font-family:'Prompt'; font-size: 1rem; transition:0.3s; outline:none;" onkeyup="window.filterHistoryTable()" onfocus="this.style.borderColor='var(--primary)'" onblur="this.style.borderColor='var(--border-input)'">
+                    <!-- [UPDATE] เปลี่ยน Event เป็น window.renderMasterTable(true) เพื่อเรียกใช้ระบบ Filter+Pagination ใหม่ -->
+                    <input type="text" id="historySearchInput" placeholder="🔍 ค้นหาในประวัติ: วันที่, รหัส, ชื่อ, CAS Number, สถานะ, เลขล็อต..." style="width:100%; padding:12px 16px; border-radius:12px; border:1.5px solid var(--border-input); font-family:'Prompt'; font-size: 1rem; transition:0.3s; outline:none;" onkeyup="window.renderMasterTable(true)" onfocus="this.style.borderColor='var(--primary)'" onblur="this.style.borderColor='var(--border-input)'">
                 </div>
 
                 <div class="table-container-scroll">
@@ -662,6 +673,8 @@
                         <tbody id="masterTableBody"></tbody>
                     </table>
                 </div>
+                <!-- [NEW] กล่องรองรับ Pagination ด้านล่างตาราง -->
+                <div id="historyPaginationWrapper"></div>
             </div>
 
             <!-- Tab: Dashboard -->
@@ -1162,6 +1175,10 @@
         let editSpecImages = [];
         let editLabelImages = [];
 
+        // [NEW] ตัวแปร Global สำหรับ Pagination หน้า History
+        let historyCurrentPage = 1;
+        let historyRowsPerPage = 15;
+
         window.clearImageStates = function(mode) {
             if (mode === 'add' || mode === 'all') {
                 msdsImages = []; specImages = []; labelImages = [];
@@ -1235,18 +1252,29 @@
                             inspections = [];
                             snapshot.forEach(doc => inspections.push({ id: doc.id, ...doc.data() }));
                             
-                            const getTimestampVal = (ts) => {
-                                if (!ts) return 0;
-                                let d = new Date(ts);
-                                if (!isNaN(d.getTime())) return d.getTime(); 
-                                let strTs = String(ts);
-                                let match = strTs.match(/(\d+)\/(\d+)\/(\d+)/);
-                                if (match) {
-                                    let year = parseInt(match[3]); if (year > 2400) year -= 543;
-                                    return new Date(year, parseInt(match[2])-1, parseInt(match[1]), 0, 0, 0).getTime();
-                                } return 0;
+                            // [UPDATE] ปรับปรุง Logic การ Sorting ให้ยึด วันที่รับของ (receivedDate) เป็นหลัก (Newest First)
+                            const getSortValue = (item) => {
+                                // 1. ลองใช้วันที่รับของ (Date Received)
+                                if (item.receivedDate) {
+                                    let d = new Date(item.receivedDate);
+                                    if (!isNaN(d.getTime())) return d.getTime();
+                                }
+                                // 2. Fallback ไปใช้วันที่สร้างเอกสาร (Timestamp)
+                                if (item.timestamp) {
+                                    let d = new Date(item.timestamp);
+                                    if (!isNaN(d.getTime())) return d.getTime(); 
+                                    // จัดการเคส Timestamp แบบเก่า (DD/MM/YYYY)
+                                    let strTs = String(item.timestamp);
+                                    let match = strTs.match(/(\d+)\/(\d+)\/(\d+)/);
+                                    if (match) {
+                                        let year = parseInt(match[3]); if (year > 2400) year -= 543;
+                                        return new Date(year, parseInt(match[2])-1, parseInt(match[1]), 0, 0, 0).getTime();
+                                    }
+                                }
+                                return 0;
                             };
-                            inspections.sort((a, b) => getTimestampVal(b.timestamp) - getTimestampVal(a.timestamp));
+                            
+                            inspections.sort((a, b) => getSortValue(b) - getSortValue(a)); // Descending Order (ใหม่สุดขึ้นก่อน)
                             
                             if (!isFilterInitialized) {
                                 initMonthFilter();
@@ -1732,42 +1760,126 @@
             window.openModal('fileViewerModal');
         }
 
-        function renderMasterTable() { 
+        // [UPDATE] เขียนฟังก์ชัน renderMasterTable ใหม่ทั้งหมด เพื่อรองรับ Pagination และ Array Filtering
+        window.renderMasterTable = function(resetPage = false) { 
+            if (resetPage) historyCurrentPage = 1;
             const tbody = document.getElementById('masterTableBody');
-            if(inspections.length === 0) { tbody.innerHTML = '<tr><td colspan="10" style="text-align:center; padding:20px; color:#94a3b8;">ยังไม่มีข้อมูลการตรวจสอบในระบบ</td></tr>'; return; }
             
-            tbody.innerHTML = inspections.map((item, idx) => `<tr>
-                <td>${item.receivedDate || '-'}</td>
-                <td><strong style="color:var(--primary);">${item.rmCode || '-'}</strong><br><small style="color:var(--text-light);">${item.rmName || '-'}</small></td>
-                <td style="color:#64748b;">${item.casNumber || '-'}</td>
-                <td>${item.lotNo || '-'}</td>
-                <td><span class="status-badge ${(item.passFail || '').toLowerCase()}">${item.passFail || '-'}</span></td>
-                <td>${item.coaFile?.isLink ? `<button class="btn btn-secondary btn-sm" onclick="window.viewAttachment(${idx}, 'coa')">📄 COA File</button>` : '-'}</td>
-                <td>${item.qcFile?.isLink ? `<button class="btn btn-success btn-sm" onclick="window.viewAttachment(${idx}, 'qc')">📸 QC Pic</button>` : '-'}</td>
-                <td>${(item.msdsImages && item.msdsImages.length > 0) ? `<button class="btn btn-info btn-sm" onclick="window.viewMultipleAttachments(${idx}, 'msds')">📸 MSDS</button>` : '-'}</td>
-                <td>${(item.specImages && item.specImages.length > 0) ? `<button class="btn btn-purple btn-sm" onclick="window.viewMultipleAttachments(${idx}, 'spec')">📑 Spec</button>` : '-'}</td>
-                <td>
-                    <button class="btn btn-info btn-sm" onclick="window.openDetailModal(${idx})" style="margin-right: 5px;">📄 View</button>
-                    <button class="btn btn-warning btn-sm" onclick="window.openEditRecord(${idx})" style="background:#fef3c7; color:#b45309; border:1px solid #fde68a;">✏️ Edit</button>
-                </td>
-            </tr>`).join('');
+            if(!isFirebaseLoaded) { 
+                tbody.innerHTML = '<tr><td colspan="10" style="text-align:center; padding:20px; color:#94a3b8;">กำลังโหลดข้อมูลจาก Firebase...</td></tr>'; 
+                return; 
+            }
+            if(inspections.length === 0) { 
+                tbody.innerHTML = '<tr><td colspan="10" style="text-align:center; padding:20px; color:#94a3b8;">ยังไม่มีข้อมูลการตรวจสอบในระบบ</td></tr>'; 
+                document.getElementById('historyPaginationWrapper').innerHTML = '';
+                return; 
+            }
+
+            // 1. Process Filtering (ค้นหาข้อมูลจาก Array)
+            const searchInput = document.getElementById('historySearchInput');
+            const query = searchInput ? searchInput.value.toLowerCase() : '';
+            let filteredData = inspections;
+
+            if (query) {
+                filteredData = inspections.filter(item => 
+                    (item.rmCode && item.rmCode.toLowerCase().includes(query)) || 
+                    (item.rmName && item.rmName.toLowerCase().includes(query)) || 
+                    (item.casNumber && item.casNumber.toLowerCase().includes(query)) ||
+                    (item.lotNo && item.lotNo.toLowerCase().includes(query)) ||
+                    (item.passFail && item.passFail.toLowerCase().includes(query)) ||
+                    (item.receivedDate && item.receivedDate.includes(query))
+                );
+            }
+
+            // 2. Process Pagination (คำนวณจำนวนหน้าและตัด Array)
+            const totalRecords = filteredData.length;
+            const totalPages = Math.ceil(totalRecords / historyRowsPerPage) || 1;
+            if (historyCurrentPage > totalPages) historyCurrentPage = totalPages;
+
+            const startIndex = (historyCurrentPage - 1) * historyRowsPerPage;
+            const endIndex = startIndex + historyRowsPerPage;
+            const paginatedData = filteredData.slice(startIndex, endIndex);
+
+            // 3. Render Table Content
+            if (paginatedData.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="10" style="text-align:center; padding:20px; color:#e74c3c;">ไม่พบข้อมูลที่ตรงกับการค้นหา</td></tr>';
+                document.getElementById('historyPaginationWrapper').innerHTML = '';
+                return;
+            }
+
+            tbody.innerHTML = paginatedData.map((item) => {
+                // จำเป็นต้องหา Index ดั้งเดิม เพื่อให้ปุ่ม View/Edit อ้างอิง Array ต้นทางได้ถูกต้อง
+                const originalIdx = inspections.findIndex(i => i.id === item.id);
+                
+                return `<tr>
+                    <td>${item.receivedDate || '-'}</td>
+                    <td><strong style="color:var(--primary);">${item.rmCode || '-'}</strong><br><small style="color:var(--text-light);">${item.rmName || '-'}</small></td>
+                    <td style="color:#64748b;">${item.casNumber || '-'}</td>
+                    <td>${item.lotNo || '-'}</td>
+                    <td><span class="status-badge ${(item.passFail || '').toLowerCase()}">${item.passFail || '-'}</span></td>
+                    <td>${item.coaFile?.isLink ? `<button class="btn btn-secondary btn-sm" onclick="window.viewAttachment(${originalIdx}, 'coa')">📄 COA</button>` : '-'}</td>
+                    <td>${item.qcFile?.isLink ? `<button class="btn btn-success btn-sm" onclick="window.viewAttachment(${originalIdx}, 'qc')">📸 QC</button>` : '-'}</td>
+                    <td>${(item.msdsImages && item.msdsImages.length > 0) ? `<button class="btn btn-info btn-sm" onclick="window.viewMultipleAttachments(${originalIdx}, 'msds')">📸 MSDS</button>` : '-'}</td>
+                    <td>${(item.specImages && item.specImages.length > 0) ? `<button class="btn btn-purple btn-sm" onclick="window.viewMultipleAttachments(${originalIdx}, 'spec')">📑 Spec</button>` : '-'}</td>
+                    <td>
+                        <button class="btn btn-info btn-sm" onclick="window.openDetailModal(${originalIdx})" style="margin-right: 5px;">📄 View</button>
+                        <button class="btn btn-warning btn-sm" onclick="window.openEditRecord(${originalIdx})" style="background:#fef3c7; color:#b45309; border:1px solid #fde68a;">✏️ Edit</button>
+                    </td>
+                </tr>`;
+            }).join('');
             
-            if (typeof window.filterHistoryTable === 'function') window.filterHistoryTable();
+            // 4. Render Pagination Controls
+            renderHistoryPagination(totalRecords, totalPages);
         }
 
-        window.filterHistoryTable = function() {
-            const input = document.getElementById('historySearchInput');
-            if(!input) return;
-            const filter = input.value.toLowerCase();
-            const tbody = document.getElementById('masterTableBody');
-            const trs = tbody.getElementsByTagName('tr');
+        // [NEW] ฟังก์ชันสำหรับสร้างปุ่มแบ่งหน้า (Pagination Controls)
+        function renderHistoryPagination(totalRecords, totalPages) {
+            const wrapper = document.getElementById('historyPaginationWrapper');
+            const startItem = ((historyCurrentPage - 1) * historyRowsPerPage) + 1;
+            const endItem = Math.min(historyCurrentPage * historyRowsPerPage, totalRecords);
 
-            for (let i = 0; i < trs.length; i++) {
-                if (trs[i].cells.length === 1) continue;
-                const rowText = trs[i].textContent.toLowerCase();
-                if (rowText.indexOf(filter) > -1) trs[i].style.display = "";
-                else trs[i].style.display = "none";
-            }
+            let buttonsHTML = `
+                <button onclick="window.changeHistoryPage(${historyCurrentPage - 1})" ${historyCurrentPage === 1 ? 'disabled' : ''}>&laquo; ก่อนหน้า</button>
+                <span style="margin: 0 10px; font-weight: 600; color: var(--primary);">หน้าที่ ${historyCurrentPage} / ${totalPages}</span>
+                <button onclick="window.changeHistoryPage(${historyCurrentPage + 1})" ${historyCurrentPage === totalPages ? 'disabled' : ''}>ถัดไป &raquo;</button>
+            `;
+
+            wrapper.innerHTML = `
+                <div class="pagination-container">
+                    <div class="page-info">แสดงรายการที่ ${startItem} ถึง ${endItem} <span style="opacity:0.6;">(จากทั้งหมด ${totalRecords} รายการ)</span></div>
+                    <div class="pagination-controls">
+                        ${buttonsHTML}
+                    </div>
+                    <div style="display:flex; align-items:center; gap:8px;">
+                        <label style="font-size:0.85rem; color:var(--text-light); font-weight:500;">แสดงหน้าละ:</label>
+                        <select onchange="window.changeHistoryRowsPerPage(this.value)" style="padding:4px 8px; border-radius:6px; border:1px solid #cbd5e1; font-family:'Prompt'; outline:none; cursor:pointer;">
+                            <option value="15" ${historyRowsPerPage === 15 ? 'selected' : ''}>15</option>
+                            <option value="30" ${historyRowsPerPage === 30 ? 'selected' : ''}>30</option>
+                            <option value="50" ${historyRowsPerPage === 50 ? 'selected' : ''}>50</option>
+                            <option value="100" ${historyRowsPerPage === 100 ? 'selected' : ''}>100</option>
+                        </select>
+                    </div>
+                </div>
+            `;
+        }
+
+        window.changeHistoryPage = function(newPage) {
+            historyCurrentPage = newPage;
+            window.renderMasterTable();
+            // เลื่อนจอขึ้นไปด้านบนสุดของตารางเมื่อเปลี่ยนหน้า
+            document.querySelector('#master .table-container-scroll').scrollTop = 0;
+        }
+
+        window.changeHistoryRowsPerPage = function(val) {
+            historyRowsPerPage = parseInt(val);
+            window.renderMasterTable(true); // Reset to page 1
+        }
+
+        // [DELETED/UPDATED] ยกเลิกการใช้งาน filterHistoryTable แบบเดิมที่อิง DOM (ซ่อน HTML <tr>) 
+        // เปลี่ยนไปผูกกับ renderMasterTable(true) ใน HTML Input <input onkeyup="..."> เรียบร้อยแล้ว
+        window.filterHistoryTable = function() {
+            // Function exists to avoid errors if any old button calls it, but redirects to new logic
+            window.renderMasterTable(true);
         }
 
         window.performSearch = function() {
