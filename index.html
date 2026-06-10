@@ -400,6 +400,7 @@
                             </div>
                         </div>
                         
+                        <!-- [UPDATE: Issue 1] คงช่องรับค่า CAS Number ไว้ให้ครบตามโฟลว์ Create -->
                         <div class="form-row">
                             <div class="form-group">
                                 <label>CAS Number <span class="en-label">(รหัสสารเคมี)</span></label>
@@ -649,15 +650,16 @@
                     </div>
                 </div>
                 
-                <!-- ช่องค้นหาเฉพาะในตารางประวัติ -->
                 <div style="margin-bottom: 15px;">
-                    <input type="text" id="historySearchInput" placeholder="🔍 ค้นหาในประวัติ: รหัส, ชื่อ, เลขล็อต, ผลการประเมิน..." style="width:100%; padding:12px 16px; border-radius:12px; border:1.5px solid var(--border-input); font-family:'Prompt'; font-size: 1rem; transition:0.3s; outline:none;" onkeyup="window.filterHistoryTable()" onfocus="this.style.borderColor='var(--primary)'" onblur="this.style.borderColor='var(--border-input)'">
+                    <!-- [UPDATE: Issue 1] อัปเดต Placeholder เพื่อบอกว่าค้นหาด้วย CAS ได้ -->
+                    <input type="text" id="historySearchInput" placeholder="🔍 ค้นหาในประวัติ: รหัส, ชื่อ, CAS Number, เลขล็อต, ผลการประเมิน..." style="width:100%; padding:12px 16px; border-radius:12px; border:1.5px solid var(--border-input); font-family:'Prompt'; font-size: 1rem; transition:0.3s; outline:none;" onkeyup="window.filterHistoryTable()" onfocus="this.style.borderColor='var(--primary)'" onblur="this.style.borderColor='var(--border-input)'">
                 </div>
 
                 <div class="table-container-scroll">
                     <table>
                         <thead>
-                            <tr><th>Date</th><th>RM Code & Name</th><th>Lot No.</th><th>Status</th><th>COA</th><th>QC Pic</th><th>Action</th></tr>
+                            <!-- [UPDATE] เพิ่มคอลัมน์ MSDS และ Spec ลงในตาราง History -->
+                            <tr><th>Date</th><th>RM Code & Name</th><th>CAS No.</th><th>Lot No.</th><th>Status</th><th>COA</th><th>QC Pic</th><th>MSDS</th><th>Spec</th><th>Action</th></tr>
                         </thead>
                         <tbody id="masterTableBody"></tbody>
                     </table>
@@ -748,6 +750,7 @@
             <div id="search" class="tab-content content-box">
                 <h2 style="color:var(--primary); font-size:1.5rem; margin-bottom:20px;">🔍 ค้นหาข้อมูล (Search & Track)</h2>
                 <div style="position:relative; margin-bottom:30px;">
+                    <!-- [UPDATE: Issue 1] แก้ไข Placeholder ของหน้า Search -->
                     <input type="text" id="searchInput" placeholder="พิมพ์คำค้นหา: RM Code, RM Name, CAS Number หรือ Lot No..." style="width:100%; padding:18px 20px 18px 60px; border-radius:16px; border:2px solid #e2e8f0; font-size:1.05rem; box-shadow: var(--shadow-sm); outline:none; transition:0.3s;" onkeyup="window.performSearch()" onfocus="this.style.borderColor='var(--primary)'" onblur="this.style.borderColor='#e2e8f0'">
                     <span style="position:absolute; left:22px; top:18px; font-size:1.3rem; opacity:0.5;">🔍</span>
                 </div>
@@ -772,8 +775,15 @@
                             <label>ชื่อวัตถุดิบ (RM Name) <span class="required">*</span></label>
                             <input type="text" id="newRmName" required placeholder="ชื่อวัตถุดิบ...">
                         </div>
-                        <div class="form-group" style="grid-column: span 2;">
-                            <button type="submit" class="btn btn-primary" style="width: 100%; font-size:1rem; padding: 12px;">💾 บันทึกรายการใหม่ลง Firebase</button>
+                        
+                        <!-- [FIX: Issue 1] เพิ่ม Input รับค่า CAS Number สำหรับฐานข้อมูลตั้งต้น RM Master -->
+                        <div class="form-group">
+                            <label>CAS Number <span class="en-label">(รหัสสารเคมี)</span></label>
+                            <input type="text" id="newRmCas" placeholder="เช่น 123-45-6" pattern="\d{2,7}-\d{2}-\d" title="รูปแบบ CAS Number เช่น 123-45-6">
+                        </div>
+                        
+                        <div class="form-group" style="grid-column: span 1;">
+                            <button type="submit" class="btn btn-primary" style="width: 100%; font-size:1rem; padding: 12px;">💾 บันทึกลง Firebase</button>
                         </div>
                     </form>
                 </div>
@@ -783,9 +793,11 @@
                         <thead>
                             <tr>
                                 <th style="width: 10%;">ลำดับ</th>
-                                <th style="width: 30%;">RM Code</th>
-                                <th style="width: 45%;">RM Name</th>
-                                <th style="width: 15%;">จัดการ</th>
+                                <th style="width: 25%;">RM Code</th>
+                                <th style="width: 40%;">RM Name</th>
+                                <!-- [FIX: Issue 1] เพิ่มการแสดงผลในหัวตาราง -->
+                                <th style="width: 15%;">CAS No.</th>
+                                <th style="width: 10%;">จัดการ</th>
                             </tr>
                         </thead>
                         <tbody id="rmMasterTableBody"></tbody>
@@ -808,7 +820,7 @@
         </div>
     </div>
 
-    <!-- 📄 Detail Modal (Read Only & Printable) -->
+    <!-- 📄 Detail Modal (Read Only & Printable & Audit Log) -->
     <div id="detailModal" class="modal">
         <div class="modal-content">
             <div class="print-hide" style="display:flex; justify-content:space-between; align-items:center; border-bottom:2px solid #f1f5f9; padding-bottom:15px; margin-bottom:20px;">
@@ -849,6 +861,7 @@
                         <div class="form-group"><label>Material Name (ชื่อวัตถุดิบ)</label><input type="text" id="edit_rmName" required></div>
                     </div>
                     
+                    <!-- [UPDATE: Issue 1] ช่องแก้ไข CAS Number ในหน้า Edit Modal -->
                     <div class="form-row" style="margin-bottom:15px;">
                         <div class="form-group">
                             <label>CAS Number (รหัสสารเคมี)</label>
@@ -912,7 +925,7 @@
                         <button type="button" id="edit_btnRemoveCoa" class="btn btn-danger btn-sm" onclick="window.markFileRemoved('coa')" style="display:none; margin-top:5px;">🗑️ ลบไฟล์เดิมทิ้ง</button>
                     </div>
 
-                    <!-- [FIX] เพิ่ม UI ส่วนอัปโหลดรูป MSDS และ Spec ในหน้า Edit Modal เพื่อแก้ปัญหาอัปโหลดรูปใหม่ในโหมด Edit ไม่ได้ -->
+                    <!-- [UPDATE: Issue 2] UI ส่วนแก้ไข/เพิ่มรูปถ่ายในหน้า Edit Modal -->
                     <div class="form-row" style="margin-top: 20px; background: #f1f5f9; padding: 15px; border-radius: 12px; border: 1px dashed #cbd5e1;">
                         <div class="form-group">
                             <label style="color:#0f172a;">📸 แก้ไข/เพิ่มรูป MSDS</label>
@@ -946,7 +959,7 @@
                         <div class="checklist-item"><input type="checkbox" id="edit_chk_pkg_label"><label for="edit_chk_pkg_label">Label readable</label></div>
                     </div>
 
-                    <!-- [FIX] เพิ่ม UI ส่วนอัปโหลดรูปฉลาก ในหน้า Edit Modal -->
+                    <!-- [UPDATE: Issue 2] UI ส่วนแก้ไขฉลากข้างถัง ในหน้า Edit Modal -->
                     <div class="form-group" style="margin-bottom: 15px; background: #fffbeb; padding: 15px; border-radius: 12px; border: 1px dashed #fcd34d;">
                         <label style="color:#92400e;">🏷️ แก้ไข/เพิ่มรูปฉลากข้างถัง</label>
                         <div class="file-upload" style="padding: 10px; border-color: #f59e0b; background: white;" onclick="document.getElementById('edit_labelFileInput').click()">
@@ -1119,12 +1132,11 @@
         let specImages = [];
         let labelImages = [];
 
-        // [FIX] เพิ่มตัวแปร Global สำหรับเก็บรูปภาพในโหมด Edit โดยเฉพาะ ป้องกัน Memory รั่วและข้อมูลตีกัน
+        // ตัวแปร Global สำหรับโหมด Edit
         let editMsdsImages = [];
         let editSpecImages = [];
         let editLabelImages = [];
 
-        // [FIX] ฟังก์ชันเพื่อทำความสะอาดตัวแปรเก็บรูปภาพ (Clear Cache) หลังปิด/บันทึกฟอร์ม
         window.clearImageStates = function(mode) {
             if (mode === 'add' || mode === 'all') {
                 msdsImages = []; specImages = []; labelImages = [];
@@ -1194,6 +1206,7 @@
                             if(document.getElementById('rmMaster').classList.contains('active')) renderRMMasterTable();
                         }, (e) => { console.error("RM Error:", e); isFirebaseLoaded = true; });
 
+                        // [UPDATE: Issue 2] Firebase Listener จะทำงานทุกครั้งที่มีการ updateDoc และดึงข้อมูลชุดล่าสุดเสมอ 
                         onSnapshot(qcCollectionPath, (snapshot) => {
                             inspections = [];
                             snapshot.forEach(doc => inspections.push({ id: doc.id, ...doc.data() }));
@@ -1216,6 +1229,7 @@
                                 isFilterInitialized = true;
                             }
 
+                            // การ Render ใหม่จะอัปเดตค่าไปยังหน้า Table, Dashboard และตัวแปร inspections Global
                             renderMasterTable();
                             renderSummary();
                             showLoading(false);
@@ -1271,7 +1285,10 @@
                 
                 msdsImages: msdsImages,
                 specImages: specImages,
-                labelImages: labelImages
+                labelImages: labelImages,
+                
+                // [NEW: Issue 2] รองรับการทำ Audit Log ให้กับเอกสาร
+                editHistory: []
             };
 
             try {
@@ -1284,9 +1301,7 @@
                 document.getElementById('fileName').innerHTML = "รองรับไฟล์ PDF, JPG, PNG";
                 document.getElementById('qcFileName').innerHTML = "รองรับไฟล์ JPG, PNG";
                 
-                // [FIX] เคลียร์ค่าตัวแปรอัปโหลดหลังเซฟสำเร็จ ป้องกันการแสดงรูปภาพผิดพลาดใน Record ถัดไป
                 window.clearImageStates('add');
-                
                 initMonthFilter(); // Update filter dropdown just in case it's a new month
                 showTab('master');
             } catch (error) { console.error(error); alert("❌ เกิดข้อผิดพลาดในการบันทึกข้อมูล"); } 
@@ -1322,6 +1337,16 @@
                 coaReceivedDate = '';
             }
 
+            // [NEW: Issue 2] รวบรวมข้อมูลก่อนแก้ เพื่อเก็บใน Audit Log สำหรับเรียกดูใน History 
+            let historyLog = originalRecord.editHistory ? JSON.parse(JSON.stringify(originalRecord.editHistory)) : [];
+            historyLog.push({
+                updatedAt: new Date().toISOString(),
+                updatedBy: window.currentUser || 'Unknown',
+                prevStatus: originalRecord.passFail || '-',
+                prevCoaStatus: originalRecord.coaStatus || '-',
+                prevRemark: originalRecord.qcRemark || '-'
+            });
+
             const updateData = {
                 rmCode: document.getElementById('edit_rmCode').value, rmName: document.getElementById('edit_rmName').value,
                 casNumber: document.getElementById('edit_casNumber').value || '',
@@ -1341,13 +1366,15 @@
                 qcAppearance: document.getElementById('edit_qcAppearance').value, qcColor: document.getElementById('edit_qcColor').value, qcOdor: document.getElementById('edit_qcOdor').value, qcPh: document.getElementById('edit_qcPh').value, qcTemp: document.getElementById('edit_qcTemp').value, qcContamination: document.getElementById('edit_qcContamination').value,
                 qcRemark: document.getElementById('edit_qcRemark').value, passFail: document.getElementById('edit_passFail').value, approvedBy: document.getElementById('edit_approvedBy').value, approvedDate: document.getElementById('edit_approvedDate').value,
                 coaFile: finalCoaFile, qcFile: finalQcFile, 
-                // [FIX] เพิ่มการบันทึก LastUpdated เพื่อแสดงข้อมูลล่าสุดหรือ Audit Log เบื้องต้น
                 lastUpdated: new Date().toISOString(),
                 
-                // [FIX] ปรับให้บันทึกภาพจากตัวแปร edit state เพื่อให้ภาพที่แก้ไขถูกบันทึก แทนที่จะเป็นค่า original เดิมๆ
+                // [UPDATE: Issue 2] นำภาพที่แก้ไขลง Database 
                 msdsImages: editMsdsImages,
                 specImages: editSpecImages,
-                labelImages: editLabelImages
+                labelImages: editLabelImages,
+                
+                // [NEW: Issue 2] บันทึก History เก็บลงไป
+                editHistory: historyLog
             };
 
             try {
@@ -1374,7 +1401,7 @@
         function renderRMMasterTable() {
             const tbody = document.getElementById('rmMasterTableBody');
             if(!isFirebaseLoaded) {
-                tbody.innerHTML = '<tr><td colspan="4" style="text-align:center; padding:20px; color:#94a3b8;">กำลังโหลดข้อมูลจาก Firebase...</td></tr>';
+                tbody.innerHTML = '<tr><td colspan="5" style="text-align:center; padding:20px; color:#94a3b8;">กำลังโหลดข้อมูลจาก Firebase...</td></tr>';
                 return;
             }
             tbody.innerHTML = MASTER_LIST.map((rm, idx) => `
@@ -1382,6 +1409,8 @@
                     <td style="color:var(--text-light);">${idx + 1}</td>
                     <td><strong style="color:var(--primary);">${rm.code}</strong></td>
                     <td>${rm.name}</td>
+                    <!-- [UPDATE: Issue 1] แสดงข้อมูล CAS ในตาราง RM Master -->
+                    <td>${rm.casNumber || '-'}</td>
                     <td><button class="btn btn-danger btn-sm" onclick="window.deleteRM(${idx})">🗑️ ลบ</button></td>
                 </tr>
             `).join('');
@@ -1392,12 +1421,20 @@
             const code = document.getElementById('newRmCode').value.trim();
             const name = document.getElementById('newRmName').value.trim();
             
+            // [UPDATE: Issue 1] รับค่า CAS Number สำหรับเซฟเข้า RM Master
+            const cas = document.getElementById('newRmCas').value.trim();
+            
             if(MASTER_LIST.some(rm => rm.code.toLowerCase() === code.toLowerCase())) { alert("❌ รหัส RM Code นี้มีอยู่ในระบบแล้ว!"); return; }
             try {
                 showLoading(true, "กำลังบันทึกลง Firebase...");
                 const rmRef = isUsingCustomConfig ? collection(db, 'rmMaster') : collection(db, 'artifacts', appId, 'public', 'data', 'rmMaster');
-                await addDoc(rmRef, { code: code, name: name, createdAt: new Date().toISOString() });
-                document.getElementById('newRmCode').value = ''; document.getElementById('newRmName').value = '';
+                
+                await addDoc(rmRef, { code: code, name: name, casNumber: cas, createdAt: new Date().toISOString() });
+                
+                document.getElementById('newRmCode').value = ''; 
+                document.getElementById('newRmName').value = '';
+                document.getElementById('newRmCas').value = '';
+                
                 alert("✅ เพิ่มข้อมูลวัตถุดิบสำเร็จ!");
             } catch (error) { console.error("Error adding doc: ", error); alert("❌ เกิดข้อผิดพลาดในการบันทึกข้อมูล"); } finally { showLoading(false); }
         }
@@ -1411,7 +1448,7 @@
             try {
                 for (const rm of DEFAULT_RM) {
                     if (!MASTER_LIST.some(existing => existing.code.toLowerCase() === rm.code.toLowerCase())) {
-                        await addDoc(rmRef, { code: rm.code, name: rm.name, createdAt: new Date().toISOString() });
+                        await addDoc(rmRef, { code: rm.code, name: rm.name, casNumber: '', createdAt: new Date().toISOString() });
                         addedCount++;
                     }
                 }
@@ -1454,7 +1491,6 @@
             });
 
             let optionsHTML = '<option value="ALL">รวมทั้งหมด (All Time)</option>';
-            // เรียงจากเดือนล่าสุดไปเก่าสุด
             Array.from(months).sort().reverse().forEach(m => {
                 const [y, mo] = m.split('-');
                 const monthName = new Date(y, mo-1, 1).toLocaleString('th-TH', { month: 'long', year: 'numeric' });
@@ -1462,11 +1498,7 @@
             });
             
             filterEl.innerHTML = optionsHTML;
-            
-            // พยายามตั้งค่ากลับเป็นเดือนเดิมที่เลือกไว้ (ถ้ายังมีอยู่ในลิสต์)
-            if (Array.from(months).includes(currentSelection)) {
-                filterEl.value = currentSelection;
-            }
+            if (Array.from(months).includes(currentSelection)) { filterEl.value = currentSelection; }
         }
 
         window.renderSummary = function() {
@@ -1475,7 +1507,6 @@
             
             document.getElementById('chartMonthLabel').textContent = `(${monthLabel})`;
 
-            // 1. กรองข้อมูลตามเดือนที่เลือก
             const filteredData = inspections.filter(i => {
                 if (selectedMonth === 'ALL') return true;
                 if (!i.receivedDate) return false;
@@ -1485,13 +1516,10 @@
                 return monthKey === selectedMonth;
             });
 
-            // 2. คำนวณ KPI
             const total = filteredData.length;
             const pass = filteredData.filter(i => i.passFail === 'Pass').length;
             const fail = filteredData.filter(i => i.passFail === 'Fail').length;
             const pendingItems = filteredData.filter(i => i.passFail === 'Pending' || i.passFail === 'Hold');
-            
-            // คำนวณ "รอ COA" (นับเฉพาะที่ระบุว่า Pending หรือพวกเก่าที่ไม่มีไฟล์แนบและไม่ใช่ Pass แบบสมบูรณ์)
             const waitCoaItems = filteredData.filter(i => i.coaStatus === 'Pending' || (!i.coaStatus && !i.coaFile?.isLink && i.passFail !== 'Pass'));
 
             document.getElementById('dashTotal').textContent = total;
@@ -1500,14 +1528,12 @@
             document.getElementById('dashRate').textContent = total > 0 ? ((pass/total)*100).toFixed(0)+'%' : '0%';
             document.getElementById('dashWaitCoa').textContent = waitCoaItems.length;
 
-            // 3. วาดตารางรอผล QA
             document.getElementById('countPendingBadge').textContent = `${pendingItems.length} รายการ`;
             document.getElementById('dashPendingBody').innerHTML = pendingItems.map(i => {
                 const days = Math.floor((new Date() - new Date(i.receivedDate)) / (1000*60*60*24));
                 return `<tr><td><strong style="color:var(--primary);">${i.rmCode}</strong><br><small style="color:#94a3b8;">${i.supplier}</small></td><td>${i.lotNo}</td><td><span class="status-badge ${i.passFail.toLowerCase()}">${i.passFail}</span></td><td style="color:${days>7?'#e74c3c':'#27ae60'}; font-weight:600;">${days} วัน</td></tr>`;
             }).join('') || '<tr><td colspan="4" style="text-align:center; padding: 20px; color: #94a3b8;">ไม่มีรายการรอผลประเมิน</td></tr>';
 
-            // 4. วาดตารางรอเอกสาร COA สำหรับจัดซื้อ
             document.getElementById('dashWaitCoaBody').innerHTML = waitCoaItems.map(i => {
                 const days = Math.floor((new Date() - new Date(i.receivedDate)) / (1000*60*60*24));
                 const alertStyle = days > 14 ? 'color:#e74c3c; font-weight:bold;' : 'color:#b45309; font-weight:bold;';
@@ -1520,7 +1546,6 @@
                 </tr>`;
             }).join('') || '<tr><td colspan="5" style="text-align:center; padding: 30px; color: #27ae60; font-weight:600;">🎉 เยี่ยมมาก! ไม่มีรายการค้างส่งเอกสาร COA</td></tr>';
 
-            // 5. อัปเดต Pie Chart
             if (myPieChart) myPieChart.destroy();
             myPieChart = new Chart(document.getElementById('qcPieChart'), {
                 type: 'doughnut', plugins: [ChartDataLabels],
@@ -1572,7 +1597,13 @@
                 Supplier: i.supplier || '', Lot_No: i.lotNo || '', Mfg_Date: i.mfgDate || '', Exp_Date: i.expDate || '', Internal_Lot: i.internalLotNo || '',
                 COA_Status: i.coaStatus === 'Pending' ? 'Waiting' : (i.coaStatus === 'Received' ? 'Received' : (i.coaStatus || '')),
                 COA_Received_Date: i.coaReceivedDate || '', COA_Wait_Days: i.coaAgingDays !== undefined && i.coaAgingDays !== null ? i.coaAgingDays : '',
-                COA_Color: i.coaColor || '', COA_Odor: i.coaOdor || '', COA_pH: i.coaPh || '', COA_Temp: i.coaTemp || '', QC_Appearance: i.qcAppearance || '', QC_Color: i.qcColor || '', QC_Odor: i.qcOdor || '', QC_pH: i.qcPh || '', QC_Temp: i.qcTemp || '', QC_Contamination: i.qcContamination || '', Remark: i.qcRemark || '', Status: i.passFail || '', Inspector: i.approvedBy || '', Inspect_Date: i.approvedDate || ''
+                COA_Color: i.coaColor || '', COA_Odor: i.coaOdor || '', COA_pH: i.coaPh || '', COA_Temp: i.coaTemp || '', QC_Appearance: i.qcAppearance || '', QC_Color: i.qcColor || '', QC_Odor: i.qcOdor || '', QC_pH: i.qcPh || '', QC_Temp: i.qcTemp || '', QC_Contamination: i.qcContamination || '', Remark: i.qcRemark || '', Status: i.passFail || '', Inspector: i.approvedBy || '', Inspect_Date: i.approvedDate || '',
+                // [UPDATE: Issue 2] อัปเดตฟิลด์เพิ่มเติมใน Excel เพื่อประโยชน์ในการทำงาน
+                Has_MSDS: (i.msdsImages && i.msdsImages.length > 0) ? 'Yes' : 'No',
+                Has_Spec: (i.specImages && i.specImages.length > 0) ? 'Yes' : 'No',
+                Has_Label: (i.labelImages && i.labelImages.length > 0) ? 'Yes' : 'No',
+                Edit_Count: (i.editHistory && i.editHistory.length > 0) ? i.editHistory.length : 0,
+                Last_Updated: i.lastUpdated ? new Date(i.lastUpdated).toLocaleString('th-TH') : ''
             })));
             const wb = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb, ws, "QC_Data"); XLSX.writeFile(wb, "QC_Report_Firebase.xlsx");
         }
@@ -1590,7 +1621,6 @@
             window.openModal('fileViewerModal');
         }
 
-        // Helper สำหรับคลิกดูรูปใหญ่โดยตรง (ใช้ Modal เดิม) สำหรับภาพเสริม (MSDS, Spec, Label)
         window.viewAttachmentDirect = function(dataUrl, name) {
             const content = document.getElementById('fileViewerContent');
             const dlBtn = document.getElementById('downloadAttachmentBtn');
@@ -1599,10 +1629,75 @@
             window.openModal('fileViewerModal');
         }
 
+        // [NEW] ฟังก์ชันสำหรับแสดงไฟล์แนบที่เป็น Array (MSDS, Spec) จากตารางโดยตรง
+        window.viewMultipleAttachments = function(idx, type) {
+            const item = inspections[idx];
+            let files = [];
+            let title = '';
+            
+            if (type === 'msds') { files = item.msdsImages || []; title = 'MSDS Documents'; }
+            if (type === 'spec') { files = item.specImages || []; title = 'Product Spec Documents'; }
+
+            if (!files || files.length === 0) return alert("❌ ไม่พบข้อมูลไฟล์ในระบบ");
+
+            const content = document.getElementById('fileViewerContent');
+            const dlBtn = document.getElementById('downloadAttachmentBtn');
+            
+            // ตั้งค่าปุ่มดาวน์โหลดหลักให้โหลดไฟล์แรกสุด
+            dlBtn.href = files[0].data; 
+            dlBtn.download = files[0].name || `${title}_1`;
+
+            let html = `<div style="display:flex; flex-direction:column; gap:20px; width:100%; padding:10px;">`;
+            html += `<h4 style="text-align:center; color:var(--primary); margin:0;">${title} (${files.length} รายการ)</h4>`;
+            
+            files.forEach((f, i) => {
+                let mediaHtml = '';
+                // รองรับทั้งรูปภาพและ PDF เผื่อการพัฒนาระบบอัปโหลดในอนาคต
+                if (f.data.startsWith('data:image')) {
+                    mediaHtml = `<img src="${f.data}" style="max-width:100%; max-height:60vh; object-fit:contain; border-radius:8px; margin-bottom:10px; border:1px solid #e2e8f0;">`;
+                } else if (f.data.startsWith('data:application/pdf')) {
+                    mediaHtml = `<iframe src="${f.data}" width="100%" height="400px" style="border:1px solid #e2e8f0; border-radius:8px; margin-bottom:10px;"></iframe>`;
+                } else {
+                    mediaHtml = `<p style="color:#e74c3c;">⚠️ เบราว์เซอร์ไม่รองรับไฟล์ประเภทนี้</p>`;
+                }
+
+                html += `
+                    <div style="background:white; padding:15px; border-radius:12px; border:1px solid #cbd5e1; text-align:center; box-shadow:var(--shadow-sm);">
+                        <div style="font-weight:600; color:#64748b; margin-bottom:10px; text-align:left;">ไฟล์ที่ ${i + 1}: ${f.name || ''}</div>
+                        ${mediaHtml}
+                        <br>
+                        <a href="${f.data}" download="${f.name || title+'_'+(i+1)}" class="btn btn-sm btn-primary" style="margin-top:10px;">⬇️ ดาวน์โหลดไฟล์นี้</a>
+                    </div>
+                `;
+            });
+            html += `</div>`;
+            
+            content.innerHTML = html;
+            window.openModal('fileViewerModal');
+        }
+
         function renderMasterTable() { 
             const tbody = document.getElementById('masterTableBody');
-            if(inspections.length === 0) { tbody.innerHTML = '<tr><td colspan="7" style="text-align:center; padding:20px; color:#94a3b8;">ยังไม่มีข้อมูลการตรวจสอบในระบบ</td></tr>'; return; }
-            tbody.innerHTML = inspections.map((item, idx) => `<tr><td>${item.receivedDate || '-'}</td><td><strong style="color:var(--primary);">${item.rmCode || '-'}</strong><br><small style="color:var(--text-light);">${item.rmName || '-'}</small></td><td>${item.lotNo || '-'}</td><td><span class="status-badge ${(item.passFail || '').toLowerCase()}">${item.passFail || '-'}</span></td><td>${item.coaFile?.isLink ? `<button class="btn btn-secondary btn-sm" onclick="window.viewAttachment(${idx}, 'coa')">📄 COA File</button>` : '-'}</td><td>${item.qcFile?.isLink ? `<button class="btn btn-success btn-sm" onclick="window.viewAttachment(${idx}, 'qc')">📸 QC Pic</button>` : '-'}</td><td><button class="btn btn-info btn-sm" onclick="window.openDetailModal(${idx})" style="margin-right: 5px;">📄 View</button><button class="btn btn-warning btn-sm" onclick="window.openEditRecord(${idx})" style="background:#fef3c7; color:#b45309; border:1px solid #fde68a;">✏️ Edit</button></td></tr>`).join('');
+            // [UPDATE] แก้ colspan จาก 8 เป็น 10 ให้ครอบคลุมคอลัมน์ใหม่
+            if(inspections.length === 0) { tbody.innerHTML = '<tr><td colspan="10" style="text-align:center; padding:20px; color:#94a3b8;">ยังไม่มีข้อมูลการตรวจสอบในระบบ</td></tr>'; return; }
+            
+            // [UPDATE] เพิ่มคอลัมน์ MSDS และ Spec โดยตรวจสอบเงื่อนไข Array Length พร้อมเพิ่มปุ่มกด
+            tbody.innerHTML = inspections.map((item, idx) => `<tr>
+                <td>${item.receivedDate || '-'}</td>
+                <td><strong style="color:var(--primary);">${item.rmCode || '-'}</strong><br><small style="color:var(--text-light);">${item.rmName || '-'}</small></td>
+                <td style="color:#64748b;">${item.casNumber || '-'}</td>
+                <td>${item.lotNo || '-'}</td>
+                <td><span class="status-badge ${(item.passFail || '').toLowerCase()}">${item.passFail || '-'}</span></td>
+                <td>${item.coaFile?.isLink ? `<button class="btn btn-secondary btn-sm" onclick="window.viewAttachment(${idx}, 'coa')">📄 COA File</button>` : '-'}</td>
+                <td>${item.qcFile?.isLink ? `<button class="btn btn-success btn-sm" onclick="window.viewAttachment(${idx}, 'qc')">📸 QC Pic</button>` : '-'}</td>
+                <td>${(item.msdsImages && item.msdsImages.length > 0) ? `<button class="btn btn-info btn-sm" onclick="window.viewMultipleAttachments(${idx}, 'msds')">📸 MSDS</button>` : '-'}</td>
+                <td>${(item.specImages && item.specImages.length > 0) ? `<button class="btn btn-purple btn-sm" onclick="window.viewMultipleAttachments(${idx}, 'spec')">📑 Spec</button>` : '-'}</td>
+                <td>
+                    <button class="btn btn-info btn-sm" onclick="window.openDetailModal(${idx})" style="margin-right: 5px;">📄 View</button>
+                    <button class="btn btn-warning btn-sm" onclick="window.openEditRecord(${idx})" style="background:#fef3c7; color:#b45309; border:1px solid #fde68a;">✏️ Edit</button>
+                </td>
+            </tr>`).join('');
+            
             if (typeof window.filterHistoryTable === 'function') window.filterHistoryTable();
         }
 
@@ -1667,6 +1762,7 @@
             }).join('');
         }
         
+        // [UPDATE: Issue 2] นำ class="print-hide" ออกไป เพื่อให้เวลาสั่งพิมพ์สามารถเห็นรูปใหม่ในรายงานกระดาษได้
         const renderAdditionalImagesHTML = (title, imagesArray) => {
             if (!imagesArray || imagesArray.length === 0) return '';
             const imgTags = imagesArray.map(img => `<img src="${img.data}" style="max-width:100px; max-height:100px; margin:5px; border-radius:8px; cursor:pointer; border:1px solid #e2e8f0; object-fit:cover;" onclick="window.viewAttachmentDirect('${img.data}', '${img.name}')" title="คลิกเพื่อขยาย">`).join('');
@@ -1674,6 +1770,7 @@
         };
 
         window.openDetailModal = function(idx) {
+            // idx ตัวนี้จะคงที่เสมอกับ object ใน Array inspections เนื่องจากเราเรียง array ตาม timestamp 
             const item = inspections[idx];
             const content = document.getElementById('detailContent');
             const v = (val) => val ? val : '<span style="color:#cbd5e1;">-</span>';
@@ -1692,20 +1789,25 @@
             }
 
             let appearanceDisplay = item.qcAppearance === 'Pass' ? '✅ Pass' : (item.qcAppearance === 'Fail' ? '❌ Fail' : v(item.qcAppearance));
-            
-            let contaminationDisplay = v(item.qcContamination);
-            if (item.qcContamination === 'Pass') contaminationDisplay = '✅ Pass (ผ่าน)';
-            if (item.qcContamination === 'Fail') contaminationDisplay = '❌ Fail (ไม่ผ่าน)';
-
+            let contaminationDisplay = item.qcContamination === 'Pass' ? '✅ Pass (ผ่าน)' : (item.qcContamination === 'Fail' ? '❌ Fail (ไม่ผ่าน)' : v(item.qcContamination));
             let passFailDisplay = item.passFail === 'Pass' ? '✅ Accepted' : (item.passFail === 'Fail' ? '❌ Rejected' : v(item.passFail));
-
             const cIcon = (val) => val ? '<span class="chk-icon" style="color:#27ae60;">☑</span>' : '<span class="chk-icon" style="color:#e74c3c;">☒</span>';
 
-            // [FIX] เพิ่มการตรวจสอบสถานะ History Log (Last Updated) ว่าเคยแก้หรือไม่
-            let updateInfo = '';
-            if (item.lastUpdated) {
-                const upDate = new Date(item.lastUpdated).toLocaleString('th-TH');
-                updateInfo = `<div class="detail-row" style="background:#fff7ed;"><div class="detail-label" style="color:#b45309;">อัปเดตข้อมูลล่าสุด:</div><div class="detail-value" style="color:#b45309; font-weight:bold;">${upDate} <span style="font-size:0.85em; font-weight:normal;">(มีการแก้ไขข้อมูล)</span></div></div>`;
+            // [NEW: Issue 2] ประวัติการแก้ไขข้อมูล (Audit Log) ในหน้า History
+            let auditHTML = '';
+            if (item.editHistory && item.editHistory.length > 0) {
+                auditHTML = `<div class="detail-section-header" style="margin-top: 25px; background: #fef2f2; color: #991b1b; border-left-color: #ef4444;">⏱️ ประวัติการแก้ไข (Audit Log)</div>`;
+                item.editHistory.forEach((log, index) => {
+                    auditHTML += `<div style="background:#fefce8; padding:12px; margin-bottom:10px; border-radius:8px; border:1px dashed #fde047; font-size:0.9rem;">
+                        <strong style="color:#b45309;">📝 การแก้ไขครั้งที่ ${index + 1}</strong> - เมื่อ ${new Date(log.updatedAt).toLocaleString('th-TH')} โดย <span style="text-decoration:underline;">${log.updatedBy}</span><br>
+                        <div style="color:#78350f; margin-top:8px; line-height:1.6;">
+                            <b>ข้อมูลเดิมก่อนแก้:</b><br>
+                            • สถานะ QC: ${log.prevStatus} <br>
+                            • สถานะ COA: ${log.prevCoaStatus} <br>
+                            • หมายเหตุ: ${log.prevRemark}
+                        </div>
+                    </div>`;
+                });
             }
 
             content.innerHTML = `
@@ -1718,9 +1820,7 @@
                         <div class="detail-section-header">1. Receiving Information (ข้อมูลการรับเข้า)</div>
                         <div class="detail-row"><div class="detail-label">Material Code:</div><div class="detail-value" style="font-weight:700;">${v(item.rmCode)}</div></div>
                         <div class="detail-row"><div class="detail-label">Material Name:</div><div class="detail-value">${v(item.rmName)}</div></div>
-                        
                         <div class="detail-row"><div class="detail-label">CAS Number:</div><div class="detail-value">${v(item.casNumber)}</div></div>
-
                         <div class="detail-row"><div class="detail-label">Supplier Name:</div><div class="detail-value">${v(item.supplier)}</div></div>
                         <div class="detail-row"><div class="detail-label">Lot Number:</div><div class="detail-value">${v(item.lotNo)}</div></div>
                         <div class="detail-row"><div class="detail-label">Manufacturing Date:</div><div class="detail-value">${v(item.mfgDate)}</div></div>
@@ -1775,8 +1875,8 @@
                         <div class="detail-row print-hide"><div class="detail-label">Inspector Name:</div><div class="detail-value">${v(item.approvedBy)}</div></div>
                         <div class="detail-row print-hide"><div class="detail-label">Inspection Date:</div><div class="detail-value">${v(item.approvedDate)}</div></div>
                         
-                        <!-- [FIX] นำค่า Last Updated มาแสดงผลที่ส่วนท้ายเพื่อแจ้งประวัติการแก้ไขข้อมูล -->
-                        ${updateInfo}
+                        <!-- แทรก Audit HTML Section ลงตรงนี้ -->
+                        ${auditHTML}
 
                         <div class="signature-area" style="display: none;">
                             <div class="signature-box">
@@ -1815,7 +1915,6 @@
             if(i.qcFile?.isLink) { document.getElementById('edit_qcFileStatus').innerHTML = `✅ <a href="#" onclick="window.viewAttachment(${idx}, 'qc'); return false;" style="color:#d97706; font-weight:600;">รูปเดิมที่มีอยู่ (คลิกเพื่อดู)</a>`; document.getElementById('edit_btnRemoveQc').style.display = "inline-block"; } 
             else { document.getElementById('edit_qcFileStatus').textContent = "❌ ไม่มีรูปถ่ายแนบ"; document.getElementById('edit_btnRemoveQc').style.display = "none"; }
             
-            // [FIX] โหลดข้อมูลรูปเก่าเข้าตัวแปรของโหมด Edit และสั่ง Render ให้แสดงผลใน UI
             editMsdsImages = i.msdsImages ? JSON.parse(JSON.stringify(i.msdsImages)) : [];
             editSpecImages = i.specImages ? JSON.parse(JSON.stringify(i.specImages)) : [];
             editLabelImages = i.labelImages ? JSON.parse(JSON.stringify(i.labelImages)) : [];
@@ -1832,7 +1931,6 @@
         window.openModal = function(id) { document.getElementById(id).classList.add('active'); }
         window.closeModal = function(id) { 
             document.getElementById(id).classList.remove('active'); 
-            // [FIX] เคลียร์ขยะรูปภาพออกเมื่อกดยกเลิก/ปิด Modal Edit
             if(id === 'editModal') window.clearImageStates('edit');
         }
         function showLoading(s, t) { document.getElementById('loading-overlay').style.display = s ? 'flex' : 'none'; document.getElementById('loading-text').textContent = t || 'กำลังโหลด...'; }
@@ -1928,7 +2026,6 @@
             if (previewId === 'msdsPreview') { msdsImages.splice(index, 1); renderImagePreviews(msdsImages, previewId); }
             else if (previewId === 'specPreview') { specImages.splice(index, 1); renderImagePreviews(specImages, previewId); }
             else if (previewId === 'labelPreview') { labelImages.splice(index, 1); renderImagePreviews(labelImages, previewId); }
-            // [FIX] เพิ่มเงื่อนไขให้ปุ่มลบรูปรองรับโหมด Edit ด้วย
             else if (previewId === 'edit_msdsPreview') { editMsdsImages.splice(index, 1); renderImagePreviews(editMsdsImages, previewId); }
             else if (previewId === 'edit_specPreview') { editSpecImages.splice(index, 1); renderImagePreviews(editSpecImages, previewId); }
             else if (previewId === 'edit_labelPreview') { editLabelImages.splice(index, 1); renderImagePreviews(editLabelImages, previewId); }
@@ -1938,7 +2035,6 @@
         document.getElementById('specFileInput').onchange = e => handleMultipleImageUpload(e.target, specImages, 'specPreview');
         document.getElementById('labelFileInput').onchange = e => handleMultipleImageUpload(e.target, labelImages, 'labelPreview');
 
-        // [FIX] กำหนด Event Listener สำหรับอินพุตถ่ายรูปในโหมด Edit
         const elEditMsds = document.getElementById('edit_msdsFileInput'); if(elEditMsds) elEditMsds.onchange = e => handleMultipleImageUpload(e.target, editMsdsImages, 'edit_msdsPreview');
         const elEditSpec = document.getElementById('edit_specFileInput'); if(elEditSpec) elEditSpec.onchange = e => handleMultipleImageUpload(e.target, editSpecImages, 'edit_specPreview');
         const elEditLabel = document.getElementById('edit_labelFileInput'); if(elEditLabel) elEditLabel.onchange = e => handleMultipleImageUpload(e.target, editLabelImages, 'edit_labelPreview');
@@ -1948,10 +2044,16 @@
             const v = e.target.value.toLowerCase();
             if(v.length < 1) { list.style.display = 'none'; return; }
             const matches = MASTER_LIST.filter(i => i.code.toLowerCase().includes(v) || i.name.toLowerCase().includes(v)).slice(0, 5);
-            list.innerHTML = matches.map(m => `<div class="autocomplete-item" onclick="window.selectRM('${m.code}', '${m.name.replace(/'/g, "\\'")}')"><strong>${m.code}</strong><br><span style="color:#64748b; font-size:0.85rem;">${m.name}</span></div>`).join('');
+            // [UPDATE: Issue 1] ดึงค่า CAS Number ลงไปใน Autocomplete List เพื่อให้ Auto-fill ในหน้าเพิ่มข้อมูลใหม่ได้
+            list.innerHTML = matches.map(m => `<div class="autocomplete-item" onclick="window.selectRM('${m.code}', '${m.name.replace(/'/g, "\\'")}', '${m.casNumber || ''}')"><strong>${m.code}</strong><br><span style="color:#64748b; font-size:0.85rem;">${m.name} ${m.casNumber ? `(CAS: ${m.casNumber})` : ''}</span></div>`).join('');
             list.style.display = matches.length ? 'block' : 'none';
         }
-        window.selectRM = function(c, n) { document.getElementById('rmCode').value = c; document.getElementById('rmName').value = n; document.querySelectorAll('.autocomplete-list').forEach(l => l.style.display = 'none'); }
+        window.selectRM = function(c, n, cas) { 
+            document.getElementById('rmCode').value = c; 
+            document.getElementById('rmName').value = n; 
+            if(document.getElementById('casNumber')) document.getElementById('casNumber').value = cas;
+            document.querySelectorAll('.autocomplete-list').forEach(l => l.style.display = 'none'); 
+        }
         
         window.addEventListener('click', e => { if(e.target.classList.contains('modal')) e.target.classList.remove('active'); });
     </script>
