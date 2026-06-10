@@ -123,7 +123,7 @@
         .file-upload .upload-icon { font-size: 2.5rem; margin-bottom: 5px; transition: transform 0.3s; }
         .file-upload:hover .upload-icon { transform: translateY(-5px); }
 
-        /* [NEW] Style สำหรับ Image Preview Grid ของระบบถ่ายรูปเอกสารใหม่ */
+        /* Style สำหรับ Image Preview Grid ของระบบถ่ายรูปเอกสารใหม่ */
         .preview-grid { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 15px; }
         .preview-item { position: relative; width: 80px; height: 80px; border-radius: 8px; overflow: hidden; border: 2px solid #e2e8f0; box-shadow: var(--shadow-sm); }
         .preview-item img { width: 100%; height: 100%; object-fit: cover; }
@@ -399,6 +399,17 @@
                                 <div class="autocomplete-list" id="rmName-autocomplete-list"></div>
                             </div>
                         </div>
+                        
+                        <!-- [FIX: Issue 1] เพิ่มช่องรับค่า CAS Number ในหน้าสร้างเอกสาร -->
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>CAS Number <span class="en-label">(รหัสสารเคมี)</span></label>
+                                <input type="text" name="casNumber" id="casNumber" placeholder="เช่น 123-45-6" pattern="\d{2,7}-\d{2}-\d" title="รูปแบบ CAS Number เช่น 123-45-6">
+                            </div>
+                            <div class="form-group"></div>
+                        </div>
+                        <!-- [END FIX] -->
+
                         <div class="form-row">
                             <div class="form-group">
                                 <label>Supplier Name <span class="en-label">(ผู้จัดจำหน่าย)</span> <span class="required">*</span></label>
@@ -748,7 +759,7 @@
             <div id="search" class="tab-content content-box">
                 <h2 style="color:var(--primary); font-size:1.5rem; margin-bottom:20px;">🔍 ค้นหาข้อมูล (Search & Track)</h2>
                 <div style="position:relative; margin-bottom:30px;">
-                    <input type="text" id="searchInput" placeholder="พิมพ์คำค้นหา: RM Code, RM Name, หรือ Lot No..." style="width:100%; padding:18px 20px 18px 60px; border-radius:16px; border:2px solid #e2e8f0; font-size:1.05rem; box-shadow: var(--shadow-sm); outline:none; transition:0.3s;" onkeyup="window.performSearch()" onfocus="this.style.borderColor='var(--primary)'" onblur="this.style.borderColor='#e2e8f0'">
+                    <input type="text" id="searchInput" placeholder="พิมพ์คำค้นหา: RM Code, RM Name, CAS Number หรือ Lot No..." style="width:100%; padding:18px 20px 18px 60px; border-radius:16px; border:2px solid #e2e8f0; font-size:1.05rem; box-shadow: var(--shadow-sm); outline:none; transition:0.3s;" onkeyup="window.performSearch()" onfocus="this.style.borderColor='var(--primary)'" onblur="this.style.borderColor='#e2e8f0'">
                     <span style="position:absolute; left:22px; top:18px; font-size:1.3rem; opacity:0.5;">🔍</span>
                 </div>
                 <div id="searchResults"></div>
@@ -848,6 +859,17 @@
                         <div class="form-group"><label>Material Code (รหัสวัตถุดิบ)</label><input type="text" id="edit_rmCode" required></div>
                         <div class="form-group"><label>Material Name (ชื่อวัตถุดิบ)</label><input type="text" id="edit_rmName" required></div>
                     </div>
+                    
+                    <!-- [FIX: Issue 1] เพิ่มช่องแก้ไข CAS Number -->
+                    <div class="form-row" style="margin-bottom:15px;">
+                        <div class="form-group">
+                            <label>CAS Number (รหัสสารเคมี)</label>
+                            <input type="text" id="edit_casNumber" placeholder="เช่น 123-45-6" pattern="\d{2,7}-\d{2}-\d" title="รูปแบบ CAS Number เช่น 123-45-6">
+                        </div>
+                        <div class="form-group"></div>
+                    </div>
+                    <!-- [END FIX] -->
+
                     <div class="form-row" style="margin-bottom:15px;">
                         <div class="form-group"><label>Supplier Name (ผู้จัดจำหน่าย)</label><input type="text" id="edit_supplier" required></div>
                         <div class="form-group"><label>Lot No. (เลขล็อต)</label><input type="text" id="edit_lotNo" required></div>
@@ -1074,7 +1096,6 @@
         let editCoaFileData = null; let editQcFileData = null;
         let isEditCoaRemoved = false; let isEditQcRemoved = false;
 
-        // [NEW] ตัวแปร Global สำหรับจัดเก็บรูปถ่ายชนิดต่างๆ รองรับการอัปโหลดหลายรูป
         let msdsImages = [];
         let specImages = [];
         let labelImages = [];
@@ -1171,21 +1192,8 @@
             e.preventDefault();
             if (!firebaseUser || !db) return alert("❌ ระบบยังไม่เชื่อมต่อ Firebase ไม่สามารถบันทึกได้");
 
-            const fd = new FormData(this);
-
-            // [FIX: Issue 6] Date Validation ควบคุมความถูกต้องของวันที่ (ฟอร์ม Add)
-            const mDate = fd.get('mfgDate');
-            const eDate = fd.get('expDate');
-            const rDate = fd.get('receivedDate');
-            
-            if (mDate && eDate && new Date(eDate) < new Date(mDate)) {
-                return alert("❌ ข้อผิดพลาด: วันหมดอายุ (Exp Date) ต้องไม่น้อยกว่าวันที่ผลิต (Mfg Date)");
-            }
-            if (rDate && new Date(rDate) > new Date()) {
-                return alert("❌ ข้อผิดพลาด: วันที่รับของ (Date Received) ต้องไม่เกินวันปัจจุบัน");
-            }
-
             showLoading(true, "กำลังส่งข้อมูลเข้าสู่ Firebase...");
+            const fd = new FormData(this);
             
             const coaStatus = fd.get('coaStatus');
             const receivedDate = fd.get('receivedDate');
@@ -1203,6 +1211,8 @@
             const newQCRecord = {
                 timestamp: new Date().toISOString(),
                 rmCode: fd.get('rmCode'), rmName: fd.get('rmName'), supplier: fd.get('supplier'), 
+                // [FIX: Issue 1] รับค่า CAS Number เข้าสู่ Database
+                casNumber: fd.get('casNumber') || '', 
                 lotNo: fd.get('lotNo'), internalLotNo: fd.get('internalLotNo'),
                 mfgDate: fd.get('mfgDate'), expDate: fd.get('expDate'), receivedDate: receivedDate, 
                 coaStatus: coaStatus, // 🌟 เพิ่มฟิลด์สถานะ COA
@@ -1220,7 +1230,6 @@
                 coaFile: currentCoaFileData ? { isLink: true, data: currentCoaFileData.data, name: currentCoaFileData.name } : null,
                 qcFile: currentQcFileData ? { isLink: true, data: currentQcFileData.data, name: currentQcFileData.name } : null,
                 
-                // [NEW] แนบข้อมูลรูปภาพใหม่เข้าไปใน Record
                 msdsImages: msdsImages,
                 specImages: specImages,
                 labelImages: labelImages
@@ -1236,8 +1245,10 @@
                 document.getElementById('fileName').innerHTML = "รองรับไฟล์ PDF, JPG, PNG";
                 document.getElementById('qcFileName').innerHTML = "รองรับไฟล์ JPG, PNG";
                 
-                // [FIX: Issue 4] เคลียร์ข้อมูลรูปภาพใหม่หลังบันทึกเสร็จอย่างสมบูรณ์
-                window.clearImageStates('add');
+                msdsImages = []; specImages = []; labelImages = [];
+                document.getElementById('msdsPreview').innerHTML = '';
+                document.getElementById('specPreview').innerHTML = '';
+                document.getElementById('labelPreview').innerHTML = '';
                 
                 initMonthFilter(); // Update filter dropdown just in case it's a new month
                 showTab('master');
@@ -1249,18 +1260,6 @@
             e.preventDefault();
             const docId = document.getElementById('editOriginalDocId').value;
             if (!docId || !db) return;
-
-            // [FIX: Issue 6] Date Validation ควบคุมความถูกต้องของวันที่ (ฟอร์ม Edit)
-            const mDate = document.getElementById('edit_mfgDate').value;
-            const eDate = document.getElementById('edit_expDate').value;
-            const rDate = document.getElementById('edit_receivedDate').value;
-            
-            if (mDate && eDate && new Date(eDate) < new Date(mDate)) {
-                return alert("❌ ข้อผิดพลาด: วันหมดอายุ (Exp Date) ต้องไม่น้อยกว่าวันที่ผลิต (Mfg Date)");
-            }
-            if (rDate && new Date(rDate) > new Date()) {
-                return alert("❌ ข้อผิดพลาด: วันที่รับของ (Date Received) ต้องไม่เกินวันปัจจุบัน");
-            }
 
             showLoading(true, "กำลังอัปเดตข้อมูล...");
             const originalRecord = inspections.find(i => i.id === docId);
@@ -1288,6 +1287,8 @@
 
             const updateData = {
                 rmCode: document.getElementById('edit_rmCode').value, rmName: document.getElementById('edit_rmName').value,
+                // [FIX: Issue 1] อัปเดตค่า CAS Number ลงฐานข้อมูลตอน Edit
+                casNumber: document.getElementById('edit_casNumber').value || '',
                 supplier: document.getElementById('edit_supplier').value, lotNo: document.getElementById('edit_lotNo').value,
                 internalLotNo: document.getElementById('edit_internalLotNo').value, mfgDate: document.getElementById('edit_mfgDate').value, expDate: document.getElementById('edit_expDate').value,
                 receivedDate: receivedDate,
@@ -1305,7 +1306,6 @@
                 qcRemark: document.getElementById('edit_qcRemark').value, passFail: document.getElementById('edit_passFail').value, approvedBy: document.getElementById('edit_approvedBy').value, approvedDate: document.getElementById('edit_approvedDate').value,
                 coaFile: finalCoaFile, qcFile: finalQcFile, lastUpdated: new Date().toISOString(),
                 
-                // [NEW] นำรูปเดิมกลับเข้าไปด้วยเวลาเซฟอัปเดต (เพื่อไม่ให้ข้อมูลหาย)
                 msdsImages: originalRecord.msdsImages || [],
                 specImages: originalRecord.specImages || [],
                 labelImages: originalRecord.labelImages || []
@@ -1513,6 +1513,8 @@
                     Supplier: i.supplier || '',
                     RM_Code: i.rmCode || '',
                     RM_Name: i.rmName || '',
+                    // [FIX: Issue 2] เพิ่มการดึง CAS Number ลง Export Excel
+                    CAS_Number: i.casNumber || '',
                     Lot_No: i.lotNo || '',
                     Date_Received: i.receivedDate || '',
                     Aging_Days: days,
@@ -1526,7 +1528,10 @@
         window.exportToExcel = function() {
             if (inspections.length === 0) return alert("ยังไม่มีข้อมูลให้ Export");
             const ws = XLSX.utils.json_to_sheet(inspections.map(i => ({
-                Date_Received: i.receivedDate || '', RM_Code: i.rmCode || '', RM_Name: i.rmName || '', Supplier: i.supplier || '', Lot_No: i.lotNo || '', Mfg_Date: i.mfgDate || '', Exp_Date: i.expDate || '', Internal_Lot: i.internalLotNo || '',
+                Date_Received: i.receivedDate || '', RM_Code: i.rmCode || '', RM_Name: i.rmName || '', 
+                // [FIX: Issue 2] ผูก Data CAS_Number ลงใน Report หลัก
+                CAS_Number: i.casNumber || '', 
+                Supplier: i.supplier || '', Lot_No: i.lotNo || '', Mfg_Date: i.mfgDate || '', Exp_Date: i.expDate || '', Internal_Lot: i.internalLotNo || '',
                 COA_Status: i.coaStatus === 'Pending' ? 'Waiting' : (i.coaStatus === 'Received' ? 'Received' : (i.coaStatus || '')),
                 COA_Received_Date: i.coaReceivedDate || '', COA_Wait_Days: i.coaAgingDays !== undefined && i.coaAgingDays !== null ? i.coaAgingDays : '',
                 COA_Color: i.coaColor || '', COA_Odor: i.coaOdor || '', COA_pH: i.coaPh || '', COA_Temp: i.coaTemp || '', QC_Appearance: i.qcAppearance || '', QC_Color: i.qcColor || '', QC_Odor: i.qcOdor || '', QC_pH: i.qcPh || '', QC_Temp: i.qcTemp || '', QC_Contamination: i.qcContamination || '', Remark: i.qcRemark || '', Status: i.passFail || '', Inspector: i.approvedBy || '', Inspect_Date: i.approvedDate || ''
@@ -1588,7 +1593,9 @@
                 .filter(({ item }) => 
                     (item.rmCode && item.rmCode.toLowerCase().includes(q)) || 
                     (item.rmName && item.rmName.toLowerCase().includes(q)) || 
-                    (item.lotNo && item.lotNo.toLowerCase().includes(q))
+                    (item.lotNo && item.lotNo.toLowerCase().includes(q)) ||
+                    // [FIX: Issue 1] ทำให้ระบบรองรับการ Search ด้วย CAS Number ได้
+                    (item.casNumber && item.casNumber.toLowerCase().includes(q))
                 );
 
             if (matches.length === 0) {
@@ -1623,11 +1630,12 @@
             }).join('');
         }
         
-        // [NEW] HTML Builder สำหรับรูปภาพเสริม ใน Detail Modal
+        // [FIX: Issue 2] HTML Builder สำหรับรูปภาพเสริม นำคลาส print-hide ออก เพื่อให้รูปใหม่แสดงเวลาพิมพ์
         const renderAdditionalImagesHTML = (title, imagesArray) => {
             if (!imagesArray || imagesArray.length === 0) return '';
             const imgTags = imagesArray.map(img => `<img src="${img.data}" style="max-width:100px; max-height:100px; margin:5px; border-radius:8px; cursor:pointer; border:1px solid #e2e8f0; object-fit:cover;" onclick="window.viewAttachmentDirect('${img.data}', '${img.name}')" title="คลิกเพื่อขยาย">`).join('');
-            return `<div class="detail-row print-hide"><div class="detail-label">${title}:</div><div class="detail-value">${imgTags}</div></div>`;
+            // นำคลาส print-hide ออก, เพิ่ม flex-wrap ป้องกันล้นขอบกระดาษ
+            return `<div class="detail-row"><div class="detail-label">${title}:</div><div class="detail-value" style="flex-wrap: wrap;">${imgTags}</div></div>`;
         };
 
         window.openDetailModal = function(idx) {
@@ -1668,6 +1676,11 @@
                         <div class="detail-section-header">1. Receiving Information (ข้อมูลการรับเข้า)</div>
                         <div class="detail-row"><div class="detail-label">Material Code:</div><div class="detail-value" style="font-weight:700;">${v(item.rmCode)}</div></div>
                         <div class="detail-row"><div class="detail-label">Material Name:</div><div class="detail-value">${v(item.rmName)}</div></div>
+                        
+                        <!-- [FIX: Issue 1] แสดงข้อมูล CAS Number ใน Detail Modal -->
+                        <div class="detail-row"><div class="detail-label">CAS Number:</div><div class="detail-value">${v(item.casNumber)}</div></div>
+                        <!-- [END FIX] -->
+
                         <div class="detail-row"><div class="detail-label">Supplier Name:</div><div class="detail-value">${v(item.supplier)}</div></div>
                         <div class="detail-row"><div class="detail-label">Lot Number:</div><div class="detail-value">${v(item.lotNo)}</div></div>
                         <div class="detail-row"><div class="detail-label">Manufacturing Date:</div><div class="detail-value">${v(item.mfgDate)}</div></div>
@@ -1747,7 +1760,8 @@
         window.openEditRecord = function(idx) {
             const i = inspections[idx];
             document.getElementById('editOriginalDocId').value = i.id;
-            const fields = ['rmCode','rmName','supplier','lotNo','internalLotNo','mfgDate','expDate','receivedDate','coaStatus','coaReceivedDate','coaColor','coaOdor','coaPh','coaTemp','qcAppearance','qcContamination','qcColor','qcOdor','qcPh','qcTemp','qcRemark','passFail','approvedBy','approvedDate'];
+            // [FIX: Issue 1] นำชื่อตัวแปร `casNumber` ใส่เข้าไปใน array เพื่อให้ Loop สามารถนำค่าไป Binding กับ Form ได้อัตโนมัติ
+            const fields = ['rmCode','rmName','casNumber','supplier','lotNo','internalLotNo','mfgDate','expDate','receivedDate','coaStatus','coaReceivedDate','coaColor','coaOdor','coaPh','coaTemp','qcAppearance','qcContamination','qcColor','qcOdor','qcPh','qcTemp','qcRemark','passFail','approvedBy','approvedDate'];
             fields.forEach(f => { if(document.getElementById('edit_'+f)) document.getElementById('edit_'+f).value = i[f] || ''; });
             
             const checkboxFields = ['chk_doc_coa', 'chk_doc_lot', 'chk_doc_mfg', 'chk_pkg_intact', 'chk_pkg_clean', 'chk_pkg_label'];
