@@ -123,6 +123,13 @@
         .file-upload .upload-icon { font-size: 2.5rem; margin-bottom: 5px; transition: transform 0.3s; }
         .file-upload:hover .upload-icon { transform: translateY(-5px); }
 
+        /* [NEW] Style สำหรับ Image Preview Grid ของระบบถ่ายรูปเอกสารใหม่ */
+        .preview-grid { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 15px; }
+        .preview-item { position: relative; width: 80px; height: 80px; border-radius: 8px; overflow: hidden; border: 2px solid #e2e8f0; box-shadow: var(--shadow-sm); }
+        .preview-item img { width: 100%; height: 100%; object-fit: cover; }
+        .preview-item .remove-btn { position: absolute; top: 2px; right: 2px; background: rgba(231, 76, 60, 0.9); color: white; border: none; border-radius: 50%; width: 22px; height: 22px; font-size: 14px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: 0.2s;}
+        .preview-item .remove-btn:hover { background: #c0392b; transform: scale(1.1); }
+
         .btn { padding: 12px 24px; border: none; border-radius: 12px; font-size: 0.95rem; font-weight: 600; cursor: pointer; transition: all 0.3s; display: inline-flex; align-items: center; justify-content: center; gap: 8px; font-family: 'Prompt'; text-decoration: none; }
         .btn-primary { background: var(--primary); color: white; }
         .btn-primary:hover { background: var(--primary-soft); box-shadow: 0 6px 15px rgba(44, 75, 70, 0.3); transform: translateY(-1px); }
@@ -203,8 +210,8 @@
         .dashboard-filter:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(44, 75, 70, 0.1); }
 
         /* =========================================
-           🖨️ PRINT STYLES
-           ========================================= */
+            🖨️ PRINT STYLES
+            ========================================= */
         @media print {
             @page { size: A4 portrait; margin: 10mm; } 
             
@@ -481,6 +488,34 @@
                                 <div class="form-group"><label>Specification Temp <span class="en-label">(อุณหภูมิตาม COA)</span></label><input type="text" name="coaTemp" placeholder="เช่น 25°C..."></div>
                             </div>
                         </div>
+
+                        <!-- [NEW] ส่วนเพิ่มปุ่มถ่ายรูปเอกสาร MSDS และ Product Spec (เพิ่มใหม่ ไม่กระทบเดิม) -->
+                        <div class="form-row" style="margin-top: 20px; background: #f1f5f9; padding: 15px; border-radius: 12px; border: 1px dashed #cbd5e1;">
+                            <div class="form-group">
+                                <label style="color:#0f172a;">📸 ถ่ายรูป MSDS <span class="en-label">(เอกสารความปลอดภัย)</span></label>
+                                <div class="file-upload" style="padding: 15px; border-color: #94a3b8;" onclick="document.getElementById('msdsFileInput').click()">
+                                    <!-- [NEW] accept="image/*" capture="environment" สำหรับเปิดกล้องถ่ายรูปได้โดยตรงบนมือถือ และ multiple เพื่อให้เลือกได้หลายรูป -->
+                                    <input type="file" id="msdsFileInput" accept="image/*" capture="environment" multiple style="display:none">
+                                    <span class="upload-icon" style="font-size: 1.8rem;">📷</span>
+                                    <span style="font-weight:600; color:#334155; font-size: 0.9rem;">ถ่ายรูป / แนบไฟล์ MSDS</span>
+                                </div>
+                                <!-- [NEW] พื้นที่แสดง Preview รูปภาพ -->
+                                <div id="msdsPreview" class="preview-grid"></div>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label style="color:#0f172a;">📸 ถ่ายรูป Product Spec <span class="en-label">(สเปคสินค้า)</span></label>
+                                <div class="file-upload" style="padding: 15px; border-color: #94a3b8;" onclick="document.getElementById('specFileInput').click()">
+                                    <input type="file" id="specFileInput" accept="image/*" capture="environment" multiple style="display:none">
+                                    <span class="upload-icon" style="font-size: 1.8rem;">📑</span>
+                                    <span style="font-weight:600; color:#334155; font-size: 0.9rem;">ถ่ายรูป / แนบไฟล์ Product Spec</span>
+                                </div>
+                                <!-- [NEW] พื้นที่แสดง Preview รูปภาพ -->
+                                <div id="specPreview" class="preview-grid"></div>
+                            </div>
+                        </div>
+                        <!-- [END NEW] -->
+
                     </div>
 
                     <!-- Section 3: Packaging Inspection -->
@@ -502,6 +537,19 @@
                                 <label for="chk_pkg_label">Label readable (ฉลากอ่านออกชัดเจน)</label>
                             </div>
                         </div>
+
+                        <!-- [NEW] ส่วนเพิ่มปุ่มถ่ายรูปฉลากข้างถัง (เพิ่มใหม่ ไม่กระทบเดิม) -->
+                        <div class="form-group" style="margin-top: 20px; background: #fffbeb; padding: 15px; border-radius: 12px; border: 1px dashed #fcd34d;">
+                            <label style="color:#92400e;">🏷️ ถ่ายรูปฉลากข้างถัง <span class="en-label">(Label Photo)</span></label>
+                            <div class="file-upload" style="padding: 15px; border-color: #f59e0b; background: white;" onclick="document.getElementById('labelFileInput').click()">
+                                <input type="file" id="labelFileInput" accept="image/*" capture="environment" multiple style="display:none">
+                                <span class="upload-icon" style="font-size: 1.8rem;">📱</span>
+                                <span style="font-weight:600; color:#b45309; font-size: 0.9rem;">ถ่ายรูป / แนบไฟล์ ฉลากข้างถัง</span>
+                            </div>
+                            <!-- [NEW] พื้นที่แสดง Preview รูปภาพ -->
+                            <div id="labelPreview" class="preview-grid"></div>
+                        </div>
+                        <!-- [END NEW] -->
                     </div>
 
                     <!-- Section 4: RM Physical Inspection -->
@@ -1026,6 +1074,11 @@
         let editCoaFileData = null; let editQcFileData = null;
         let isEditCoaRemoved = false; let isEditQcRemoved = false;
 
+        // [NEW] ตัวแปร Global สำหรับจัดเก็บรูปถ่ายชนิดต่างๆ รองรับการอัปโหลดหลายรูป
+        let msdsImages = [];
+        let specImages = [];
+        let labelImages = [];
+
         const DEFAULT_RM = [
             { code: "RM1-SV-WT", name: "Water" }, { code: "RM2-CA-LRGS", name: "Plantacare 1200 UP" },
             { code: "RM2-CA-DG-DGS", name: "Plantacare 2000 UP" }, { code: "RM2-CA-CGS", name: "Plantacare 810 UP" },
@@ -1152,7 +1205,12 @@
                 qcAppearance: fd.get('qcAppearance'), qcColor: fd.get('qcColor'), qcOdor: fd.get('qcOdor'), qcPh: fd.get('qcPh'), qcTemp: fd.get('qcTemp'), qcContamination: fd.get('qcContamination'),
                 qcRemark: fd.get('qcRemark') || '', passFail: fd.get('passFail'), approvedBy: fd.get('approvedBy'), approvedDate: fd.get('approvedDate'),
                 coaFile: currentCoaFileData ? { isLink: true, data: currentCoaFileData.data, name: currentCoaFileData.name } : null,
-                qcFile: currentQcFileData ? { isLink: true, data: currentQcFileData.data, name: currentQcFileData.name } : null
+                qcFile: currentQcFileData ? { isLink: true, data: currentQcFileData.data, name: currentQcFileData.name } : null,
+                
+                // [NEW] แนบข้อมูลรูปภาพใหม่เข้าไปใน Record
+                msdsImages: msdsImages,
+                specImages: specImages,
+                labelImages: labelImages
             };
 
             try {
@@ -1164,6 +1222,13 @@
                 currentCoaFileData = null; currentQcFileData = null;
                 document.getElementById('fileName').innerHTML = "รองรับไฟล์ PDF, JPG, PNG";
                 document.getElementById('qcFileName').innerHTML = "รองรับไฟล์ JPG, PNG";
+                
+                // [NEW] เคลียร์ข้อมูลรูปภาพใหม่หลังบันทึกเสร็จ
+                msdsImages = []; specImages = []; labelImages = [];
+                document.getElementById('msdsPreview').innerHTML = '';
+                document.getElementById('specPreview').innerHTML = '';
+                document.getElementById('labelPreview').innerHTML = '';
+                
                 initMonthFilter(); // Update filter dropdown just in case it's a new month
                 showTab('master');
             } catch (error) { console.error(error); alert("❌ เกิดข้อผิดพลาดในการบันทึกข้อมูล"); } 
@@ -1216,7 +1281,12 @@
                 coaColor: document.getElementById('edit_coaColor').value, coaOdor: document.getElementById('edit_coaOdor').value, coaPh: document.getElementById('edit_coaPh').value, coaTemp: document.getElementById('edit_coaTemp').value,
                 qcAppearance: document.getElementById('edit_qcAppearance').value, qcColor: document.getElementById('edit_qcColor').value, qcOdor: document.getElementById('edit_qcOdor').value, qcPh: document.getElementById('edit_qcPh').value, qcTemp: document.getElementById('edit_qcTemp').value, qcContamination: document.getElementById('edit_qcContamination').value,
                 qcRemark: document.getElementById('edit_qcRemark').value, passFail: document.getElementById('edit_passFail').value, approvedBy: document.getElementById('edit_approvedBy').value, approvedDate: document.getElementById('edit_approvedDate').value,
-                coaFile: finalCoaFile, qcFile: finalQcFile, lastUpdated: new Date().toISOString()
+                coaFile: finalCoaFile, qcFile: finalQcFile, lastUpdated: new Date().toISOString(),
+                
+                // [NEW] นำรูปเดิมกลับเข้าไปด้วยเวลาเซฟอัปเดต (เพื่อไม่ให้ข้อมูลหาย)
+                msdsImages: originalRecord.msdsImages || [],
+                specImages: originalRecord.specImages || [],
+                labelImages: originalRecord.labelImages || []
             };
 
             try {
@@ -1455,10 +1525,19 @@
             window.openModal('fileViewerModal');
         }
 
+        // [NEW] Helper สำหรับคลิกดูรูปใหญ่โดยตรง (ใช้ Modal เดิม) สำหรับภาพเสริม (MSDS, Spec, Label)
+        window.viewAttachmentDirect = function(dataUrl, name) {
+            const content = document.getElementById('fileViewerContent');
+            const dlBtn = document.getElementById('downloadAttachmentBtn');
+            dlBtn.href = dataUrl; dlBtn.download = name || 'Image';
+            content.innerHTML = `<img src="${dataUrl}" style="max-width:100%; max-height:100%; object-fit:contain; border-radius:8px;">`;
+            window.openModal('fileViewerModal');
+        }
+
         function renderMasterTable() { 
             const tbody = document.getElementById('masterTableBody');
             if(inspections.length === 0) { tbody.innerHTML = '<tr><td colspan="7" style="text-align:center; padding:20px; color:#94a3b8;">ยังไม่มีข้อมูลการตรวจสอบในระบบ</td></tr>'; return; }
-            tbody.innerHTML = inspections.map((item, idx) => `<tr><td>${item.receivedDate || '-'}</td><td><strong style="color:var(--primary);">${item.rmCode || '-'}</strong><br><small style="color:var(--text-light);">${item.rmName || '-'}</small></td><td>${item.lotNo || '-'}</td><td><span class="status-badge ${(item.passFail || '').toLowerCase()}">${item.passFail || '-'}</span></td><td>${item.coaFile?.isLink ? `<button class="btn btn-secondary btn-sm" onclick="window.viewAttachment(${idx}, 'coa')">📄 COA File</button>` : '-'}</td><td>${item.qcFile?.isLink ? `<button class="btn btn-success btn-sm" onclick="window.viewAttachment(${idx}, 'qc')">📸 QC Photo</button>` : '-'}</td><td><button class="btn btn-info btn-sm" onclick="window.openDetailModal(${idx})" style="margin-right: 5px;">📄 View</button><button class="btn btn-warning btn-sm" onclick="window.openEditRecord(${idx})" style="background:#fef3c7; color:#b45309; border:1px solid #fde68a;">✏️ Edit</button></td></tr>`).join('');
+            tbody.innerHTML = inspections.map((item, idx) => `<tr><td>${item.receivedDate || '-'}</td><td><strong style="color:var(--primary);">${item.rmCode || '-'}</strong><br><small style="color:var(--text-light);">${item.rmName || '-'}</small></td><td>${item.lotNo || '-'}</td><td><span class="status-badge ${(item.passFail || '').toLowerCase()}">${item.passFail || '-'}</span></td><td>${item.coaFile?.isLink ? `<button class="btn btn-secondary btn-sm" onclick="window.viewAttachment(${idx}, 'coa')">📄 COA File</button>` : '-'}</td><td>${item.qcFile?.isLink ? `<button class="btn btn-success btn-sm" onclick="window.viewAttachment(${idx}, 'qc')">📸 QC Pic</button>` : '-'}</td><td><button class="btn btn-info btn-sm" onclick="window.openDetailModal(${idx})" style="margin-right: 5px;">📄 View</button><button class="btn btn-warning btn-sm" onclick="window.openEditRecord(${idx})" style="background:#fef3c7; color:#b45309; border:1px solid #fde68a;">✏️ Edit</button></td></tr>`).join('');
             if (typeof window.filterHistoryTable === 'function') window.filterHistoryTable();
         }
 
@@ -1522,6 +1601,13 @@
             }).join('');
         }
         
+        // [NEW] HTML Builder สำหรับรูปภาพเสริม ใน Detail Modal
+        const renderAdditionalImagesHTML = (title, imagesArray) => {
+            if (!imagesArray || imagesArray.length === 0) return '';
+            const imgTags = imagesArray.map(img => `<img src="${img.data}" style="max-width:100px; max-height:100px; margin:5px; border-radius:8px; cursor:pointer; border:1px solid #e2e8f0; object-fit:cover;" onclick="window.viewAttachmentDirect('${img.data}', '${img.name}')" title="คลิกเพื่อขยาย">`).join('');
+            return `<div class="detail-row print-hide"><div class="detail-label">${title}:</div><div class="detail-value">${imgTags}</div></div>`;
+        };
+
         window.openDetailModal = function(idx) {
             const item = inspections[idx];
             const content = document.getElementById('detailContent');
@@ -1584,6 +1670,10 @@
                         <div class="detail-row" style="background:#f5f3ff;"><div class="detail-label" style="color:#6b21a8;">COA Status:</div><div class="detail-value" style="font-weight:bold; color:#6b21a8;">${coaStatDisplay}</div></div>
                         ${coaAgingDisplay}
                         <div class="detail-row print-hide"><div class="detail-label">COA File:</div><div class="detail-value">${item.coaFile?.isLink ? `<button class="btn btn-secondary btn-sm" onclick="window.viewAttachment(${idx}, 'coa')">📄 เปิดไฟล์ COA</button>` : '<span style="color:#94a3b8;">ไม่มีไฟล์แนบ</span>'}</div></div>
+                        
+                        <!-- [NEW] แทรกรูปถ่ายเอกสาร MSDS และ Spec ลงใน Section 2 -->
+                        ${renderAdditionalImagesHTML('รูปถ่าย MSDS', item.msdsImages)}
+                        ${renderAdditionalImagesHTML('รูปถ่าย Product Spec', item.specImages)}
 
                         <div class="detail-section-header" style="margin-top: 20px;">3. Packaging Inspection (การตรวจสอบบรรจุภัณฑ์)</div>
                         <div class="detail-checklist-box">
@@ -1592,6 +1682,9 @@
                             <div class="chk-item">${cIcon(item.chk_pkg_clean)} <span>Seal intact & No leakage (ซีลปิดสนิท และไม่มีการรั่วซึม)</span></div>
                             <div class="chk-item">${cIcon(item.chk_pkg_label)} <span>Label readable (ฉลากอ่านออกชัดเจน)</span></div>
                         </div>
+                        
+                        <!-- [NEW] แทรกรูปถ่ายฉลากข้างถัง ลงใน Section 3 -->
+                        ${renderAdditionalImagesHTML('รูปถ่ายฉลากข้างถัง', item.labelImages)}
 
                         <div class="detail-section-header" style="margin-top: 20px;">4. RM Physical Inspection</div>
                         <div class="detail-row"><div class="detail-label">Appearance:</div><div class="detail-value">${appearanceDisplay}</div></div>
@@ -1686,6 +1779,78 @@
         document.getElementById('edit_coaFileInput').onchange = e => readFile(e.target, d => { editCoaFileData = d; document.getElementById('edit_coaFileStatus').innerHTML = "<span style='color:#2563eb; font-weight:bold;'>🆕 เลือกไฟล์ใหม่แล้ว: " + d.name + "</span>"; isEditCoaRemoved = false; });
         document.getElementById('edit_qcFileInput').onchange = e => readFile(e.target, d => { editQcFileData = d; document.getElementById('edit_qcFileStatus').innerHTML = "<span style='color:#d97706; font-weight:bold;'>🆕 เลือกรูปใหม่แล้ว: " + d.name + "</span>"; isEditQcRemoved = false; });
         
+        // [NEW] Logic ควบคุมระบบอัปโหลดรูปหลายรูป และย่อขนาดภาพ (Compression) สำหรับเอกสารใหม่
+        function handleMultipleImageUpload(input, targetArray, previewId) {
+            const files = input.files;
+            if (!files || files.length === 0) return;
+
+            showLoading(true, "กำลังประมวลผลรูปภาพ...");
+            let processedCount = 0;
+
+            Array.from(files).forEach(file => {
+                // หากไม่ใช่รูปภาพให้ข้ามไป
+                if (!file.type.startsWith('image/')) {
+                    processedCount++;
+                    if (processedCount === files.length) { showLoading(false); input.value = ''; }
+                    return;
+                }
+
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const img = new Image();
+                    img.onload = function() {
+                        const canvas = document.createElement('canvas');
+                        let w = img.width; let h = img.height; 
+                        const MAX_SIZE = 800; // บีบอัดให้เล็กกว่าปกติ (800px) เพื่อให้แนบได้หลายรูปโดยไม่เกิน Limit 1MB ต่อ 1 Document
+
+                        if (w > h && w > MAX_SIZE) { h *= MAX_SIZE / w; w = MAX_SIZE; }
+                        else if (h > w && h > MAX_SIZE) { w *= MAX_SIZE / h; h = MAX_SIZE; }
+                        else if (h === w && w > MAX_SIZE) { w = MAX_SIZE; h = MAX_SIZE; }
+                        
+                        canvas.width = w; canvas.height = h;
+                        canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+
+                        targetArray.push({
+                            name: file.name,
+                            data: canvas.toDataURL('image/jpeg', 0.7) // ลด Quality ลงเหลือ 70%
+                        });
+
+                        processedCount++;
+                        if (processedCount === files.length) {
+                            showLoading(false);
+                            renderImagePreviews(targetArray, previewId);
+                            input.value = ''; // เคลียร์ input ให้เลือกถ่ายรูปซ้ำได้อีก
+                        }
+                    }
+                    img.src = e.target.result;
+                };
+                reader.readAsDataURL(file);
+            });
+        }
+
+        // [NEW] Function แสดงรูปภาพ Preview ที่เพิ่งถ่ายมาลงใน UI
+        function renderImagePreviews(targetArray, previewId) {
+            const container = document.getElementById(previewId);
+            container.innerHTML = targetArray.map((img, index) => `
+                <div class="preview-item">
+                    <img src="${img.data}" alt="${img.name}">
+                    <button type="button" class="remove-btn" onclick="removeNewImage(${index}, '${previewId}')">&times;</button>
+                </div>
+            `).join('');
+        }
+
+        // [NEW] Function ลบรูปภาพที่เพิ่งถ่ายออก หากไม่พอใจ
+        window.removeNewImage = function(index, previewId) {
+            if (previewId === 'msdsPreview') { msdsImages.splice(index, 1); renderImagePreviews(msdsImages, previewId); }
+            else if (previewId === 'specPreview') { specImages.splice(index, 1); renderImagePreviews(specImages, previewId); }
+            else if (previewId === 'labelPreview') { labelImages.splice(index, 1); renderImagePreviews(labelImages, previewId); }
+        }
+
+        // [NEW] กำหนด Event Listener ให้อินพุตของรูปถ่าย
+        document.getElementById('msdsFileInput').onchange = e => handleMultipleImageUpload(e.target, msdsImages, 'msdsPreview');
+        document.getElementById('specFileInput').onchange = e => handleMultipleImageUpload(e.target, specImages, 'specPreview');
+        document.getElementById('labelFileInput').onchange = e => handleMultipleImageUpload(e.target, labelImages, 'labelPreview');
+
         window.handleAutocomplete = function(e, f) { 
             const list = document.getElementById(f + '-autocomplete-list');
             const v = e.target.value.toLowerCase();
